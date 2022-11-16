@@ -13,6 +13,9 @@ import {
   IonMenuToggle,
   IonNote,
 } from '@ionic/react';
+import React from 'react';
+import axios from 'axios';
+import DataTable, { TableColumn } from "react-data-table-component";
 
 interface AppPage {
   url: string;
@@ -52,43 +55,28 @@ const appPages: AppPage[] = [
 // console.log(result)
 // console.log(JSON.parse(result))
 
-interface Admin {
-  fio: string;
-  role: string;
-  phone: string;
-  mail: string;
+interface Worker {
+  id: number,
+  name: string,
+  surname: string,
+  last_name: string,
+  phone_number: string,
+  email: string,
+  role_name: string
 }
 
-const Admins: Admin[] = [
-  {
-    fio: 'Васильев Василий Васильевич',
-    role: 'Управляющий',
-    phone: '+7(495)775-09-45',
-    mail: 'some_mail@main.com'
-  },
-  {
-    fio: 'Васильев Василий Васильевич',
-    role: 'Управляющий',
-    phone: '+7(495)775-09-45',
-    mail: 'some_mail@main.com'
-  },
-  {
-    fio: 'Васильев Василий Васильевич',
-    role: 'Управляющий',
-    phone: '+7(495)775-09-45',
-    mail: 'some_mail@main.com'
-  },
-  {
-    fio: 'Васильев Василий Васильевич',
-    role: 'Управляющий',
-    phone: '+7(495)775-09-45',
-    mail: 'some_mail@main.com'
-  },
-];
-
 const Page: React.FC = () => {
+  const [admins, setAdmins] = React.useState(null as Array<Worker> | null);
 
   const { name } = useParams<{ name: string; }>();
+
+  React.useEffect(() =>  {
+    axios
+      .get("https://api.necrom.ru/worker?join=true")
+      .then((response) => setAdmins(response.data));
+  });
+
+  console.log(admins);
 
   return (
     <IonPage>
@@ -123,25 +111,59 @@ const Page: React.FC = () => {
           <h4>List Managers:</h4>
 
         <IonList id="admins-list">
-          {Admins.map((appPage, index) => {
-            return (
-              <IonMenuToggle key={index} autoHide={false}>
-                <IonItem className={ true === true ? 'selected' : 'functions'}  routerDirection="none" lines="full" detail={false}>
-                  <IonLabel>{appPage.fio}</IonLabel>
-                  <IonText><br></br>
-                  ФИО Администратора: {appPage.fio}<br></br><br></br>
-                  Role: {appPage.role}<br></br><br></br>
-                  Phone: {appPage.phone}<br></br><br></br>
-                  E-mail: {appPage.mail}<br></br><br></br>
-                  </IonText>
-                </IonItem>
-              </IonMenuToggle>
-            );
-          })}
+          {
+            (admins === null) ?
+              <IonTitle>Загрузка...</IonTitle> :
+              generateWorkersTable(admins)
+          }
         </IonList>
       </IonContent>
     </IonPage>
   );
 };
+
+function generateWorkersTable(workers: Array<Worker>) {
+  const columns: TableColumn<Worker>[] = [
+    {
+      name: "Имя",
+      selector: (row: Worker) => row.name,
+      sortable: true
+    },
+    {
+      name: "Фамилия",
+      selector: (row: Worker) => row.surname,
+      sortable: true
+    },
+    {
+      name: "Отчество",
+      selector: (row: Worker) => row.last_name,
+      sortable: true
+    },
+    {
+      name: "Телефон",
+      selector: (row: Worker) => row.phone_number,
+      sortable: true
+    },
+    {
+      name: "Почта",
+      selector: (row: Worker) => row.email,
+      sortable: true
+    },
+    {
+      name: "Роль",
+      selector: (row: Worker) => row.role_name,
+      sortable: true
+    }
+  ];
+
+  return <DataTable
+    title="Employess"
+    columns={columns}
+    data={workers}
+    defaultSortFieldId="name"
+    pagination
+    selectableRows
+  />
+}
 
 export default Page;
