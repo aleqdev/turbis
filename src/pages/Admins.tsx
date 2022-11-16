@@ -26,6 +26,32 @@ const appPages: AppPage[] = [
   },
 ];
 
+// interface Admin {
+//   id: number;
+//   name: string;
+//   surname: string;
+//   lastname: string;
+//   role_id: string;
+//   phone: string;
+//   email: string;
+// }
+// let result:Admin = []
+// const API_RESULT = fetch(
+//     "https://api.necrom.ru/worker"
+//     ,{
+//       method: "get",
+//       headers: { Accept: 'application/json' }
+//     })
+//     .then((response) => {return response.json()}).then((resp) => {result = resp});
+
+// console.log(ResultApi)
+// let Admins = []
+// result.forEach(element => {
+//   Admins.push(element)
+// });
+// console.log(result)
+// console.log(JSON.parse(result))
+
 interface Admin {
   fio: string;
   role: string;

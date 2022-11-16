@@ -1,14 +1,9 @@
 import './ExploreContainer.css';
 import {
-  IonContent,
-  IonIcon,
   IonItem,
   IonLabel,
   IonList,
-  IonListHeader,
-  IonMenu,
   IonMenuToggle,
-  IonNote,
 } from '@ionic/react';
 
 

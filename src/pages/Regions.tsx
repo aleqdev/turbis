@@ -83,12 +83,6 @@ const Page: React.FC = () => {
               <IonMenuToggle key={index} autoHide={false}>
                 <IonItem className={true === true ? 'selected' : 'item'} routerDirection="none" lines='full' detail={false}>
                   <IonLabel>{appPage.title}</IonLabel>
-                  {/* <IonText><br></br>
-                  ФИО Admin: {appPage.}<br></br><br></br>
-                  Place: {appPage.place}<br></br><br></br>
-                  Phone: {appPage.phone}<br></br><br></br>
-                  Description: {appPage.description}<br></br><br></br>
-                  </IonText> */}
                 </IonItem>
               </IonMenuToggle>
             );
