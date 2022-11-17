@@ -50,7 +50,7 @@ const Page: React.FC = () => {
   const [SelectedRowsAll, setSelectedRows] = React.useState(Array<Worker>);
   const [admins, setAdmins] = React.useState(null as Array<Worker> | null);
   const [roles, setRoles] = React.useState( null as Array<Role> | null);
-  const { name } = useParams<{ name: string; }>();
+  // const { name } = useParams<{ name: string; }>();
   const columns: TableColumn<Worker>[] = [
     {
       name: "Имя",
@@ -107,32 +107,76 @@ const Page: React.FC = () => {
 
   function clickUpdateItem(){
     //open modal
-    console.log('updated', SelectedRowsAll);
+    setModalIsOpen(true);
+    const input_upd_email = document.getElementById("input_upd_email")
+    input_upd_email?.setAttribute('value', SelectedRowsAll[0].email)
+    console.log('updated', SelectedRowsAll[0].email);
+    // setUser_upd_name(SelectedRowsAll[0].name)
+    // setUpd_surname(SelectedRowsAll[0].surname)
+    // setUpd_last_name(SelectedRowsAll[0].last_name)
+    // setUpd_phone_number(SelectedRowsAll[0].phone_number)
+    // setUpd_email(SelectedRowsAll[0].email)
+    // setRoleUpd(SelectedRowsAll[0].role_name)
   }
 
   
     const modalAdd = useRef<HTMLIonModalElement>(null);
-    const input = useRef<HTMLIonInputElement>(null);
-  
-  
-    function confirm() {
-      modalAdd.current?.dismiss(input.current?.value, 'confirm');
-    }
-  
-  // function getRoles(){
-  //   axios
-  //     .get("https://api.necrom.ru/worker_role?join=true")
-  //     .then((response) => setRoles(response.data));
-  //   roles.map(function retResult(element:any){
-  //     return (
-  //       <IonSelectOption value={element.name}>{element.name}</IonSelectOption>
-  //     )
-  //   })
-  //   // for ( let role of roles ) {
-  //   //   result = result + "<IonSelectOption value='" + role.name + "'>" + role.name + "</IonSelectOption>"
-  // }
-  // }
+    const modalUpdate = useRef<HTMLIonModalElement>(null);
+    const [modalIsOpen, setModalIsOpen] = React.useState(false);
+    const [user_upd_role, setRoleUpd] = React.useState("");
+    const [user_upd_name, setUser_upd_name] = React.useState<any>("");
+    const [upd_surname, setUpd_surname] = React.useState("");
+    const [upd_last_name, setUpd_last_name] = React.useState("");
+    const [upd_phone_number, setUpd_phone_number] = React.useState("");
+    const [upd_email, setUpd_email] = React.useState("");
+    // const [user_upd_email, setUser_upd_email] = useRecoilState("");
 
+    const name = useRef<HTMLIonInputElement>(null);
+    const surname = useRef<HTMLIonInputElement>(null);
+    const last_name = useRef<HTMLIonInputElement>(null);
+    const phone_number = useRef<HTMLIonInputElement>(null);
+    const email = useRef<HTMLIonInputElement>(null);
+    const [user_role, setSelectRole] = React.useState("");
+    const [error_mess_add, setError_mess_add] = React.useState("");
+    const [error_mess_upd, setError_mess_upd] = React.useState("");
+
+    function confirmUpd() {
+      setError_mess_upd("")
+      if
+        (user_upd_name && upd_surname && upd_email && upd_last_name && upd_phone_number && user_upd_role) {
+          // API[POST] запрос на добавление manager
+          console.log(user_upd_name, upd_surname, upd_email, upd_last_name, upd_phone_number, user_upd_role)
+          console.log('Все заполненно')
+          modalUpdate.current?.dismiss(name.current?.value, 'confirm');
+        } else {
+          setError_mess_upd('Одно из полей не заполненно')
+          console.log('error что-то не заполненно')
+        }
+      console.log('тут')
+    }
+
+
+    function confirm() {
+      setError_mess_add("")
+      let user_name = name.current?.value
+      let user_surname = surname.current?.value
+      let user_last_name = last_name.current?.value
+      let user_phone_number = phone_number.current?.value
+      let user_email = email.current?.value
+      if
+        (user_name && user_surname && user_email && user_last_name && user_phone_number && user_role) {
+          // API[POST] запрос на добавление manager
+          console.log(user_name, user_surname, user_last_name, user_role, user_email, user_phone_number)
+          console.log('Все заполненно')
+          modalAdd.current?.dismiss(name.current?.value, 'confirm');
+        } else {
+          setError_mess_add('Одно из полей не заполненно')
+          console.log('error что-то не заполненно')
+        }
+      console.log('тут')
+    }
+
+  
   return (
     <IonPage>
       <IonModal ref={modalAdd} trigger="open-modal">
@@ -141,7 +185,7 @@ const Page: React.FC = () => {
                 <IonButtons slot="start">
                   <IonButton onClick={() => modalAdd.current?.dismiss()}>Cancel</IonButton>
                 </IonButtons>
-                <IonTitle>Welcome</IonTitle>
+                <IonTitle>Add Manager</IonTitle>
                 <IonButtons slot="end">
                   <IonButton strong={true} onClick={() => confirm()}>
                     Confirm
@@ -152,31 +196,71 @@ const Page: React.FC = () => {
             <IonContent className="ion-padding">
               
               <IonItem>
+              {(error_mess_add != "") ? <IonText color={'danger'}> {error_mess_add}</IonText> : ""}
                 <IonLabel position="stacked">Имя</IonLabel>
-                <IonInput ref={input} type="text" placeholder="Введите имя" />
+                <IonInput ref={name} type="text" placeholder="Введите имя" required/>
                 <IonLabel position="stacked">Фамилия</IonLabel>
-                <IonInput ref={input} type="text" placeholder="Введите фамилию" />
+                <IonInput ref={surname} type="text" placeholder="Введите фамилию" required/>
                 <IonLabel position="stacked">Отчество</IonLabel>
-                <IonInput ref={input} type="text" placeholder="Введите отчество" />
+                <IonInput ref={last_name} type="text" placeholder="Введите отчество" required/>
                 <IonLabel position="stacked">Телефон</IonLabel>
-                <IonInput ref={input} type="text" placeholder="Введите телефон" />
+                <IonInput ref={phone_number} type="text" placeholder="Введите телефон" required/>
                 <IonLabel position="stacked">Почта</IonLabel>
-                <IonInput ref={input} type="text" placeholder="Введите почту" />
-                <IonLabel position="stacked">Роль</IonLabel>
-                <IonSelect placeholder="Select fruit">
+                <IonInput ref={email} type="text" placeholder="Введите почту" required/>
+                <IonLabel position="stacked" >Роль</IonLabel>
+                <IonSelect placeholder="Select role" onIonChange={(ev) => setSelectRole(ev.target.value)}>
                   {
                   roles?.map(function retResult(element:any){
                   return (
                     <IonSelectOption value={element.name}>{element.name}</IonSelectOption>
                   )
                 }) }
-                  {/* <IonSelectOption value="apples">Apples</IonSelectOption>
-                  <IonSelectOption value="oranges">Oranges</IonSelectOption>
-                  <IonSelectOption value="bananas">Bananas</IonSelectOption> */}
                 </IonSelect>
               </IonItem>
             </IonContent>
-          </IonModal>
+      </IonModal>
+
+      <IonModal ref={modalUpdate} isOpen={modalIsOpen} trigger="open-modal-upd">
+            <IonHeader>
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonButton onClick={() => {modalUpdate.current?.dismiss(); setModalIsOpen(false) }}>Cancel</IonButton>
+                </IonButtons>
+                <IonTitle>Update Manager</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton strong={true} onClick={() => confirmUpd()}>
+                    Confirm
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              
+              <IonItem>
+              {(error_mess_upd != "") ? <IonText color={'danger'}> {error_mess_upd}</IonText> : ""}
+                <IonLabel position="stacked">Имя</IonLabel>
+                <IonInput value={user_upd_name} onIonChange={(ev) => setUser_upd_name(ev.target.value) } type="text" placeholder="Введите имя" required/>
+                <IonLabel position="stacked">Фамилия</IonLabel>
+                <IonInput value={upd_surname} type="text" placeholder="Введите фамилию" required/>
+                <IonLabel position="stacked">Отчество</IonLabel>
+                <IonInput value={upd_last_name} type="text" placeholder="Введите отчество" required/>
+                <IonLabel position="stacked">Телефон</IonLabel>
+                <IonInput value={upd_phone_number} type="text" placeholder="Введите телефон" required/>
+                <IonLabel position="stacked">Почта</IonLabel>
+                <IonInput value="" id="input_upd_email" type="text" placeholder="Введите почту" required/>
+                <IonLabel position="stacked" >Роль</IonLabel>
+                <IonSelect  placeholder="Select role" onIonChange={(ev) => setRoleUpd(ev.target.value)}>
+                  {
+                  roles?.map(function retResult(element:any){
+                  return (
+                    <IonSelectOption value={element.name}>{element.name}</IonSelectOption>
+                  )
+                }) }
+                </IonSelect>
+              </IonItem>
+            </IonContent>
+      </IonModal>
+
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -189,7 +273,7 @@ const Page: React.FC = () => {
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">{name}</IonTitle>
+            <IonTitle size="large">Admins</IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonList id="inbox-list" >
@@ -200,7 +284,7 @@ const Page: React.FC = () => {
         <br></br><br></br><br></br>
           <h4>List Managers:</h4>
           {(SelectedRowsAll?.length > 0 ) ? <IonButton color="danger" onClick={clickDeleteItems}>Удалить</IonButton> : ""}
-          {(SelectedRowsAll?.length === 1 ) ? <IonButton color="secondary" id={'open-modal777777'} onClick={clickUpdateItem}>Изменить</IonButton> : ""}
+          {(SelectedRowsAll?.length === 1 ) ? <IonButton color="secondary" id='open-modal-upd' onClick={() => {clickUpdateItem(); setModalIsOpen(true);}}>Изменить</IonButton> : ""}
         <IonList id="admins-list">
           {
             (admins === null) ?
@@ -222,60 +306,10 @@ const Page: React.FC = () => {
   );
 };
 
-// function GenerateWorkersTable(workers: Array<Worker>) {
-//   const columns: TableColumn<Worker>[] = [
-//     {
-//       name: "Имя",
-//       selector: (row: Worker) => row.name,
-//       sortable: true
-//     },
-//     {
-//       name: "Фамилия",
-//       selector: (row: Worker) => row.surname,
-//       sortable: true
-//     },
-//     {
-//       name: "Отчество",
-//       selector: (row: Worker) => row.last_name,
-//       sortable: true
-//     },
-//     {
-//       name: "Телефон",
-//       selector: (row: Worker) => row.phone_number,
-//       sortable: true
-//     },
-//     {
-//       name: "Почта",
-//       selector: (row: Worker) => row.email,
-//       sortable: true
-//     },
-//     {
-//       name: "Роль",
-//       selector: (row: Worker) => row.role_name,
-//       sortable: true
-//     }
-//   ];
-
-//   const [SelectedRowsAll, setSelectedRows] = React.useState(null as Array<Worker> | null);
-//   function changeRowPerPage(selected:any) {
-//     setSelectedRows(selected.selectedRows);
-//     console.log(selected.allSelected, selected.selectedCount, selected.selectedRows);
-//     console.log('huk', SelectedRowsAll);
-//   }
-
-//   return <DataTable
-//     title="Employess"
-//     columns={columns}
-//     data={workers}
-//     defaultSortFieldId="name"
-//     onSelectedRowsChange={(selected) => {setSelectedRows(selected.selectedRows);
-//       console.log(selected.allSelected, selected.selectedCount, selected.selectedRows);
-//       console.log('huk', SelectedRowsAll);}}
-//     pagination
-//     selectableRows
-//   />
-// }
-
 
 export default Page;
+
+function useRecoilState(refLinkState: any): [any, any] {
+  throw new Error('Function not implemented.');
+}
 
