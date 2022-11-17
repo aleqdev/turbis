@@ -22,7 +22,6 @@ const Modal: React.FC<ContainerProps> = ({ id, manager,  place, phone, descripti
     const { name } = useParams<{ name: string; }>();
     const modal = useRef<HTMLIonModalElement>(null);
     const input = useRef<HTMLIonInputElement>(null);
-    console.log(id)
   const [message, setMessage] = useState(
     'This modal example uses triggers to automatically open a modal when the button is clicked.'
   );
