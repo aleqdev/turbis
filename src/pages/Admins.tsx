@@ -18,6 +18,7 @@ import axios from 'axios';
 import DataTable, { TableColumn } from "react-data-table-component";
 import Modal from '../components/modal';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
+import ReactDOM from 'react-dom';
 
 interface AppPage {
   url: string;
@@ -104,12 +105,14 @@ const Page: React.FC = () => {
     console.log('deleted', SelectedRowsAll)
     window.location.reload()
   }
+  
 
-  function clickUpdateItem(){
+  function clickUpdateItem(event:any){
     //open modal
     setModalIsOpen(true);
-    const input_upd_email = document.getElementById("input_upd_email")
-    input_upd_email?.setAttribute('value', SelectedRowsAll[0].email)
+    console.log(name_inp_upd.current)
+    name_inp_upd.current.value = SelectedRowsAll[0].email;
+    // input_upd_email?.setAttribute('value', SelectedRowsAll[0].email)
     console.log('updated', SelectedRowsAll[0].email);
     // setUser_upd_name(SelectedRowsAll[0].name)
     // setUpd_surname(SelectedRowsAll[0].surname)
@@ -122,6 +125,7 @@ const Page: React.FC = () => {
   
     const modalAdd = useRef<HTMLIonModalElement>(null);
     const modalUpdate = useRef<HTMLIonModalElement>(null);
+    const name_inp_upd : any = React.createRef();
     const [modalIsOpen, setModalIsOpen] = React.useState(false);
     const [user_upd_role, setRoleUpd] = React.useState("");
     const [user_upd_name, setUser_upd_name] = React.useState<any>("");
@@ -142,6 +146,7 @@ const Page: React.FC = () => {
 
     function confirmUpd() {
       setError_mess_upd("")
+      setModalIsOpen(true);
       if
         (user_upd_name && upd_surname && upd_email && upd_last_name && upd_phone_number && user_upd_role) {
           // API[POST] запрос на добавление manager
@@ -239,7 +244,7 @@ const Page: React.FC = () => {
               <IonItem>
               {(error_mess_upd != "") ? <IonText color={'danger'}> {error_mess_upd}</IonText> : ""}
                 <IonLabel position="stacked">Имя</IonLabel>
-                <IonInput value={user_upd_name} onIonChange={(ev) => setUser_upd_name(ev.target.value) } type="text" placeholder="Введите имя" required/>
+                <IonInput ref={name_inp_upd} type="text" placeholder="Введите имя" required/>
                 <IonLabel position="stacked">Фамилия</IonLabel>
                 <IonInput value={upd_surname} type="text" placeholder="Введите фамилию" required/>
                 <IonLabel position="stacked">Отчество</IonLabel>
@@ -284,7 +289,7 @@ const Page: React.FC = () => {
         <br></br><br></br><br></br>
           <h4>List Managers:</h4>
           {(SelectedRowsAll?.length > 0 ) ? <IonButton color="danger" onClick={clickDeleteItems}>Удалить</IonButton> : ""}
-          {(SelectedRowsAll?.length === 1 ) ? <IonButton color="secondary" id='open-modal-upd' onClick={() => {clickUpdateItem(); setModalIsOpen(true);}}>Изменить</IonButton> : ""}
+          {(SelectedRowsAll?.length === 1 ) ? <IonButton color="secondary" id='open-modal-upd' onClick={(e) => {clickUpdateItem(e); setModalIsOpen(true);}}>Изменить</IonButton> : ""}
         <IonList id="admins-list">
           {
             (admins === null) ?
