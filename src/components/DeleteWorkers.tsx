@@ -81,6 +81,7 @@ export const DeleteWorkersModalController: React.FC<RemoveWorkersModalController
               header: "Сотрудники удалены",
               buttons: ["Ок"]
             });
+            window.location.reload()
           })
         }
       },

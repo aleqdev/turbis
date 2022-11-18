@@ -118,6 +118,7 @@ export const PutWorkerModalController: React.FC = () => {
                 header: "Сотрудник добавлен",
                 buttons: ["Ок"]
               });
+              window.location.reload()
             })
             .catch((error) => {
               presentAlert({

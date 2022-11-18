@@ -116,15 +116,16 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           props.set_selected_workers([]);
-
+          console.log('confirm', ev.detail.data.input_role)
+          console.log(ev.detail.data)
           axios
-            .patch(`https://api.necrom.ru/worker/${ev.detail.data.id}`, {
+            .patch(`https://api.necrom.ru/worker/${props.selected_workers[0].id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,
               email: ev.detail.data.email,
               phone_number: ev.detail.data.phone_number,
-              role_id: ev.detail.data.role.id,
+              role_id: ev.detail.data.input_role.id,
               db_user_email: "primitive_email@not.even.valid",
               db_user_password: "primitive_password",
             })
@@ -133,6 +134,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
                 header: "Данные сотрудника изменены",
                 buttons: ["Ок"]
               });
+              window.location.reload()
             })
             .catch((error) => {
               presentAlert({
