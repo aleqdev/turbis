@@ -9,7 +9,6 @@ import {
   IonMenuToggle,
 } from '@ionic/react';
 
-
 interface AppPage {
   url: string;
   title: string;
@@ -22,24 +21,6 @@ const appPages: AppPage[] = [
   },
 ];
 
-interface Region {
-  title: string;
-}
-
-const Regions: Region[] = [
-  {
-    title: 'Moskow',
-  },
-  {
-    title: 'Novosibirsk',
-  },
-  {
-    title: 'St. Petersburg',
-  },
-  {
-    title: 'Kaliningrad',
-  },
-];
 
 const Page: React.FC = () => {
 
@@ -78,15 +59,7 @@ const Page: React.FC = () => {
           <h4>List Regions:</h4>
 
         <IonList id="hotels_list">
-          {Regions.map((appPage, index) => {
-            return (
-              <IonMenuToggle key={index} autoHide={false}>
-                <IonItem className={true === true ? 'selected' : 'item'} routerDirection="none" lines='full' detail={false}>
-                  <IonLabel>{appPage.title}</IonLabel>
-                </IonItem>
-              </IonMenuToggle>
-            );
-          })}
+
         </IonList>
       </IonContent>
     </IonPage>

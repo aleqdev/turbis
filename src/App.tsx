@@ -4,13 +4,13 @@ import { Redirect, Route } from 'react-router-dom';
 import Menu from './components/Menu';
 import Hotels from './pages/Hotels';
 import Regions from './pages/Regions'
-import Admins from './pages/Admins'
+import Admins from './pages/Workers'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
 /* Basic CSS for apps built with Ionic */
-import '@ionic/react/css/normalize.css';
+import '@ionic/react/css/normalize.css'; 
 import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
 

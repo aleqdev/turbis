@@ -23,19 +23,19 @@ interface AppPage {
 
 const appPages: AppPage[] = [
   {
-    title: 'Hotels',
+    title: 'Отели',
     url: '/page/Hotels',
     iosIcon: homeOutline,
     mdIcon: homeOutline
   },
   {
-    title: 'Admins',
+    title: 'Сотрудники',
     url: '/page/Admins',
     iosIcon: peopleOutline,
     mdIcon: peopleOutline
   },
   {
-    title: 'Regions',
+    title: 'Геолокация',
     url: '/page/Regions',
     iosIcon: businessOutline,
     mdIcon: businessOutline
