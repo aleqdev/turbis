@@ -8,7 +8,7 @@ import React from 'react';
 import { WorkerJoinedFetch } from '../interface/worker';
 import { PutWorkerModalController } from '../components/PutWorker';
 import { PatchWorkerModalController } from '../components/PatchWorker';
-import { RemoveWorkersModalController } from '../components/RemoveWorkers';
+import { DeleteWorkersModalController } from '../components/DeleteWorkers';
 import { WorkersList } from '../components/WorkersList';
 
 const Page: React.FC = () => {
@@ -32,12 +32,12 @@ const Page: React.FC = () => {
 
         {
           (selected_workers?.length > 0 ) ? 
-            <RemoveWorkersModalController selected_workers={selected_workers} set_selected_workers={set_selected_workers}/>
+            <DeleteWorkersModalController selected_workers={selected_workers} set_selected_workers={set_selected_workers}/>
             : ""
         }
         {
           (selected_workers?.length === 1 ) ? 
-            <PatchWorkerModalController set_selected_workers={set_selected_workers}/>
+            <PatchWorkerModalController selected_workers={selected_workers} set_selected_workers={set_selected_workers}/>
             : ""
         }
         

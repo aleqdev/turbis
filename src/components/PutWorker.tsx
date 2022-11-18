@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
+import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { WorkerRole } from '../interface/worker_role';
@@ -38,7 +38,7 @@ export function PutWorkerModal(
         last_name,
         email,
         phone_number,
-        input_role: inputRole
+        role: inputRole
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -81,7 +81,7 @@ export function PutWorkerModal(
             {
               roles ? 
                 roles.map((element) => {
-                  return <IonSelectOption key={element.name} value={element.name}>{element.name}</IonSelectOption>
+                  return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
                 }) :
                 <IonText>Загрузка...</IonText>
             }
@@ -96,13 +96,37 @@ export const PutWorkerModalController: React.FC = () => {
   const [present, dismiss] = useIonModal(PutWorkerModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
+  const [presentAlert] = useIonAlert();
 
   function openModal() {
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          window.location.reload();
-          console.log(`Hello, ${ev.detail.data}!`);
+          axios
+            .put("https://api.necrom.ru/worker", {
+              name: ev.detail.data.name,
+              surname: ev.detail.data.surname,
+              last_name: ev.detail.data.last_name,
+              email: ev.detail.data.email,
+              phone_number: ev.detail.data.phone_number,
+              role_id: ev.detail.data.role.id,
+              db_user_email: "primitive_email@not.even.valid",
+              db_user_password: "primitive_password",
+            })
+            .then((_) => {
+              presentAlert({
+                header: "Сотрудник добавлен",
+                buttons: ["Ок"]
+              });
+            })
+            .catch((error) => {
+              presentAlert({
+                header: "Ошибка",
+                subHeader: error.response.statusText,
+                message: error.response.data,
+                buttons: ["Ок"]
+              });
+            });
         }
       },
     });
