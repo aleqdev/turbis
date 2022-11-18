@@ -88,7 +88,7 @@ export function PatchWorkerModal(
             {
               roles ? 
                 roles.map((element) => {
-                  return <IonSelectOption key={element.name} value={element.name}>{element.name}</IonSelectOption>
+                  return <IonSelectOption key={element.name} value={element.id}>{element.name}</IonSelectOption>
                 }) :
                 <IonText>Загрузка...</IonText>
             }
@@ -125,7 +125,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
               last_name: ev.detail.data.last_name,
               email: ev.detail.data.email,
               phone_number: ev.detail.data.phone_number,
-              role_id: ev.detail.data.input_role.id,
+              role_id: ev.detail.data.input_role,
               db_user_email: "primitive_email@not.even.valid",
               db_user_password: "primitive_password",
             })
