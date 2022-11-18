@@ -88,7 +88,7 @@ export function PatchWorkerModal(
             {
               roles ? 
                 roles.map((element) => {
-                  return <IonSelectOption key={element.name} value={element.id}>{element.name}</IonSelectOption>
+                  return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
                 }) :
                 <IonText>Загрузка...</IonText>
             }
@@ -116,8 +116,6 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           props.set_selected_workers([]);
-          console.log('confirm', ev.detail.data.input_role)
-          console.log(ev.detail.data)
           axios
             .patch(`https://api.necrom.ru/worker/${props.selected_workers[0].id}`, {
               name: ev.detail.data.name,
@@ -125,7 +123,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
               last_name: ev.detail.data.last_name,
               email: ev.detail.data.email,
               phone_number: ev.detail.data.phone_number,
-              role_id: ev.detail.data.input_role,
+              role_id: ev.detail.data.input_role.id,
               db_user_email: "primitive_email@not.even.valid",
               db_user_password: "primitive_password",
             })
