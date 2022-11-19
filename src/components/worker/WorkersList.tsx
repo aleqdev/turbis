@@ -3,37 +3,45 @@ import axios from "axios";
 import React, { Dispatch } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import { WorkerJoinedFetch } from "../../interface/worker";
+import DataTableExtensions from "react-data-table-component-extensions";
+import 'react-data-table-component-extensions/dist/index.css';
 
-const listColumns: TableColumn<WorkerJoinedFetch>[] = [
+const listColumns = [
   {
-    name: "Имя",
+    name: "name",
     selector: (row: WorkerJoinedFetch) => row.name,
-    sortable: true
+    sortable: true,
+    wrap: true
   },
   {
     name: "Фамилия",
     selector: (row: WorkerJoinedFetch) => row.surname,
-    sortable: true
+    sortable: true,
+    wrap: true
   },
   {
     name: "Отчество",
     selector: (row: WorkerJoinedFetch) => row.last_name,
-    sortable: true
+    sortable: true,
+    wrap: true
   },
   {
     name: "Телефон",
     selector: (row: WorkerJoinedFetch) => row.phone_number,
-    sortable: true
+    sortable: true,
+    wrap: true
   },
   {
     name: "Почта",
     selector: (row: WorkerJoinedFetch) => row.email,
-    sortable: true
+    sortable: true,
+    wrap: true
   },
   {
     name: "Роль",
     selector: (row: WorkerJoinedFetch) => row.role_name,
-    sortable: true
+    sortable: true,
+    wrap: true
   }
 ];
 
@@ -48,15 +56,25 @@ export const WorkersList: React.FC<WorkersListProps> = (props) => {
       {
         (props.workers === null) ?
           <IonTitle>Загрузка...</IonTitle> :
-          <DataTable
+          <DataTableExtensions
+          columns={listColumns}
+          data={props.workers}
+          print={false}
+          export={false}
+          >
+            <DataTable
             title="Список сотрудников:"
             columns={listColumns}
             data={props.workers}
+            // noHeader={true}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination
             selectableRows
+            highlightOnHover
           />
+         </DataTableExtensions>
+  
       }
     </IonList>
   );
