@@ -1,12 +1,11 @@
 import { IonList, IonTitle } from "@ionic/react";
-import axios from "axios";
 import React, { Dispatch } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import { WorkerJoinedFetch } from "../../interface/worker";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 
-const listColumns = [
+const listColumns: TableColumn<WorkerJoinedFetch>[] = [
   {
     name: "Имя",
     selector: (row: WorkerJoinedFetch) => row.name,
