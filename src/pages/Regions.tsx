@@ -5,8 +5,6 @@ import {
   IonList,
 } from '@ionic/react';
 import React from 'react';
-import { WorkerJoinedFetch } from '../interface/worker';
-import { DeleteRegionsModalController } from '../components/DeleteRegions';
 import { RegionsList } from '../components/RegionsList';
 import { RegionJoinedFetch } from '../interface/region';
 

@@ -1,24 +1,28 @@
 import { IonCol, IonGrid, IonList, IonRow, IonTitle } from "@ionic/react";
 import React, { Dispatch } from "react";
-import DataTable, { TableColumn } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 import { HotelJoinedFetch } from "../../interface/hotel";
 import { formatHotelCity, formatHotelOwner } from "../../utils/fmt";
+import DataTableExtensions from "react-data-table-component-extensions";
+import 'react-data-table-component-extensions/dist/index.css';
 
-const listColumns: TableColumn<HotelJoinedFetch>[] = [
+const listColumns = [
   {
     name: "Название",
-    selector: (row: HotelJoinedFetch) => row.name,
+    selector: "name",
     sortable: true
   },
   {
     name: "Местоположение",
-    selector: (row: HotelJoinedFetch) => `${row.country_name}, ${row.region_name}, ${row.city_name}`,
-    sortable: true
+    selector: "city_name",
+    sortable: true,
+    cell: (row: HotelJoinedFetch) => formatHotelCity(row)
   },
   {
     name: "Владелец",
-    selector: (row: HotelJoinedFetch) => `${row.owner_surname} ${row.owner_name[0]}. ${row.owner_last_name[0]}. (+${row.owner_phone_number})`,
-    sortable: true
+    selector: "owner_phone_number",
+    sortable: true,
+    cell: (row: HotelJoinedFetch) => formatHotelOwner(row)
   },
 ];
 
@@ -62,17 +66,25 @@ export const HotelsList: React.FC<HotelsListProps> = (props) => {
       {
         (props.hotels === null) ?
           <IonTitle>Загрузка...</IonTitle> :
-          <DataTable
-            title="Список отелей:"
+          <DataTableExtensions
             columns={listColumns}
             data={props.hotels}
-            defaultSortFieldId="name"
-            onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
-            pagination
-            selectableRows
-            expandableRows={true}
-            expandableRowsComponent={ExpandedHotel}
-          />
+            print={false}
+            export={false}
+            filterPlaceholder="Поиск"
+          >
+            <DataTable
+              title="Список отелей:"
+              columns={listColumns as any}
+              data={props.hotels}
+              defaultSortFieldId="name"
+              onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
+              pagination
+              selectableRows
+              expandableRows={true}
+              expandableRowsComponent={ExpandedHotel}
+            />
+          </DataTableExtensions>
       }
     </IonList>
   );

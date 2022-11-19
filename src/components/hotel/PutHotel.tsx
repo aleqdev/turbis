@@ -1,45 +1,109 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
-import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
+import { WorkerJoinedFetch } from '../../interface/worker';
+import { CityJoinedFetch } from '../../interface/city';
+import { SelectWithSearchModal } from '../SelectWithSearch';
+import { formatCity, formatWorker } from '../../utils/fmt';
 
-export function PutWorkerModal(
+export function PutHotelModal(
   {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [roles, setRoles] = React.useState(null as Array<WorkerRole> | null);
+  const [workers, setWorkers] = React.useState(null as Array<WorkerJoinedFetch> | null);
+  const [cities, setCities] = React.useState(null as Array<CityJoinedFetch> | null);
+
   const inputName = useRef<HTMLIonInputElement>(null);
-  const inputSurname = useRef<HTMLIonInputElement>(null);
-  const inputLastName = useRef<HTMLIonInputElement>(null);
-  const inputEmail = useRef<HTMLIonInputElement>(null);
-  const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
-  const [inputRole, setInputRole] = useState(null as WorkerRole | null);
+  const inputDescription = useRef<HTMLIonInputElement>(null);
+  const [cityInput, setCityInput] = useState(null as CityJoinedFetch | null);
+  const [ownerInput, setOwnerInput] = useState(null as WorkerJoinedFetch | null);
+
   const [errorMessage, setErrorMessage] = useState(null as string | null);
+
+  const [presentCityChoice, dismissCityChoice] = useIonModal(SelectWithSearchModal, {
+    elements: cities,
+    title: "Выберите город",
+    formatter: (e: CityJoinedFetch) => formatCity(e),
+    sorter: (e: CityJoinedFetch, query: string) => {
+      return query.split(' ').reduce((value, element) => {
+        element = element.toLowerCase();
+        return value + 
+          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() == element) + 
+          +e.region_name.toLowerCase().includes(element) + 10 * +(e.region_name.toLowerCase() == element) +
+          +e.country_name.toLowerCase().includes(element) + 10 * +(e.country_name.toLowerCase() == element);
+      }, 0);
+    },
+    keyer: (e: CityJoinedFetch) => e.id,
+    onDismiss: (data: object | null, role: string) => dismissCityChoice(data, role),
+  });
+
+  const [presentOwnerChoice, dismissOwnerChoice] = useIonModal(SelectWithSearchModal, {
+    elements: workers,
+    title: "Выберите контактное лицо",
+    formatter: (e: WorkerJoinedFetch) => formatWorker(e),
+    sorter: (e: WorkerJoinedFetch, query: string) => {
+      return query.split(' ').reduce((value, element) => {
+        element = element.toLowerCase();
+        return value + 
+          +e.name.toLowerCase().includes(element) +
+          +e.surname.toLowerCase().includes(element) +
+          +e.last_name.toLowerCase().includes(element) +
+          +e.phone_number.includes(element);
+      }, 0);
+    },
+    keyer: (e: WorkerJoinedFetch) => e.id,
+    onDismiss: (data: object | null, role: string) => dismissOwnerChoice(data, role),
+  });
+
+  function openCitySelectModal() {
+    presentCityChoice({
+      onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (ev.detail.role === 'confirm') {
+          setCityInput(ev.detail.data.value);
+        }
+      },
+    });
+  }
+
+  function openOwnerSelectModal() {
+    presentOwnerChoice({
+      onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (ev.detail.role === 'confirm') {
+          setOwnerInput(ev.detail.data.value);
+        }
+      },
+    });
+  }
 
   React.useEffect(() => {
     axios
-      .get("https://api.necrom.ru/worker_role")
-      .then((response) => setRoles(response.data));
-  }, [])
+      .get("https://api.necrom.ru/worker")
+      .then((response) => {
+        setWorkers(response.data);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    axios
+      .get("https://api.necrom.ru/city?join=true")
+      .then((response) => {
+        setCities(response.data);
+      });
+  }, []);
 
   function confirm() {
     const name = inputName.current?.value;
-    const surname = inputSurname.current?.value
-    const last_name = inputLastName.current?.value
-    const email = inputEmail.current?.value;
-    const phone_number = inputPhoneNumber.current?.value;
+    const description = inputDescription.current?.value
 
-    if (name && surname && last_name && email && phone_number && inputRole) {
+    if (name && description && cityInput && ownerInput) {
       onDismiss({
         name,
-        surname,
-        last_name,
-        email,
-        phone_number,
-        role: inputRole
+        description,
+        city_id: cityInput.id,
+        owner_id: ownerInput.id
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -55,10 +119,10 @@ export function PutWorkerModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Создать Сотрудника</IonTitle>
+          <IonTitle>Добавить отель</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
-              Создать
+              Добавить
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -67,38 +131,30 @@ export function PutWorkerModal(
       <IonContent className="ion-padding">
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
-          <IonLabel position="stacked">Имя</IonLabel>
+          <IonLabel position="stacked">Название</IonLabel>
           <IonInput ref={inputName} type="text" placeholder="Введите имя" required/>
-          <IonLabel position="stacked">Фамилия</IonLabel>
-          <IonInput ref={inputSurname} type="text" placeholder="Введите фамилию" required/>
-          <IonLabel position="stacked">Отчество</IonLabel>
-          <IonInput ref={inputLastName} type="text" placeholder="Введите отчество" required/>
-          <IonLabel position="stacked">Телефон</IonLabel>
-          <IonInput ref={inputPhoneNumber} type="text" placeholder="Введите телефон" required/>
-          <IonLabel position="stacked">Почта</IonLabel>
-          <IonInput ref={inputEmail} type="text" placeholder="Введите почту" required/>
-          <IonLabel position="stacked" >Роль</IonLabel>
-          <IonSelect  placeholder="Select role" onIonChange={(ev) => setInputRole(ev.target.value)}>
-            {
-              roles ? 
-                roles.map((element) => {
-                  return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
-                }) :
-                <IonText>Загрузка...</IonText>
-            }
-          </IonSelect>
+          <IonLabel position="stacked">Местоположение</IonLabel>
+          <IonButton disabled={cities === null} onClick={() => openCitySelectModal()}>
+            {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : formatCity(cityInput))}
+          </IonButton>
+          <IonLabel position="stacked" >Владелец</IonLabel>
+          <IonButton disabled={workers === null} onClick={() => openOwnerSelectModal()}>
+            {workers === null ? "Загрузка..." : (ownerInput === null ? "Выбрать" : formatWorker(ownerInput))}
+          </IonButton>
+          <IonLabel position="stacked">Описание</IonLabel>
+          <IonInput ref={inputDescription} type="text" placeholder="Введите описание" required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PutWorkerModalControllerProps {
-  refetch_workers: RefetchFunction<any, any>,
+export interface PutHotelModalControllerProps {
+  refetch_hotels: RefetchFunction<any, any>,
 }
 
-export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> = (props) => {
-  const [present, dismiss] = useIonModal(PutWorkerModal, {
+export const PutHotelModalController: React.FC<PutHotelModalControllerProps> = (props) => {
+  const [present, dismiss] = useIonModal(PutHotelModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -108,25 +164,23 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           axios
-            .put("https://api.necrom.ru/worker", {
+            .put(`https://api.necrom.ru/hotel`, {
               name: ev.detail.data.name,
-              surname: ev.detail.data.surname,
-              last_name: ev.detail.data.last_name,
-              email: ev.detail.data.email,
-              phone_number: ev.detail.data.phone_number,
-              role_id: ev.detail.data.role.id,
+              description: ev.detail.data.description,
+              city_id: ev.detail.data.city_id,
+              owner_id: ev.detail.data.owner_id,
               db_user_email: "primitive_email@not.even.valid",
               db_user_password: "primitive_password",
             })
             .then((_) => {
-              props.refetch_workers();
+              props.refetch_hotels();
               presentAlert({
-                header: "Сотрудник добавлен",
+                header: "Отель добавлен",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_workers();
+              props.refetch_hotels();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,

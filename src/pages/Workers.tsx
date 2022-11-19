@@ -42,18 +42,17 @@ const Page: React.FC = () => {
       <IonContent fullscreen>
         <IonList id="inbox-list">
           <PutWorkerModalController refetch_workers={refetch_workers} />
+          {
+            (selected_workers?.length > 0 ) ? 
+              <DeleteWorkersModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+              : ""
+          }
+          {
+            (selected_workers?.length === 1 ) ? 
+              <PatchWorkerModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+              : ""
+          }
         </IonList>
-
-        {
-          (selected_workers?.length > 0 ) ? 
-            <DeleteWorkersModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
-            : ""
-        }
-        {
-          (selected_workers?.length === 1 ) ? 
-            <PatchWorkerModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
-            : ""
-        }
         
         <WorkersList workers={workers!} on_selected_change={set_selected_workers}></WorkersList>
       </IonContent>

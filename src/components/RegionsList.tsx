@@ -3,19 +3,20 @@ import axios from "axios";
 import React, { Dispatch } from "react";
 import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
-import 'react-data-table-component-extensions/dist/index.css';
 import { RegionJoinedFetch } from "../interface/region";
+import 'react-data-table-component-extensions/dist/index.css';
 
 const listColumns = [
   {
     name: "Регион",
-    selector: (row: RegionJoinedFetch) => row.name,
+    selector: "name",
     sortable: true,
-    wrap: true
+    wrap: true,
+    cell: (d: RegionJoinedFetch) => d.name == "None" ? "-" : d.name
   },
   {
     name: "Страна",
-    selector: (row: RegionJoinedFetch) => row.country_name,
+    selector: "country_name",
     sortable: true,
     wrap: true
   }
@@ -44,16 +45,14 @@ export const RegionsList: React.FC<RegionsListProps> = (props) => {
           data={regions}
           print={false}
           export={false}
+          filterPlaceholder="Поиск"
           >
             <DataTable
             title="Список регионов:"
-            columns={listColumns}
+            columns={listColumns as any}
             data={regions}
-            // noHeader={true}
             defaultSortFieldId="name"
-            // onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination
-            // selectableRows
             highlightOnHover
           />
          </DataTableExtensions>

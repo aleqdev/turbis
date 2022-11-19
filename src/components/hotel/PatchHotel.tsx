@@ -8,7 +8,6 @@ import { WorkerJoinedFetch } from '../../interface/worker';
 import { CityJoinedFetch } from '../../interface/city';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatCity, formatWorker } from '../../utils/fmt';
-import { golfOutline } from 'ionicons/icons';
 
 export function PatchHotelModal(
   {selected_hotels, onDismiss}: {
@@ -176,11 +175,9 @@ export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps>
           axios
             .patch(`https://api.necrom.ru/hotel/${ev.detail.data.id}`, {
               name: ev.detail.data.name,
-              surname: ev.detail.data.surname,
-              last_name: ev.detail.data.last_name,
-              email: ev.detail.data.email,
-              phone_number: ev.detail.data.phone_number,
-              role_id: ev.detail.data.role.id,
+              description: ev.detail.data.description,
+              city_id: ev.detail.data.city_id,
+              owner_id: ev.detail.data.owner_id,
               db_user_email: "primitive_email@not.even.valid",
               db_user_password: "primitive_password",
             })

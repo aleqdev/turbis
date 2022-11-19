@@ -6,11 +6,11 @@ import {
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
 import { HotelJoinedFetch } from '../interface/hotel';
-import { PutWorkerModalController } from '../components/worker/PutWorker';
 import { PatchHotelModalController } from '../components/hotel/PatchHotel';
 import useAxios from 'axios-hooks'
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
 import { HotelsList } from '../components/hotel/HotelsList';
+import { PutHotelModalController } from '../components/hotel/PutHotel';
 
 const Page: React.FC = () => {
   const [selected_hotels, set_selected_hotels] = useState(Array<HotelJoinedFetch>);
@@ -41,20 +41,18 @@ const Page: React.FC = () => {
 
       <IonContent fullscreen>
         <IonList id="inbox-list">
-          <PutWorkerModalController refetch_workers={refetch_hotels} />
+          <PutHotelModalController refetch_hotels={refetch_hotels} />
+          {
+            (selected_hotels?.length > 0) ? 
+              <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+              : ""
+          }
+          {
+            (selected_hotels?.length === 1) ? 
+              <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+              : ""
+          }
         </IonList>
-
-        {
-          (selected_hotels?.length > 0 ) ? 
-            <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
-            : ""
-        }
-
-        {
-          (selected_hotels?.length > 0 ) ? 
-            <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
-            : ""
-        }
         
         <HotelsList hotels={hotels!} on_selected_change={set_selected_hotels} />
       </IonContent>

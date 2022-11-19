@@ -11,9 +11,9 @@ export function formatHotelOwner(w: HotelJoinedFetch): string {
 }
 
 export function formatCity(c: CityJoinedFetch): string {
-  return `${c.country_name} ${c.region_name} ${c.name}`;
+  return `${c.country_name}, ${c.region_name}, ${c.name}`;
 }
 
 export function formatHotelCity(c: HotelJoinedFetch): string {
-  return `${c.country_name} ${c.region_name} ${c.city_name}`;
+  return `${c.country_name}, ${c.region_name}, ${c.city_name}`;
 }
