@@ -1,9 +1,10 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WorkerJoinedFetch } from '../interface/worker';
+import { WorkerJoinedFetch } from '../../interface/worker';
 import React, { Dispatch } from 'react';
 import axios, { AxiosError } from 'axios';
-import { process_error_hint } from '../utils/process_erros_hints';
+import { process_error_hint } from '../../utils/process_erros_hints';
+import { RefetchFunction } from 'axios-hooks'
 
 export function DeleteWorkersModal(
   {selected_workers, onDismiss}: {
@@ -42,8 +43,8 @@ export function DeleteWorkersModal(
 }
 
 export interface RemoveWorkersModalControllerProps {
+  refetch_workers: RefetchFunction<any, any>,
   selected_workers: Array<WorkerJoinedFetch>,
-  set_selected_workers: Dispatch<React.SetStateAction<Array<WorkerJoinedFetch>>>
 }
 
 export const DeleteWorkersModalController: React.FC<RemoveWorkersModalControllerProps> = (props) => {
@@ -57,7 +58,6 @@ export const DeleteWorkersModalController: React.FC<RemoveWorkersModalController
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          props.set_selected_workers([]);
           Promise.allSettled(ev.detail.data.map(async (worker: WorkerJoinedFetch) => {
             await axios
               .delete(`https://api.necrom.ru/worker/${worker.id}`, {data: {
@@ -68,6 +68,7 @@ export const DeleteWorkersModalController: React.FC<RemoveWorkersModalController
           .then((results) => {
             for (const result of results) {
               if (result.status == "rejected" && result.reason instanceof AxiosError) {
+                props.refetch_workers();
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -77,11 +78,11 @@ export const DeleteWorkersModalController: React.FC<RemoveWorkersModalController
                 return;
               }
             }
+            props.refetch_workers();
             presentAlert({
               header: "Сотрудники удалены",
               buttons: ["Ок"]
             });
-            window.location.reload()
           })
         }
       },

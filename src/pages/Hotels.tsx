@@ -1,155 +1,64 @@
-import { IonButtons, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSplitPane, IonText, IonButton, IonModal, IonInput } from '@ionic/react';
-import { useParams } from 'react-router';
-import ExploreContainer from '../components/ExploreContainer';
-import Modal from '../components/modal'
+import { IonButtons, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
   IonContent,
-  IonIcon,
-  IonItem,
-  IonLabel,
   IonList,
-  IonListHeader,
-  IonMenu,
-  IonMenuToggle,
-  IonNote,
 } from '@ionic/react';
-import { useRef, useState } from 'react';
-import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
-
-interface Hotel {
-  id: number;
-  title: string;
-  place: string;
-  phone: string;
-  admin_fio: string;
-  description: string;
-}
-
-const Hotels: Hotel[] = [
-  {
-    id: 1,
-    title: 'Hotel Graph',
-    place:'Moskow',
-    phone: '+7(495)775-09-45',
-    admin_fio: 'Васильев Василий Васильевич', 
-    description: 'Лучший отель в Москве, 5 звезд...'
-  },
-  {
-    id: 2,
-    title: 'Hotel Graph',
-    place:'Moskow',
-    phone: '+7(495)775-09-45',
-    admin_fio: 'Васильев Василий Васильевич', 
-    description: 'Лучший отель в Москве, 5 звезд...'
-  },
-  {
-    id: 3,
-    title: 'Hotel Graph',
-    place:'Moskow',
-    phone: '+7(495)775-09-45',
-    admin_fio: 'Васильев Василий Васильевич', 
-    description: 'Лучший отель в Москве, 5 звезд...'
-  },
-  {
-    id: 4,
-    title: 'Hotel Graph',
-    place:'Moskow',
-    phone: '+7(495)775-09-45',
-    admin_fio: 'Васильев Василий Васильевич', 
-    description: 'Лучший отель в Москве, 5 звезд...'
-  },
-];
-
-interface AppPage {
-  url: string;
-  title: string;
-}
-
-const appPages: AppPage[] = [
-  {
-    title: 'Add Hotel',
-    url: '/page/add_hotel',
-  },
-];
-
+import React, { useEffect, useState } from 'react';
+import { WorkerJoinedFetch } from '../interface/worker';
+import { PutWorkerModalController } from '../components/worker/PutWorker';
+import { PatchWorkerModalController } from '../components/worker/PatchWorker';
+import { DeleteWorkersModalController } from '../components/worker/DeleteWorkers';
+import { WorkersList } from '../components/worker/WorkersList';
+import useAxios from 'axios-hooks'
 
 const Page: React.FC = () => {
+  const [selected_workers, set_selected_workers] = useState(Array<WorkerJoinedFetch>);
 
-  const { name } = useParams<{ name: string; }>();
-  const modal = useRef<HTMLIonModalElement>(null);
-  const input = useRef<HTMLIonInputElement>(null);
-
-  const [message, setMessage] = useState(
-    'This modal example uses triggers to automatically open a modal when the button is clicked.'
+  const [{ data: workers }, refetch_workers]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
+    'https://api.necrom.ru/worker?join=true'
   );
 
-  function confirm() {
-    modal.current?.dismiss(input.current?.value, 'confirm');
-  }
-
-  function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
-    if (ev.detail.role === 'confirm') {
-      setMessage(`Hello, ${ev.detail.data}!`);
-    }
-  }
+  useEffect(
+    () => {
+      set_selected_workers(selected_workers.map((selected_worker) => {
+        return workers?.find((w) => w.id == selected_worker.id)
+      }).filter((w) => w != undefined).map((w) => w!));
+    },
+    [workers]
+  );
+  
   return (
-
-    
-
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Hotels</IonTitle>
+          <IonTitle>Сотрудники</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">{name}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonList id="inbox-list" >
-          {appPages.map((appPage, index) => {
-            return (
-              <IonMenuToggle key={index} autoHide={false}>
-                <IonItem className={window.location.pathname === appPage.url ? 'selected' : 'functions'} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
-                  <IonLabel>{appPage.title}</IonLabel>
-                </IonItem>
-              </IonMenuToggle>
-            );
-          })}
+        <IonList id="inbox-list">
+          <PutWorkerModalController refetch_workers={refetch_workers} />
         </IonList>
-        <br></br><br></br><br></br>
-          <h4>List Hotels:</h4>
-        <IonList id="hotels_list">
-          {Hotels.map((appPage, index) => {
-            return (
-              <IonMenuToggle key={index} autoHide={false}>
-                <IonItem className={true === true ? 'selected' : 'functions'} routerDirection="none" lines="full" detail={false}>
-                  <IonLabel className={'fix_flex'}>{appPage.title}</IonLabel>
-                  <IonText><br></br>
-                  Manager: {appPage.admin_fio}<br></br><br></br>
-                  Place: {appPage.place}<br></br><br></br>
-                  Phone: {appPage.phone}<br></br><br></br>
-                  Description: {appPage.description}<br></br><br></br>
-                  </IonText>
-                  <IonButton id={"open-modal" + index.toString()} expand="block">Изменить</IonButton>
-                  <Modal id={index} manager={appPage.admin_fio} place={appPage.place} phone={appPage.phone} description={appPage.description} />
-                </IonItem>
-              </IonMenuToggle>
-              
-            );
-          })}
-        </IonList>
+
+        {
+          (selected_workers?.length > 0 ) ? 
+            <DeleteWorkersModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+            : ""
+        }
+        {
+          (selected_workers?.length === 1 ) ? 
+            <PatchWorkerModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+            : ""
+        }
+        
+        <WorkersList workers={workers!} on_selected_change={set_selected_workers}></WorkersList>
       </IonContent>
     </IonPage>
   );
 };
 
 export default Page;
-

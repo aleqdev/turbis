@@ -11,7 +11,7 @@ import {
 } from '@ionic/react';
 
 import { useLocation } from 'react-router-dom';
-import { homeOutline, peopleOutline, businessOutline} from 'ionicons/icons';
+import { bodyOutline, homeOutline, earthOutline } from 'ionicons/icons';
 import './Menu.css';
 
 interface AppPage {
@@ -31,14 +31,14 @@ const appPages: AppPage[] = [
   {
     title: 'Сотрудники',
     url: '/page/Admins',
-    iosIcon: peopleOutline,
-    mdIcon: peopleOutline
+    iosIcon: bodyOutline,
+    mdIcon: bodyOutline
   },
   {
     title: 'Геолокация',
     url: '/page/Regions',
-    iosIcon: businessOutline,
-    mdIcon: businessOutline
+    iosIcon: earthOutline,
+    mdIcon: earthOutline
   },
 ];
 

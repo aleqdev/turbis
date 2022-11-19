@@ -4,15 +4,29 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { WorkerJoinedFetch } from '../interface/worker';
-import { PutWorkerModalController } from '../components/PutWorker';
-import { PatchWorkerModalController } from '../components/PatchWorker';
-import { DeleteWorkersModalController } from '../components/DeleteWorkers';
-import { WorkersList } from '../components/WorkersList';
+import { PutWorkerModalController } from '../components/worker/PutWorker';
+import { PatchWorkerModalController } from '../components/worker/PatchWorker';
+import { DeleteWorkersModalController } from '../components/worker/DeleteWorkers';
+import { WorkersList } from '../components/worker/WorkersList';
+import useAxios from 'axios-hooks'
 
 const Page: React.FC = () => {
-  const [selected_workers, set_selected_workers] = React.useState(Array<WorkerJoinedFetch>);
+  const [selected_workers, set_selected_workers] = useState(Array<WorkerJoinedFetch>);
+
+  const [{ data: workers }, refetch_workers]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
+    'https://api.necrom.ru/worker?join=true'
+  );
+
+  useEffect(
+    () => {
+      set_selected_workers(selected_workers.map((selected_worker) => {
+        return workers?.find((w) => w.id == selected_worker.id)
+      }).filter((w) => w != undefined).map((w) => w!));
+    },
+    [workers]
+  );
   
   return (
     <IonPage>
@@ -27,21 +41,21 @@ const Page: React.FC = () => {
 
       <IonContent fullscreen>
         <IonList id="inbox-list">
-          <PutWorkerModalController />
+          <PutWorkerModalController refetch_workers={refetch_workers} />
         </IonList>
 
         {
           (selected_workers?.length > 0 ) ? 
-            <DeleteWorkersModalController selected_workers={selected_workers} set_selected_workers={set_selected_workers}/>
+            <DeleteWorkersModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
             : ""
         }
         {
           (selected_workers?.length === 1 ) ? 
-            <PatchWorkerModalController selected_workers={selected_workers} set_selected_workers={set_selected_workers}/>
+            <PatchWorkerModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
             : ""
         }
         
-        <WorkersList on_selected_change={set_selected_workers}></WorkersList>
+        <WorkersList workers={workers!} on_selected_change={set_selected_workers}></WorkersList>
       </IonContent>
     </IonPage>
   );
