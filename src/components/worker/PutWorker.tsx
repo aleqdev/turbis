@@ -140,8 +140,8 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
   }
 
   return (
-    <IonButton routerDirection="none" onClick={openModal}>
-      <IonLabel>Добавить сотрудника</IonLabel>
+    <IonButton color='medium' routerDirection="none" onClick={openModal}>
+      <IonLabel>Добавить контактное лицо</IonLabel>
     </IonButton>
   )
 }

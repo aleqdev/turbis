@@ -55,7 +55,7 @@ export function PutWorkerModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Создать Сотрудника</IonTitle>
+          <IonTitle>Создать отель</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
               Создать
@@ -97,7 +97,7 @@ export interface PutWorkerModalControllerProps {
   refetch_workers: RefetchFunction<any, any>,
 }
 
-export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> = (props) => {
+export const PutHotelModalController: React.FC<PutWorkerModalControllerProps> = (props) => {
   const [present, dismiss] = useIonModal(PutWorkerModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -140,7 +140,7 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
   }
 
   return (
-    <IonButton routerDirection="none" onClick={openModal}>
+    <IonButton color='medium' routerDirection="none" onClick={openModal}>
       <IonLabel>Добавить отель</IonLabel>
     </IonButton>
   )

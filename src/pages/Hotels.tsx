@@ -7,6 +7,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { HotelJoinedFetch } from '../interface/hotel';
 import { PutWorkerModalController } from '../components/worker/PutWorker';
+import { PutHotelModalController } from '../components/hotel/PutHotel';
 import { PatchHotelModalController } from '../components/hotel/PatchHotel';
 import useAxios from 'axios-hooks'
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
@@ -41,7 +42,7 @@ const Page: React.FC = () => {
 
       <IonContent fullscreen>
         <IonList id="inbox-list">
-          <PutWorkerModalController refetch_workers={refetch_hotels} />
+          <PutHotelModalController refetch_workers={refetch_hotels} />
         </IonList>
 
         {
@@ -51,7 +52,7 @@ const Page: React.FC = () => {
         }
 
         {
-          (selected_hotels?.length > 0 ) ? 
+          (selected_hotels?.length === 1 ) ? 
             <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
             : ""
         }

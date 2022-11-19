@@ -29,13 +29,13 @@ const appPages: AppPage[] = [
     mdIcon: homeOutline
   },
   {
-    title: 'Сотрудники',
+    title: 'Контактные лица',
     url: '/page/Admins',
     iosIcon: bodyOutline,
     mdIcon: bodyOutline
   },
   {
-    title: 'Геолокация',
+    title: 'Регионы',
     url: '/page/Regions',
     iosIcon: earthOutline,
     mdIcon: earthOutline
