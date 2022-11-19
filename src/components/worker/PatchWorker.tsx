@@ -21,15 +21,19 @@ export function PatchWorkerModal(
   const inputLastName = useRef<HTMLIonInputElement>(null);
   const inputEmail = useRef<HTMLIonInputElement>(null);
   const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
-  const [inputRole, setInputRole] = useState(prevRole as WorkerRole | null);
+  const inputRole = useRef<HTMLIonSelectElement>(null);
+
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   React.useEffect(() => {
+    console.log(inputRole.current);
+    if (inputRole.current !== null) {
+      inputRole.current.value = prevRole;
+    }
+
     axios
       .get("https://api.necrom.ru/worker_role")
       .then((response) => setRoles(response.data));
-
-    
   }, []);
 
   function confirm() {
@@ -38,8 +42,9 @@ export function PatchWorkerModal(
     const last_name = inputLastName.current?.value
     const email = inputEmail.current?.value;
     const phone_number = inputPhoneNumber.current?.value;
+    const input_role = inputRole.current?.value;
 
-    if (name && surname && last_name && email && phone_number && inputRole) {
+    if (name && surname && last_name && email && phone_number && input_role) {
       onDismiss({
         id: worker.id,
         name,
@@ -47,7 +52,7 @@ export function PatchWorkerModal(
         last_name,
         email,
         phone_number,
-        role: inputRole
+        role: input_role
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -86,7 +91,7 @@ export function PatchWorkerModal(
           <IonLabel position="stacked">Почта</IonLabel>
           <IonInput ref={inputEmail} type="text" placeholder="Введите почту" value={worker.email} required/>
           <IonLabel position="stacked" >Роль</IonLabel>
-          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
+          <IonSelect ref={inputRole} placeholder="Выбрать">
             {
               roles ? 
                 roles.map((element) => {

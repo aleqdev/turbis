@@ -4,10 +4,11 @@ import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { HotelJoinedFetch } from '../../interface/hotel';
-import { Worker, WorkerJoinedFetch } from '../../interface/worker';
-import { City, CityJoinedFetch } from '../../interface/city';
+import { WorkerJoinedFetch } from '../../interface/worker';
+import { CityJoinedFetch } from '../../interface/city';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatCity, formatWorker } from '../../utils/fmt';
+import { golfOutline } from 'ionicons/icons';
 
 export function PatchHotelModal(
   {selected_hotels, onDismiss}: {
@@ -85,13 +86,19 @@ export function PatchHotelModal(
   React.useEffect(() => {
     axios
       .get("https://api.necrom.ru/worker")
-      .then((response) => setWorkers(response.data));
+      .then((response) => {
+        setWorkers(response.data);
+        setOwnerInput(response.data.find((e: WorkerJoinedFetch) => e.id == hotel.owner_id));
+      });
   }, []);
 
   React.useEffect(() => {
     axios
       .get("https://api.necrom.ru/city?join=true")
-      .then((response) => setCities(response.data));
+      .then((response) => {
+        setCities(response.data);
+        setCityInput(response.data.find((e: CityJoinedFetch) => e.id == hotel.city_id));
+      });
   }, []);
 
   function confirm() {

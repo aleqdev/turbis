@@ -1,7 +1,7 @@
 import { IonList, IonTitle } from "@ionic/react";
 import axios from "axios";
 import React, { Dispatch } from "react";
-import DataTable, { TableColumn } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { RegionJoinedFetch } from "../interface/region";
