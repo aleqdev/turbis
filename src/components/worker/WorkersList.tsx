@@ -8,7 +8,7 @@ import 'react-data-table-component-extensions/dist/index.css';
 
 const listColumns = [
   {
-    name: "name",
+    name: "Имя",
     selector: (row: WorkerJoinedFetch) => row.name,
     sortable: true,
     wrap: true
