@@ -1,31 +1,18 @@
 import { IonButtons, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { useParams } from 'react-router';
 import './Page.css';
 import {
   IonContent,
-  IonItem,
-  IonLabel,
   IonList,
-  IonMenuToggle,
 } from '@ionic/react';
-
-interface AppPage {
-  url: string;
-  title: string;
-}
-
-const appPages: AppPage[] = [
-  {
-    title: 'Add region',
-    url: '/page/add_region',
-  },
-];
-
+import React from 'react';
+import { WorkerJoinedFetch } from '../interface/worker';
+import { DeleteRegionsModalController } from '../components/DeleteRegions';
+import { RegionsList } from '../components/RegionsList';
+import { RegionJoinedFetch } from '../interface/region';
 
 const Page: React.FC = () => {
-
-  const { name } = useParams<{ name: string; }>();
-
+  const [selected_regions, set_selected_regions] = React.useState(Array<RegionJoinedFetch>);
+  
   return (
     <IonPage>
       <IonHeader>
@@ -33,34 +20,27 @@ const Page: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Regions</IonTitle>
+          <IonTitle>Регионы</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">{name}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         <IonList id="inbox-list">
-          {appPages.map((appPage, index) => {
-            return (
-              <IonMenuToggle key={index} autoHide={false}>
-                <IonItem className={window.location.pathname === appPage.url ? 'selected' : 'functions'} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
-                  <IonLabel>{appPage.title}</IonLabel>
-                </IonItem>
-              </IonMenuToggle>
-            );
-          })}
+          {/* <PutWorkerModalController /> */}
         </IonList>
-        {/* <ExploreContainer name={name} /> */}
-        <br></br><br></br><br></br>
-          <h4>List Regions:</h4>
 
-        <IonList id="hotels_list">
-
-        </IonList>
+        {/* {
+          (selected_regions?.length > 0 ) ? 
+            <DeleteRegionsModalController selected_regions={selected_regions} set_selected_regions={set_selected_regions}/>
+            : ""
+        }
+        {
+          (selected_regions?.length === 1 ) ? 
+            <PatchRegionModalController selected_regions={selected_regions} set_selected_regions={set_selected_regions}/>
+            : ""
+        } */}
+        
+        <RegionsList on_selected_change={set_selected_regions}></RegionsList>
       </IonContent>
     </IonPage>
   );
