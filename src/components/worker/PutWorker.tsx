@@ -78,7 +78,7 @@ export function PutWorkerModal(
           <IonLabel position="stacked">Почта</IonLabel>
           <IonInput ref={inputEmail} type="text" placeholder="Введите почту" required/>
           <IonLabel position="stacked" >Роль</IonLabel>
-          <IonSelect  placeholder="Select role" onIonChange={(ev) => setInputRole(ev.target.value)}>
+          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
             {
               roles ? 
                 roles.map((element) => {

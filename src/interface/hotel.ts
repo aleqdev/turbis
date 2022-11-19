@@ -1,4 +1,4 @@
-export type Hotel = {
+export interface Hotel {
     id: number,
     name: string,
     city_id: number,
@@ -6,7 +6,7 @@ export type Hotel = {
     description: string
 }
 
-export type HotelJoinedFetch = Hotel & {
+export interface HotelJoinedFetch extends Hotel {
     city_name: string,
     region_id: number,
     region_name: string,

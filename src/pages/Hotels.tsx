@@ -5,27 +5,27 @@ import {
   IonList,
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import { WorkerJoinedFetch } from '../interface/worker';
+import { HotelJoinedFetch } from '../interface/hotel';
 import { PutWorkerModalController } from '../components/worker/PutWorker';
-import { PatchWorkerModalController } from '../components/worker/PatchWorker';
-import { DeleteWorkersModalController } from '../components/worker/DeleteWorkers';
-import { WorkersList } from '../components/worker/WorkersList';
+import { PatchHotelModalController } from '../components/hotel/PatchHotel';
 import useAxios from 'axios-hooks'
+import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
+import { HotelsList } from '../components/hotel/HotelsList';
 
 const Page: React.FC = () => {
-  const [selected_workers, set_selected_workers] = useState(Array<WorkerJoinedFetch>);
+  const [selected_hotels, set_selected_hotels] = useState(Array<HotelJoinedFetch>);
 
-  const [{ data: workers }, refetch_workers]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
-    'https://api.necrom.ru/worker?join=true'
+  const [{ data: hotels }, refetch_hotels]: [{data?: Array<HotelJoinedFetch>}, ...any] = useAxios(
+    'https://api.necrom.ru/hotel?join=true'
   );
 
   useEffect(
     () => {
-      set_selected_workers(selected_workers.map((selected_worker) => {
-        return workers?.find((w) => w.id == selected_worker.id)
-      }).filter((w) => w != undefined).map((w) => w!));
+      set_selected_hotels(selected_hotels.map((selected_hotel) => {
+        return hotels?.find((h) => h.id == selected_hotel.id)
+      }).filter((h) => h != undefined).map((h) => h!));
     },
-    [workers]
+    [hotels]
   );
   
   return (
@@ -35,27 +35,28 @@ const Page: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Сотрудники</IonTitle>
+          <IonTitle>Отели</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
         <IonList id="inbox-list">
-          <PutWorkerModalController refetch_workers={refetch_workers} />
+          <PutWorkerModalController refetch_workers={refetch_hotels} />
         </IonList>
 
         {
-          (selected_workers?.length > 0 ) ? 
-            <DeleteWorkersModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+          (selected_hotels?.length > 0 ) ? 
+            <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
             : ""
         }
+
         {
-          (selected_workers?.length === 1 ) ? 
-            <PatchWorkerModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+          (selected_hotels?.length > 0 ) ? 
+            <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
             : ""
         }
         
-        <WorkersList workers={workers!} on_selected_change={set_selected_workers}></WorkersList>
+        <HotelsList hotels={hotels!} on_selected_change={set_selected_hotels} />
       </IonContent>
     </IonPage>
   );

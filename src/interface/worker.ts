@@ -1,5 +1,5 @@
 
-export type Worker = {
+export interface Worker {
     id: number,
     name: string,
     surname: string,
@@ -9,6 +9,6 @@ export type Worker = {
     role_id: number
 }
 
-export type WorkerJoinedFetch = Worker & {
+export interface WorkerJoinedFetch extends Worker {
     role_name: string
 }

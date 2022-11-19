@@ -1,9 +1,9 @@
-export type Region = {
+export interface Region {
     id: number,
     name: string,
     country_id: number
 }
 
-export type RegionJoinedFetch = Region & {
+export interface RegionJoinedFetch extends Region {
     country_name: string
 }

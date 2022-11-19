@@ -1,4 +1,4 @@
-export type WorkerRole = {
+export interface WorkerRole {
     id: number,
     name: string
 }

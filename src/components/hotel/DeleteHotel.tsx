@@ -1,14 +1,13 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WorkerJoinedFetch } from '../../interface/worker';
-import React, { Dispatch } from 'react';
 import axios, { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
+import { HotelJoinedFetch } from '../../interface/hotel';
 
-export function DeleteWorkersModal(
-  {selected_workers, onDismiss}: {
-    selected_workers: Array<WorkerJoinedFetch>
+export function DeleteHotelsModal(
+  {selected_hotels, onDismiss}: {
+    selected_hotels: Array<HotelJoinedFetch>
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -21,9 +20,9 @@ export function DeleteWorkersModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление Сотрудников</IonTitle>
+          <IonTitle>Удаление Отелей</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_workers, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selected_hotels, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -31,10 +30,10 @@ export function DeleteWorkersModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить сотрудников? (${selected_workers.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить отели? (${selected_hotels.length})`}</IonText>
         <IonList>
-          {selected_workers.map((worker) => {
-            return <IonItem key={worker.id}>{`- ${worker.surname} ${worker.name} ${worker.last_name}`}</IonItem>
+          {selected_hotels.map((hotel) => {
+            return <IonItem key={hotel.id}>{`- ${hotel.name} в городе ${hotel.city_name} (${hotel.region_name})`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -42,15 +41,15 @@ export function DeleteWorkersModal(
   )
 }
 
-export interface DeleteWorkersModalControllerProps {
-  refetch_workers: RefetchFunction<any, any>,
-  selected_workers: Array<WorkerJoinedFetch>,
+export interface DeleteHotelsModalControllerProps {
+  refetch_hotels: RefetchFunction<any, any>,
+  selected_hotels: Array<HotelJoinedFetch>,
 }
 
-export const DeleteWorkersModalController: React.FC<DeleteWorkersModalControllerProps> = (props) => {
-  const [present, dismiss] = useIonModal(DeleteWorkersModal, {
-    selected_workers: props.selected_workers,
-    onDismiss: (data: Array<WorkerJoinedFetch> | null, role: string) => dismiss(data, role),
+export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerProps> = (props) => {
+  const [present, dismiss] = useIonModal(DeleteHotelsModal, {
+    selected_hotels: props.selected_hotels,
+    onDismiss: (data: Array<HotelJoinedFetch> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -58,9 +57,9 @@ export const DeleteWorkersModalController: React.FC<DeleteWorkersModalController
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          Promise.allSettled(ev.detail.data.map(async (worker: WorkerJoinedFetch) => {
+          Promise.allSettled(ev.detail.data.map(async (hotel: HotelJoinedFetch) => {
             await axios
-              .delete(`https://api.necrom.ru/worker/${worker.id}`, {data: {
+              .delete(`https://api.necrom.ru/hotel/${hotel.id}`, {data: {
                 db_user_email: "primitive_email@not.even.valid",
                 db_user_password: "primitive_password",
               }})
@@ -68,7 +67,7 @@ export const DeleteWorkersModalController: React.FC<DeleteWorkersModalController
           .then((results) => {
             for (const result of results) {
               if (result.status == "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_workers();
+                props.refetch_hotels();
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -78,9 +77,9 @@ export const DeleteWorkersModalController: React.FC<DeleteWorkersModalController
                 return;
               }
             }
-            props.refetch_workers();
+            props.refetch_hotels();
             presentAlert({
-              header: "Сотрудники удалены",
+              header: "Отели удалены",
               buttons: ["Ок"]
             });
           })
