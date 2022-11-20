@@ -30,19 +30,17 @@ const appPages: AppPage[] = [
   },
   {
     title: 'Сотрудники',
-    url: '/page/Admins',
+    url: '/page/Workers',
     iosIcon: bodyOutline,
     mdIcon: bodyOutline
   },
   {
-    title: 'Геолокация',
+    title: 'Регионы',
     url: '/page/Regions',
     iosIcon: earthOutline,
     mdIcon: earthOutline
   },
 ];
-
-// const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
 const Menu: React.FC = () => {
   const location = useLocation();
@@ -64,16 +62,6 @@ const Menu: React.FC = () => {
             );
           })}
         </IonList>
-
-        {/* <IonList id="labels-list">
-          <IonListHeader>Labels</IonListHeader>
-          {labels.map((label, index) => (
-            <IonItem lines="none" key={index}>
-              <IonIcon slot="start" icon={bookmarkOutline} />
-              <IonLabel>{label}</IonLabel>
-            </IonItem>
-          ))}
-        </IonList> */}
       </IonContent>
     </IonMenu>
   );

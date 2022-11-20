@@ -1,14 +1,14 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WorkerJoinedFetch } from '../../interface/worker';
-import React, { Dispatch } from 'react';
+import React from 'react';
 import axios, { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
+import { WorkerRole } from '../../interface/worker_role';
 
-export function DeleteWorkersModal(
-  {selected_workers, onDismiss}: {
-    selected_workers: Array<WorkerJoinedFetch>
+export function DeleteWorkerRolesModal(
+  {selected_worker_roles, onDismiss}: {
+    selected_worker_roles: Array<WorkerRole>
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -21,9 +21,9 @@ export function DeleteWorkersModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление Сотрудников</IonTitle>
+          <IonTitle>Удаление Ролей</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_workers, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selected_worker_roles, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -31,10 +31,10 @@ export function DeleteWorkersModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить сотрудников? (${selected_workers.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить роли? (${selected_worker_roles.length})`}</IonText>
         <IonList>
-          {selected_workers.map((worker) => {
-            return <IonItem key={worker.id}>{`- ${worker.surname} ${worker.name} ${worker.last_name}`}</IonItem>
+          {selected_worker_roles.map((role) => {
+            return <IonItem key={role.id}>{`- ${role.name}`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -42,15 +42,15 @@ export function DeleteWorkersModal(
   )
 }
 
-export interface DeleteWorkersModalControllerProps {
-  refetch_workers: RefetchFunction<any, any>,
-  selected_workers: Array<WorkerJoinedFetch>,
+export interface DeleteWorkerRolesModalControllerProps {
+  refetch_worker_roles: RefetchFunction<any, any>,
+  selected_worker_roles: Array<WorkerRole>,
 }
 
-export const DeleteWorkersModalController: React.FC<DeleteWorkersModalControllerProps> = (props) => {
-  const [present, dismiss] = useIonModal(DeleteWorkersModal, {
-    selected_workers: props.selected_workers,
-    onDismiss: (data: Array<WorkerJoinedFetch> | null, role: string) => dismiss(data, role),
+export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalControllerProps> = (props) => {
+  const [present, dismiss] = useIonModal(DeleteWorkerRolesModal, {
+    selected_worker_roles: props.selected_worker_roles,
+    onDismiss: (data: Array<WorkerRole> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -58,9 +58,9 @@ export const DeleteWorkersModalController: React.FC<DeleteWorkersModalController
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          Promise.allSettled(ev.detail.data.map(async (worker: WorkerJoinedFetch) => {
+          Promise.allSettled(ev.detail.data.map(async (role: WorkerRole) => {
             await axios
-              .delete(`https://api.necrom.ru/worker/${worker.id}`, {data: {
+              .delete(`https://api.necrom.ru/worker_role/${role.id}`, {data: {
                 db_user_email: "primitive_email@not.even.valid",
                 db_user_password: "primitive_password",
               }})
@@ -68,7 +68,7 @@ export const DeleteWorkersModalController: React.FC<DeleteWorkersModalController
           .then((results) => {
             for (const result of results) {
               if (result.status == "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_workers();
+                props.refetch_worker_roles();
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -78,9 +78,9 @@ export const DeleteWorkersModalController: React.FC<DeleteWorkersModalController
                 return;
               }
             }
-            props.refetch_workers();
+            props.refetch_worker_roles();
             presentAlert({
-              header: "Сотрудники удалены",
+              header: "Роли удалены",
               buttons: ["Ок"]
             });
           })

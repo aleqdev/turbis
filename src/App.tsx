@@ -4,7 +4,8 @@ import { Redirect, Route } from 'react-router-dom';
 import Menu from './components/Menu';
 import Hotels from './pages/Hotels';
 import Regions from './pages/Regions'
-import Admins from './pages/Workers'
+import Workers from './pages/Workers'
+import WorkerRoles from './pages/WorkerRoles'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -38,17 +39,17 @@ const App: React.FC = () => {
             <Route path="/" exact={true}>
               <Redirect to="/page/hotels" />
             </Route>
-            {/* <Route path="/page/:name" exact={true}>
-              <Page />
-            </Route> */}
-            <Route path="/page/hotels" exact={true}>
+            <Route path="/page/Hotels" exact={true}>
               <Hotels />
             </Route>
-            <Route path="/page/regions" exact={true}>
+            <Route path="/page/Regions" exact={true}>
               <Regions />
             </Route>
-            <Route path="/page/admins" exact={true}>
-              <Admins />
+            <Route path="/page/Workers" exact={true}>
+              <Workers />
+            </Route>
+            <Route path="/page/WorkerRole" exact={true}>
+              <WorkerRoles />
             </Route>
           </IonRouterOutlet>
         </IonSplitPane>

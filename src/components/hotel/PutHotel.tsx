@@ -132,7 +132,7 @@ export function PutHotelModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите имя" required/>
+          <IonInput ref={inputName} type="text" placeholder="Введите название" required/>
           <IonLabel position="stacked">Местоположение</IonLabel>
           <IonButton disabled={cities === null} onClick={() => openCitySelectModal()}>
             {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : formatCity(cityInput))}

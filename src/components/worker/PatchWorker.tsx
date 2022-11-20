@@ -29,7 +29,7 @@ export function PatchWorkerModal(
     if (inputRole.current !== null) {
       inputRole.current.value = prevRole;
     }
-    
+
     axios
       .get("https://api.necrom.ru/worker_role")
       .then((response) => setRoles(response.data));
@@ -122,7 +122,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           axios
-            .patch(`https://api.necrom.ru/worker/${props.selected_workers[0].id}`, {
+            .patch(`https://api.necrom.ru/worker/${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

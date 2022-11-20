@@ -139,7 +139,7 @@ export function PatchHotelModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите имя" value={hotel.name} required/>
+          <IonInput ref={inputName} type="text" placeholder="Введите название" value={hotel.name} required/>
           <IonLabel position="stacked">Местоположение</IonLabel>
           <IonButton disabled={cities === null} onClick={() => openCitySelectModal()}>
             {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : formatCity(cityInput))}

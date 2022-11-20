@@ -1,4 +1,4 @@
-import { IonButtons, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
   IonContent,
@@ -35,7 +35,10 @@ const Page: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Сотрудники</IonTitle>
+          <IonItem lines="none">
+            <IonTitle>Сотрудники</IonTitle>
+            <IonButton routerLink='/page/WorkerRole'>Перейти к ролям</IonButton>
+          </IonItem>
         </IonToolbar>
       </IonHeader>
 
