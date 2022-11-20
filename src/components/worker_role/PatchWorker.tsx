@@ -1,6 +1,6 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
-import React, { useMemo, useRef, useState } from 'react'
+import React, { Dispatch, useRef, useState } from 'react'
 import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { WorkerJoinedFetch } from '../../interface/worker';
@@ -13,7 +13,7 @@ export function PatchWorkerModal(
   }
 ) {
   const worker = selected_workers[0];
-  const prevRole = useMemo(() => {return {id: worker.role_id, name: worker.role_name}}, [worker]);
+  const prevRole = {id: worker.role_id, name: worker.role_name};
 
   const [roles, setRoles] = React.useState(null as Array<WorkerRole> | null);
   const inputName = useRef<HTMLIonInputElement>(null);
@@ -29,11 +29,11 @@ export function PatchWorkerModal(
     if (inputRole.current !== null) {
       inputRole.current.value = prevRole;
     }
-    
+
     axios
       .get("https://api.necrom.ru/worker_role")
       .then((response) => setRoles(response.data));
-  }, [prevRole]);
+  }, []);
 
   function confirm() {
     const name = inputName.current?.value;
