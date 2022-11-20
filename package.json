@@ -53,7 +53,7 @@
     "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
     "eject": "react-scripts eject",
     "electron": "ionic build && npx cap copy @capacitor-community/electron && npx cap open @capacitor-community/electron",
-    "electron:make": "cd ./electron; npm run electron:make"
+    "electron:make": "cd electron && npm run electron:make"
   },
   "eslintConfig": {
     "extends": [
