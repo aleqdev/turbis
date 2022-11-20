@@ -1,5 +1,5 @@
 {
-  "appId": "com.yourdoamnin.yourapp",
+  "appId": "ru.necrom.turbis",
   "directories": {
     "buildResources": "resources"
   },
@@ -18,8 +18,19 @@
     "allowToChangeInstallationDirectory": true
   },
   "win": {
-    "target": "nsis",
+    "target": [
+      {
+        "target": "portable",
+        "arch": [
+          "x64",
+          "ia32"
+        ]
+      }
+    ],
     "icon": "assets/appIcon.ico"
+  },
+  "linux": {
+    "target": "AppImage"
   },
   "mac": {
     "category": "your.app.category.type",

@@ -1,14 +1,14 @@
 {
-  "name": "IonicAnotherTest",
+  "name": "turbis",
   "version": "1.0.0",
   "description": "An Amazing Capacitor App",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "Aleksandr Nazarov",
+    "email": "necromfox@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/necromfox/turbis"
   },
   "license": "MIT",
   "main": "build/src/index.js",
@@ -17,7 +17,7 @@
     "electron:start-live": "node ./live-runner.js",
     "electron:start": "npm run build && electron --inspect=5858 ./",
     "electron:pack": "npm run build && electron-builder build -c ./electron-builder.config.json",
-    "electron:make": "npm run build && electron-builder build -c ./electron-builder.config.json -p never"
+    "electron:make": "npm run build && electron-builder build -wl -c ./electron-builder.config.json -p never"
   },
   "dependencies": {
     "@capacitor-community/electron": "^4.1.1",
