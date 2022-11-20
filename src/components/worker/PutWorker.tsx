@@ -55,7 +55,7 @@ export function PutWorkerModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Создать Сотрудника</IonTitle>
+          <IonTitle>Создать контактное лицо</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
               Создать
@@ -68,15 +68,15 @@ export function PutWorkerModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Имя</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите имя" required/>
+          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" required/>
           <IonLabel position="stacked">Фамилия</IonLabel>
-          <IonInput ref={inputSurname} type="text" placeholder="Введите фамилию" required/>
+          <IonInput ref={inputSurname} clearInput={true} type="text" placeholder="Введите фамилию" required/>
           <IonLabel position="stacked">Отчество</IonLabel>
-          <IonInput ref={inputLastName} type="text" placeholder="Введите отчество" required/>
+          <IonInput ref={inputLastName} clearInput={true} type="text" placeholder="Введите отчество" required/>
           <IonLabel position="stacked">Телефон</IonLabel>
-          <IonInput ref={inputPhoneNumber} type="text" placeholder="Введите телефон" required/>
+          <IonInput ref={inputPhoneNumber} clearInput={true} type="text" placeholder="Введите телефон" required/>
           <IonLabel position="stacked">Почта</IonLabel>
-          <IonInput ref={inputEmail} type="text" placeholder="Введите почту" required/>
+          <IonInput ref={inputEmail} clearInput={true} type="text" placeholder="Введите почту" required/>
           <IonLabel position="stacked" >Роль</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
             {
@@ -141,7 +141,7 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
 
   return (
     <IonButton routerDirection="none" onClick={openModal}>
-      <IonLabel>Добавить сотрудника</IonLabel>
+      <IonLabel>Добавить контактное лицо</IonLabel>
     </IonButton>
   )
 }

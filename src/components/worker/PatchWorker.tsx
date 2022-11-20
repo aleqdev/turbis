@@ -67,7 +67,7 @@ export function PatchWorkerModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Изменить Сотрудника</IonTitle>
+          <IonTitle>Изменить контактное лицо</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
               Изменить
@@ -80,15 +80,15 @@ export function PatchWorkerModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Имя</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите имя" value={worker.name} required/>
+          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" value={worker.name} required/>
           <IonLabel position="stacked">Фамилия</IonLabel>
-          <IonInput ref={inputSurname} type="text" placeholder="Введите фамилию" value={worker.surname} required/>
+          <IonInput ref={inputSurname} clearInput={true} type="text" placeholder="Введите фамилию" value={worker.surname} required/>
           <IonLabel position="stacked">Отчество</IonLabel>
-          <IonInput ref={inputLastName} type="text" placeholder="Введите отчество" value={worker.last_name} required/>
+          <IonInput ref={inputLastName} clearInput={true} type="text" placeholder="Введите отчество" value={worker.last_name} required/>
           <IonLabel position="stacked">Телефон</IonLabel>
-          <IonInput ref={inputPhoneNumber} type="text" placeholder="Введите телефон" value={worker.phone_number} required/>
+          <IonInput ref={inputPhoneNumber} clearInput={true} type="text" placeholder="Введите телефон" value={worker.phone_number} required/>
           <IonLabel position="stacked">Почта</IonLabel>
-          <IonInput ref={inputEmail} type="text" placeholder="Введите почту" value={worker.email} required/>
+          <IonInput ref={inputEmail} clearInput={true} type="text" placeholder="Введите почту" value={worker.email} required/>
           <IonLabel position="stacked" >Роль</IonLabel>
           <IonSelect ref={inputRole} placeholder="Выбрать">
             {
@@ -135,7 +135,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
             .then((_) => {
               props.refetch_workers();
               presentAlert({
-                header: "Данные сотрудника изменены",
+                header: "Данные контактного лица изменены",
                 buttons: ["Ок"]
               });
             })
@@ -155,7 +155,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
 
   return (
     <IonButton routerDirection="none" color="secondary" onClick={openModal}>
-      <IonLabel>Изменить сотрудника</IonLabel>
+      <IonLabel>Изменить контактное лицо</IonLabel>
     </IonButton>
   )
 }
