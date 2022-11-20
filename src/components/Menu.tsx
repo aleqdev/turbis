@@ -35,13 +35,13 @@ const appPages: AppPage[] = [
     mdIcon: homeOutline
   },
   {
-    title: 'Сотрудники',
+    title: 'Контактные лица',
     url: '/page/Workers',
     iosIcon: personOutline,
     mdIcon: personOutline,
     children: [
       {
-        title: 'Сотрудники',
+        title: 'Контактные лица',
         url: '/page/Workers',
         iosIcon: personOutline,
         mdIcon: personOutline,

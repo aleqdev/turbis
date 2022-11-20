@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
@@ -21,7 +21,7 @@ export function PatchHotelModal(
   const [cities, setCities] = React.useState(null as Array<CityJoinedFetch> | null);
 
   const inputName = useRef<HTMLIonInputElement>(null);
-  const inputDescription = useRef<HTMLIonInputElement>(null);
+  const inputDescription = useRef<HTMLIonTextareaElement>(null);
   const [cityInput, setCityInput] = useState(null as CityJoinedFetch | null);
   const [ownerInput, setOwnerInput] = useState(null as WorkerJoinedFetch | null);
 
@@ -105,13 +105,19 @@ export function PatchHotelModal(
     const description = inputDescription.current?.value
 
     if (name && description && cityInput && ownerInput) {
-      onDismiss({
-        id: hotel.id,
-        name,
-        description,
-        city_id: cityInput.id,
-        owner_id: ownerInput.id
-      }, 'confirm');
+      if (description.length > 500) {
+        setErrorMessage("Описание отеля должно быть меньше 500 символов.")
+      } else if (name.toString().length > 200) {
+        setErrorMessage("Название отеля должно быть меньше 200 символов.")
+      } else {
+        onDismiss({
+          id: hotel.id,
+          name,
+          description,
+          city_id: cityInput.id,
+          owner_id: ownerInput.id
+        }, 'confirm');
+      }
     } else {
       setErrorMessage("Не все поля заполнены!")
     }
@@ -139,7 +145,7 @@ export function PatchHotelModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите название" value={hotel.name} required/>
+          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" value={hotel.name} required/>
           <IonLabel position="stacked">Местоположение</IonLabel>
           <IonButton disabled={cities === null} onClick={() => openCitySelectModal()}>
             {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : formatCity(cityInput))}
@@ -149,7 +155,7 @@ export function PatchHotelModal(
             {workers === null ? "Загрузка..." : (ownerInput === null ? "Выбрать" : formatWorker(ownerInput))}
           </IonButton>
           <IonLabel position="stacked">Описание</IonLabel>
-          <IonInput ref={inputDescription} type="text" placeholder="Введите описание" value={hotel.description} required/>
+          <IonTextarea ref={inputDescription} auto-grow={true} value={hotel.description} placeholder="Введите описание" required/>
         </IonItem>
       </IonContent>
     </>
