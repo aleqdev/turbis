@@ -225,8 +225,8 @@ export function setupContentSecurityPolicy(customScheme: string): void {
         ...details.responseHeaders,
         'Content-Security-Policy': [
           electronIsDev
-            ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:; connect-src https://api.necrom.ru`
-            : `default-src ${customScheme}://* 'unsafe-inline' data:; connect-src https://api.necrom.ru`,
+            ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:; connect-src https://api-debug.necrom.ru https://api-release.necrom.ru`
+            : `default-src ${customScheme}://* 'unsafe-inline' data:; connect-src https://api-debug.necrom.ru https://api-release.necrom.ru`,
         ],
       },
     });

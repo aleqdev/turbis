@@ -28,3 +28,5 @@ yarn-error.log*
 
 # Optional eslint cache
 .eslintcache
+
+/src/utils/server_url.ts
