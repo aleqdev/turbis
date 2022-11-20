@@ -32,7 +32,9 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.1",
     "styled-components": "^5.3.6",
+    "tryer": "^1.0.1",
     "typescript": "^4.1.3",
+    "universalify": "^2.0.0",
     "web-vitals": "^0.2.4",
     "workbox-background-sync": "^5.1.4",
     "workbox-broadcast-update": "^5.1.4",
@@ -48,12 +50,18 @@
     "workbox-streams": "^5.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
-    "eject": "react-scripts eject",
-    "electron": "ionic build && npx cap copy @capacitor-community/electron && npx cap open @capacitor-community/electron",
-    "electron:make": "cd electron && npm run electron:make"
+    "copy-debug": "npx ncp ./src/utils/server_url.debug.ts ./src/utils/server_url.ts",
+    "copy-release": "npx ncp ./src/utils/server_url.release.ts ./src/utils/server_url.ts",
+    "start": "npm run start:debug",
+    "start:debug": "npm run copy-debug && react-scripts start",
+    "start:release": "npm run copy-release && react-scripts start",
+    "build": "copy-debug && react-scripts build",
+    "test": "copy-debug && react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
+    "eject": "copy-debug && react-scripts eject",
+    "electron:debug": "npm run copy-debug && ionic build && npx cap copy @capacitor-community/electron && npx cap open @capacitor-community/electron",
+    "electron:debug:make": "npm run copy-debug && ionic build && npx cap copy @capacitor-community/electron && cd ./electron && npm run electron:make",
+    "electron:release": "npm run copy-release && ionic build && npx cap copy @capacitor-community/electron && npx cap open @capacitor-community/electron",
+    "electron:release:make": "npm run copy-release && ionic build && npx cap copy @capacitor-community/electron && cd ./electron && npm run electron:make"
   },
   "eslintConfig": {
     "extends": [
@@ -74,7 +82,9 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "4.5.0"
+    "@capacitor/cli": "4.5.0",
+    "@ionic/v1-toolkit": "3.2.20",
+    "ncp": "^2.0.0"
   },
   "description": "An Ionic project"
 }

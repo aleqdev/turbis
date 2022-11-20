@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react'
 import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
+import { atLocation } from '../../utils/server_url';
 
 export function PutWorkerModal(
   {onDismiss}: {
@@ -21,7 +22,7 @@ export function PutWorkerModal(
 
   React.useEffect(() => {
     axios
-      .get("https://api.necrom.ru/worker_role")
+      .get(atLocation('worker_role'))
       .then((response) => setRoles(response.data));
   }, [])
 
@@ -108,7 +109,7 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           axios
-            .put("https://api.necrom.ru/worker", {
+            .put(atLocation('worker'), {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

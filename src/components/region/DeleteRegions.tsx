@@ -4,6 +4,7 @@ import React, { Dispatch } from 'react';
 import axios, { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RegionJoinedFetch } from '../../interface/region';
+import { atLocation } from '../../utils/server_url';
 
 export function DeleteRegionsModal(
   {selected_regions, onDismiss}: {
@@ -61,7 +62,7 @@ export const DeleteRegionsModalController: React.FC<RemoveRegionsModalController
           props.set_selected_regions([]);
           Promise.allSettled(ev.detail.data.map(async (region: RegionJoinedFetch) => {
             await axios
-              .delete(`https://api.necrom.ru/region/${region.id}`, {data: {
+              .delete(`${atLocation('region')}/${region.id}`, {data: {
                 db_user_email: "primitive_email@not.even.valid",
                 db_user_password: "primitive_password",
               }})

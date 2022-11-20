@@ -11,12 +11,13 @@ import { PutWorkerRoleModalController } from '../components/worker_role/PutWorke
 import { PatchWorkerRoleModalController } from '../components/worker_role/PatchWorkerRole';
 import { WorkerRolesList } from '../components/worker_role/WorkerRolesList';
 import { DeleteWorkerRolesModalController } from '../components/worker_role/DeleteWorkerRoles';
+import { atLocation } from '../utils/server_url';
 
 const Page: React.FC = () => {
   const [selected_worker_roles, set_selected_worker_roles] = useState(Array<WorkerRole>);
 
   const [{ data: worker_roles }, refetch_worker_roles]: [{data?: Array<WorkerRole>}, ...any] = useAxios(
-    'https://api.necrom.ru/worker_role'
+    atLocation('worker_role')
   );
 
   useEffect(

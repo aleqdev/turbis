@@ -4,6 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
 import { HotelJoinedFetch } from '../../interface/hotel';
+import { atLocation } from '../../utils/server_url';
 
 export function DeleteHotelsModal(
   {selected_hotels, onDismiss}: {
@@ -59,7 +60,7 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (hotel: HotelJoinedFetch) => {
             await axios
-              .delete(`https://api.necrom.ru/hotel/${hotel.id}`, {data: {
+              .delete(`${atLocation("hotel")}/${hotel.id}`, {data: {
                 db_user_email: "primitive_email@not.even.valid",
                 db_user_password: "primitive_password",
               }})

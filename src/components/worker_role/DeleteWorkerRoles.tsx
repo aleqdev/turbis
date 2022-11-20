@@ -5,6 +5,7 @@ import axios, { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
 import { WorkerRole } from '../../interface/worker_role';
+import { atLocation } from '../../utils/server_url';
 
 export function DeleteWorkerRolesModal(
   {selected_worker_roles, onDismiss}: {
@@ -60,7 +61,7 @@ export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalCo
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (role: WorkerRole) => {
             await axios
-              .delete(`https://api.necrom.ru/worker_role/${role.id}`, {data: {
+              .delete(`${atLocation('worker_role')}/${role.id}`, {data: {
                 db_user_email: "primitive_email@not.even.valid",
                 db_user_password: "primitive_password",
               }})
