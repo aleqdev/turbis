@@ -108,6 +108,7 @@ export class ElectronCapacitorApp {
     // Setup preload script path and construct our main window.
     const preloadPath = join(app.getAppPath(), 'build', 'src', 'preload.js');
     this.MainWindow = new BrowserWindow({
+      autoHideMenuBar: true,
       icon,
       show: false,
       x: this.mainWindowState.x,
@@ -208,7 +209,7 @@ export class ElectronCapacitorApp {
       }
       setTimeout(() => {
         if (electronIsDev) {
-          this.MainWindow.webContents.openDevTools();
+          //this.MainWindow.webContents.openDevTools();
         }
         CapElectronEventEmitter.emit('CAPELECTRON_DeeplinkListenerInitialized', '');
       }, 400);
@@ -224,8 +225,8 @@ export function setupContentSecurityPolicy(customScheme: string): void {
         ...details.responseHeaders,
         'Content-Security-Policy': [
           electronIsDev
-            ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:`
-            : `default-src ${customScheme}://* 'unsafe-inline' data:`,
+            ? `default-src ${customScheme}://* 'unsafe-inline' devtools://* 'unsafe-eval' data:; connect-src https://api.necrom.ru`
+            : `default-src ${customScheme}://* 'unsafe-inline' data:; connect-src https://api.necrom.ru`,
         ],
       },
     });

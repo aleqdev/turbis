@@ -67,7 +67,7 @@ export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalCo
           }))
           .then((results) => {
             for (const result of results) {
-              if (result.status == "rejected" && result.reason instanceof AxiosError) {
+              if (result.status === "rejected" && result.reason instanceof AxiosError) {
                 props.refetch_worker_roles();
                 presentAlert({
                   header: "Ошибка",
