@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react'
 import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
+import { atLocation } from '../../utils/server_url';
 
 export function PatchWorkerRoleModal(
   {selected_worker_roles, onDismiss}: {
@@ -76,7 +77,7 @@ export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalContro
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           axios
-            .patch(`https://api.necrom.ru/worker_role/${ev.detail.data.id}`, {
+            .patch(`${atLocation('worker_role')}/${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               db_user_email: "primitive_email@not.even.valid",
               db_user_password: "primitive_password",

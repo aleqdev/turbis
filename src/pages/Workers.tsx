@@ -11,12 +11,14 @@ import { PatchWorkerModalController } from '../components/worker/PatchWorker';
 import { DeleteWorkersModalController } from '../components/worker/DeleteWorkers';
 import { WorkersList } from '../components/worker/WorkersList';
 import useAxios from 'axios-hooks'
+import { atLocation } from '../utils/server_url';
 
 const Page: React.FC = () => {
   const [selected_workers, set_selected_workers] = useState(Array<WorkerJoinedFetch>);
+  const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
   const [{ data: workers }, refetch_workers]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
-    'https://api.necrom.ru/worker?join=true'
+    atLocation('worker?join=true')
   );
 
   useEffect(
@@ -27,6 +29,13 @@ const Page: React.FC = () => {
     },
     [workers]
   );
+
+  useEffect(
+    () => {
+      set_clear_selection_trigger(s => !s);
+    },
+    [workers]
+  )
   
   return (
     <IonPage>
@@ -55,7 +64,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <WorkersList workers={workers!} on_selected_change={set_selected_workers}></WorkersList>
+        <WorkersList clear_selection_trigger={clear_selection_trigger} workers={workers!} on_selected_change={set_selected_workers}></WorkersList>
       </IonContent>
     </IonPage>
   );

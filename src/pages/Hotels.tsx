@@ -11,12 +11,14 @@ import useAxios from 'axios-hooks'
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
 import { HotelsList } from '../components/hotel/HotelsList';
 import { PutHotelModalController } from '../components/hotel/PutHotel';
+import { atLocation } from '../utils/server_url';
 
 const Page: React.FC = () => {
   const [selected_hotels, set_selected_hotels] = useState(Array<HotelJoinedFetch>);
+  const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
   const [{ data: hotels }, refetch_hotels]: [{data?: Array<HotelJoinedFetch>}, ...any] = useAxios(
-    'https://api.necrom.ru/hotel?join=true'
+    atLocation('hotel?join=true')
   );
 
   useEffect(
@@ -27,6 +29,13 @@ const Page: React.FC = () => {
     },
     [hotels]
   );
+
+  useEffect(
+    () => {
+      set_clear_selection_trigger(s => !s);
+    },
+    [hotels]
+  )
   
   return (
     <IonPage>
@@ -55,7 +64,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <HotelsList hotels={hotels!} on_selected_change={set_selected_hotels} />
+        <HotelsList clear_selection_trigger={clear_selection_trigger} hotels={hotels!} on_selected_change={set_selected_hotels} />
       </IonContent>
     </IonPage>
   );

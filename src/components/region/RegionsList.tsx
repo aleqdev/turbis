@@ -5,6 +5,7 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import { RegionJoinedFetch } from "../../interface/region";
 import 'react-data-table-component-extensions/dist/index.css';
+import { atLocation } from "../../utils/server_url";
 
 const listColumns = [
   {
@@ -31,7 +32,7 @@ export const RegionsList: React.FC<RegionsListProps> = (props) => {
 
   React.useEffect(() => {
     axios
-      .get("https://api.necrom.ru/region?join=true")
+      .get(atLocation('region?join=true'))
       .then((response) => set_regions(response.data));
   }, [])
   

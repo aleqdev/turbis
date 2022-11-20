@@ -5,6 +5,7 @@ import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { WorkerJoinedFetch } from '../../interface/worker';
 import { RefetchFunction } from 'axios-hooks'
+import { atLocation } from '../../utils/server_url';
 
 export function PatchWorkerModal(
   {selected_workers, onDismiss}: {
@@ -31,7 +32,7 @@ export function PatchWorkerModal(
     }
 
     axios
-      .get("https://api.necrom.ru/worker_role")
+      .get(atLocation('worker_role'))
       .then((response) => setRoles(response.data));
   }, [prevRole]);
 
@@ -122,7 +123,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           axios
-            .patch(`https://api.necrom.ru/worker/${ev.detail.data.id}`, {
+            .patch(`${atLocation('worker')}/${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

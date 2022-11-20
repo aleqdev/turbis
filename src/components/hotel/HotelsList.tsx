@@ -57,7 +57,8 @@ const ExpandedHotel = ({ data }: { data: any}) => {
 
 export interface HotelsListProps {
   hotels: Array<HotelJoinedFetch> | null,
-  on_selected_change: Dispatch<React.SetStateAction<Array<HotelJoinedFetch>>>
+  on_selected_change: Dispatch<React.SetStateAction<Array<HotelJoinedFetch>>>,
+  clear_selection_trigger: boolean
 }
 
 export const HotelsList: React.FC<HotelsListProps> = (props) => {
@@ -83,6 +84,7 @@ export const HotelsList: React.FC<HotelsListProps> = (props) => {
               selectableRows
               expandableRows={true}
               expandableRowsComponent={ExpandedHotel}
+              clearSelectedRows={props.clear_selection_trigger}
             />
           </DataTableExtensions>
       }

@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { Dispatch, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RegionJoinedFetch } from '../../interface/region';
+import { atLocation } from '../../utils/server_url';
 
 export function PatchRegionModal(
   {selected_regions, onDismiss}: {
@@ -88,7 +89,7 @@ export const PatchRegionModalController: React.FC<PatchRegionModalControllerProp
         if (ev.detail.role === 'confirm') {
           props.set_selected_region([]);
           axios
-            .patch(`https://api.necrom.ru/worker/${props.selected_regions[0].id}`, {
+            .patch(`${atLocation('region')}/${props.selected_regions[0].id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
@@ -8,6 +8,7 @@ import { WorkerJoinedFetch } from '../../interface/worker';
 import { CityJoinedFetch } from '../../interface/city';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatCity, formatWorker } from '../../utils/fmt';
+import { atLocation } from '../../utils/server_url';
 
 export function PatchHotelModal(
   {selected_hotels, onDismiss}: {
@@ -84,7 +85,7 @@ export function PatchHotelModal(
 
   React.useEffect(() => {
     axios
-      .get("https://api.necrom.ru/worker")
+      .get(atLocation('worker'))
       .then((response) => {
         setWorkers(response.data);
         setOwnerInput(response.data.find((e: WorkerJoinedFetch) => e.id === hotel.owner_id));
@@ -93,7 +94,7 @@ export function PatchHotelModal(
 
   React.useEffect(() => {
     axios
-      .get("https://api.necrom.ru/city?join=true")
+      .get(atLocation('city?join=true'))
       .then((response) => {
         setCities(response.data);
         setCityInput(response.data.find((e: CityJoinedFetch) => e.id === hotel.city_id));
@@ -179,7 +180,7 @@ export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps>
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           axios
-            .patch(`https://api.necrom.ru/hotel/${ev.detail.data.id}`, {
+            .patch(`${atLocation('hotel')}/${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               description: ev.detail.data.description,
               city_id: ev.detail.data.city_id,

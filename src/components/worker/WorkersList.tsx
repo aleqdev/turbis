@@ -47,7 +47,8 @@ const listColumns = [
 
 export interface WorkersListProps {
   workers: Array<WorkerJoinedFetch> | null,
-  on_selected_change: Dispatch<React.SetStateAction<Array<WorkerJoinedFetch>>>
+  on_selected_change: Dispatch<React.SetStateAction<Array<WorkerJoinedFetch>>>,
+  clear_selection_trigger: boolean
 }
 
 export const WorkersList: React.FC<WorkersListProps> = (props) => {
@@ -72,6 +73,7 @@ export const WorkersList: React.FC<WorkersListProps> = (props) => {
             pagination
             selectableRows
             highlightOnHover
+            clearSelectedRows={props.clear_selection_trigger}
           />
          </DataTableExtensions>
   
