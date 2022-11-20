@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
   IonContent,
@@ -37,26 +37,24 @@ const Page: React.FC = () => {
           </IonButtons>
           <IonItem lines="none">
             <IonTitle>Сотрудники</IonTitle>
-            <IonButton routerLink='/page/WorkerRole'>Перейти к ролям</IonButton>
+            <IonList>
+              {
+                (selected_workers?.length === 1 ) ? 
+                  <PatchWorkerModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+                  : ""
+              }
+              {
+                (selected_workers?.length > 0 ) ? 
+                  <DeleteWorkersModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+                  : ""
+              }
+              <PutWorkerModalController refetch_workers={refetch_workers} />
+            </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <IonList id="inbox-list">
-          <PutWorkerModalController refetch_workers={refetch_workers} />
-          {
-            (selected_workers?.length > 0 ) ? 
-              <DeleteWorkersModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
-              : ""
-          }
-          {
-            (selected_workers?.length === 1 ) ? 
-              <PatchWorkerModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
-              : ""
-          }
-        </IonList>
-        
         <WorkersList workers={workers!} on_selected_change={set_selected_workers}></WorkersList>
       </IonContent>
     </IonPage>

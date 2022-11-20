@@ -1,4 +1,4 @@
-import { IonButtons, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
   IonContent,
@@ -35,25 +35,26 @@ const Page: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Отели</IonTitle>
+          <IonItem lines='none'>
+            <IonTitle>Отели</IonTitle>
+            <IonList>
+              {
+                (selected_hotels?.length === 1) ? 
+                  <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                  : ""
+              }
+              {
+                (selected_hotels?.length > 0) ? 
+                  <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                  : ""
+              }
+              <PutHotelModalController refetch_hotels={refetch_hotels} />
+            </IonList>
+          </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <IonList id="inbox-list">
-          <PutHotelModalController refetch_hotels={refetch_hotels} />
-          {
-            (selected_hotels?.length > 0) ? 
-              <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
-              : ""
-          }
-          {
-            (selected_hotels?.length === 1) ? 
-              <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
-              : ""
-          }
-        </IonList>
-        
         <HotelsList hotels={hotels!} on_selected_change={set_selected_hotels} />
       </IonContent>
     </IonPage>

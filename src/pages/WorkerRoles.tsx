@@ -1,4 +1,4 @@
-import { IonButtons, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
   IonContent,
@@ -35,25 +35,26 @@ const Page: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Роли</IonTitle>
+          <IonItem lines="none">
+            <IonTitle>Роли</IonTitle>
+            <IonList>
+              {
+                (selected_worker_roles?.length === 1 ) ? 
+                  <PatchWorkerRoleModalController refetch_worker_roles={refetch_worker_roles} selected_worker_roles={selected_worker_roles}/>
+                  : ""
+              }
+              {
+                (selected_worker_roles?.length > 0 ) ? 
+                  <DeleteWorkerRolesModalController refetch_worker_roles={refetch_worker_roles} selected_worker_roles={selected_worker_roles}/>
+                  : ""
+              }
+              <PutWorkerRoleModalController refetch_worker_roles={refetch_worker_roles} />
+            </IonList>
+          </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <IonList id="inbox-list">
-          <PutWorkerRoleModalController refetch_worker_roles={refetch_worker_roles} />
-          {
-            (selected_worker_roles?.length > 0 ) ? 
-              <DeleteWorkerRolesModalController refetch_worker_roles={refetch_worker_roles} selected_worker_roles={selected_worker_roles}/>
-              : ""
-          }
-          {
-            (selected_worker_roles?.length === 1 ) ? 
-              <PatchWorkerRoleModalController refetch_worker_roles={refetch_worker_roles} selected_worker_roles={selected_worker_roles}/>
-              : ""
-          }
-        </IonList>
-        
         <WorkerRolesList worker_roles={worker_roles!} on_selected_change={set_selected_worker_roles} />
       </IonContent>
     </IonPage>
