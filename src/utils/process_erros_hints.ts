@@ -16,7 +16,7 @@ export function process_error_hint(body: any): string {
     }
   }
 
-  return body.error_hint != undefined ?
+  return body.error_hint !== undefined ?
     map_hint(body) :
     JSON.stringify(body)
 }

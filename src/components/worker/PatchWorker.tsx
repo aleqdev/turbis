@@ -26,7 +26,6 @@ export function PatchWorkerModal(
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   React.useEffect(() => {
-    console.log(inputRole.current);
     if (inputRole.current !== null) {
       inputRole.current.value = prevRole;
     }

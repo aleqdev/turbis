@@ -1,10 +1,8 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { Dispatch, useRef, useState } from 'react'
-import { WorkerRole } from '../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WorkerJoinedFetch } from '../interface/worker';
-import { RegionJoinedFetch } from '../interface/region';
+import { RegionJoinedFetch } from '../../interface/region';
 
 export function PatchRegionModal(
   {selected_regions, onDismiss}: {

@@ -5,11 +5,11 @@ import {
   IonList,
 } from '@ionic/react';
 import React from 'react';
-import { RegionsList } from '../components/RegionsList';
+import { RegionsList } from '../components/region/RegionsList';
 import { RegionJoinedFetch } from '../interface/region';
 
 const Page: React.FC = () => {
-  const [selected_regions, set_selected_regions] = React.useState(Array<RegionJoinedFetch>);
+  const [_, set_selected_regions] = React.useState(Array<RegionJoinedFetch>);
   
   return (
     <IonPage>

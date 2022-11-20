@@ -21,9 +21,9 @@ const Page: React.FC = () => {
 
   useEffect(
     () => {
-      set_selected_workers(selected_workers.map((selected_worker) => {
-        return workers?.find((w) => w.id == selected_worker.id)
-      }).filter((w) => w != undefined).map((w) => w!));
+      set_selected_workers(s => s.map((selected_worker) => {
+        return workers?.find((w) => w.id === selected_worker.id)
+      }).filter((w) => w !== undefined).map((w) => w!));
     },
     [workers]
   );

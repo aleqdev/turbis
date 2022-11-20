@@ -21,9 +21,9 @@ const Page: React.FC = () => {
 
   useEffect(
     () => {
-      set_selected_hotels(selected_hotels.map((selected_hotel) => {
-        return hotels?.find((h) => h.id == selected_hotel.id)
-      }).filter((h) => h != undefined).map((h) => h!));
+      set_selected_hotels(s => s.map((selected_hotel) => {
+        return hotels?.find((h) => h.id === selected_hotel.id)
+      }).filter((h) => h !== undefined).map((h) => h!));
     },
     [hotels]
   );

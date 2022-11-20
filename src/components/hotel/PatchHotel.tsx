@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
@@ -35,9 +35,9 @@ export function PatchHotelModal(
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
         return value + 
-          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() == element) + 
-          +e.region_name.toLowerCase().includes(element) + 10 * +(e.region_name.toLowerCase() == element) +
-          +e.country_name.toLowerCase().includes(element) + 10 * +(e.country_name.toLowerCase() == element);
+          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() === element) + 
+          +e.region_name.toLowerCase().includes(element) + 10 * +(e.region_name.toLowerCase() === element) +
+          +e.country_name.toLowerCase().includes(element) + 10 * +(e.country_name.toLowerCase() === element);
       }, 0);
     },
     keyer: (e: CityJoinedFetch) => e.id,
@@ -87,18 +87,18 @@ export function PatchHotelModal(
       .get("https://api.necrom.ru/worker")
       .then((response) => {
         setWorkers(response.data);
-        setOwnerInput(response.data.find((e: WorkerJoinedFetch) => e.id == hotel.owner_id));
+        setOwnerInput(response.data.find((e: WorkerJoinedFetch) => e.id === hotel.owner_id));
       });
-  }, []);
+  }, [hotel.owner_id]);
 
   React.useEffect(() => {
     axios
       .get("https://api.necrom.ru/city?join=true")
       .then((response) => {
         setCities(response.data);
-        setCityInput(response.data.find((e: CityJoinedFetch) => e.id == hotel.city_id));
+        setCityInput(response.data.find((e: CityJoinedFetch) => e.id === hotel.city_id));
       });
-  }, []);
+  }, [hotel.city_id]);
 
   function confirm() {
     const name = inputName.current?.value;
