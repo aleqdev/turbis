@@ -1,9 +1,9 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonLabel, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
 import React, { Dispatch } from 'react';
 import axios, { AxiosError } from 'axios';
-import { process_error_hint } from '../utils/process_erros_hints';
-import { RegionJoinedFetch } from '../interface/region';
+import { process_error_hint } from '../../utils/process_erros_hints';
+import { RegionJoinedFetch } from '../../interface/region';
 
 export function DeleteRegionsModal(
   {selected_regions, onDismiss}: {

@@ -31,9 +31,9 @@ export function PutHotelModal(
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
         return value + 
-          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() == element) + 
-          +e.region_name.toLowerCase().includes(element) + 10 * +(e.region_name.toLowerCase() == element) +
-          +e.country_name.toLowerCase().includes(element) + 10 * +(e.country_name.toLowerCase() == element);
+          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() === element) + 
+          +e.region_name.toLowerCase().includes(element) + 10 * +(e.region_name.toLowerCase() === element) +
+          +e.country_name.toLowerCase().includes(element) + 10 * +(e.country_name.toLowerCase() === element);
       }, 0);
     },
     keyer: (e: CityJoinedFetch) => e.id,

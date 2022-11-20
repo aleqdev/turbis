@@ -1,7 +1,7 @@
 import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
-import { WorkerRole } from '../interface/worker_role';
+import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 
 export function PutWorkerModal(

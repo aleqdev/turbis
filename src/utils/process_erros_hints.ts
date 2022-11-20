@@ -7,6 +7,9 @@ export function process_error_hint(body: any): string {
           case "worker-hotel":
             return `Невозможно удалить контактное лицо, так как оно является управляющим отелем. Сначала обновите владельца отеля, а затем удалите контактное лицо.`
 
+          case "worker_role-worker":
+            return `Невозможно удалить роль, так как существуют сотрудники с данной ролью. Сначала обновите сотрудников с данной ролью, а затем удалите роль.`
+
           default:
             return "Один из объектов является ссылаемым из другой таблицы и не может быть удалён."
         }
@@ -16,7 +19,7 @@ export function process_error_hint(body: any): string {
     }
   }
 
-  return body.error_hint != undefined ?
+  return body.error_hint !== undefined ?
     map_hint(body) :
     JSON.stringify(body)
 }

@@ -69,7 +69,7 @@ export function SelectWithSearchModal<T>(
       <IonContent className="ion-padding">
         {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
 
-        <IonSearchbar ref={inputQuery} debounce={300} onIonChange={(ev) => handleChange(ev)}></IonSearchbar>
+        <IonSearchbar placeholder="Поиск" ref={inputQuery} debounce={300} onIonChange={(ev) => handleChange(ev)}></IonSearchbar>
 
         <IonList>
           { results.slice(0, 10).map(result => {

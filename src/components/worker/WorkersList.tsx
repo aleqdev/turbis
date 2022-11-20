@@ -28,7 +28,8 @@ const listColumns = [
     name: "Телефон",
     selector: "phone_number",
     sortable: true,
-    wrap: true
+    wrap: true,
+    cell: (e: WorkerJoinedFetch) => `+${e.phone_number}`
   },
   {
     name: "Почта",

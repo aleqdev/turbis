@@ -1,7 +1,7 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { WorkerJoinedFetch } from '../../interface/worker';
-import React, { Dispatch } from 'react';
+import React from 'react';
 import axios, { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
@@ -67,7 +67,7 @@ export const DeleteWorkersModalController: React.FC<DeleteWorkersModalController
           }))
           .then((results) => {
             for (const result of results) {
-              if (result.status == "rejected" && result.reason instanceof AxiosError) {
+              if (result.status === "rejected" && result.reason instanceof AxiosError) {
                 props.refetch_workers();
                 presentAlert({
                   header: "Ошибка",
