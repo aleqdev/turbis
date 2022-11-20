@@ -64,7 +64,7 @@ export const WorkersList: React.FC<WorkersListProps> = (props) => {
             filterPlaceholder="Поиск"
           >
             <DataTable
-            title="Список сотрудников:"
+            title="Список контактных лиц:"
             columns={listColumns as any}
             data={props.workers}
             defaultSortFieldId="name"
