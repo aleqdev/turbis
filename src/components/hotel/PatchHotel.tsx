@@ -105,13 +105,19 @@ export function PatchHotelModal(
     const description = inputDescription.current?.value
 
     if (name && description && cityInput && ownerInput) {
-      onDismiss({
-        id: hotel.id,
-        name,
-        description,
-        city_id: cityInput.id,
-        owner_id: ownerInput.id
-      }, 'confirm');
+      if (description.length > 500) {
+        setErrorMessage("Описание отеля должно быть меньше 500 символов.")
+      } else if (name.toString().length > 200) {
+        setErrorMessage("Название отеля должно быть меньше 200 символов.")
+      } else {
+        onDismiss({
+          id: hotel.id,
+          name,
+          description,
+          city_id: cityInput.id,
+          owner_id: ownerInput.id
+        }, 'confirm');
+      }
     } else {
       setErrorMessage("Не все поля заполнены!")
     }

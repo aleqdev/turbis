@@ -99,12 +99,19 @@ export function PutHotelModal(
     const description = inputDescription.current?.value
 
     if (name && description && cityInput && ownerInput) {
-      onDismiss({
-        name,
-        description,
-        city_id: cityInput.id,
-        owner_id: ownerInput.id
-      }, 'confirm');
+      if (description.length > 500) {
+        setErrorMessage("Описание отеля должно быть меньше 500 символов.")
+      } else if (name.toString().length > 200) {
+        setErrorMessage("Название отеля должно быть меньше 200 символов.")
+      } else {
+        onDismiss({
+          name,
+          description,
+          city_id: cityInput.id,
+          owner_id: ownerInput.id
+        }, 'confirm');
+        setErrorMessage("Не все поля заполнены!")
+      }
     } else {
       setErrorMessage("Не все поля заполнены!")
     }
