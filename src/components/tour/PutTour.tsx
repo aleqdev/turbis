@@ -4,13 +4,14 @@ import React, { useRef, useState } from 'react'
 import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
+import DateRangePicker from 'rsuite/DateRangePicker';
 
 export function PutWorkerModal(
   {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [roles, setRoles] = React.useState(null as Array<WorkerRole> | null);
+  const [hotels, setHotels] = React.useState(null as Array<WorkerRole> | null);
   const inputName = useRef<HTMLIonInputElement>(null);
   const inputSurname = useRef<HTMLIonInputElement>(null);
   const inputLastName = useRef<HTMLIonInputElement>(null);
@@ -22,8 +23,9 @@ export function PutWorkerModal(
   React.useEffect(() => {
     axios
       .get("https://api.necrom.ru/worker_role")
-      .then((response) => setRoles(response.data));
+      .then((response) => setHotels(response.data));
   }, [])
+  
 
   function confirm() {
     const name = inputName.current?.value;
@@ -45,6 +47,8 @@ export function PutWorkerModal(
       setErrorMessage("Не все поля заполнены!")
     }
   }
+
+  
   const [tagInputVal, setTagInputVal] = useState("");
   function onChangeTagInput(e:any) {
     console.log(e.target)
@@ -71,6 +75,17 @@ export function PutWorkerModal(
       <IonContent className="ion-padding">
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
+          <IonLabel position="stacked" >Отель</IonLabel>
+          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
+            {
+              hotels ? 
+                hotels.map((element) => {
+                  return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
+                }) :
+                <IonText>Загрузка...</IonText>
+            }
+          </IonSelect>
+          <DateRangePicker />
           <IonLabel position="stacked">Имя</IonLabel>
           <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" required/>
           <IonLabel position="stacked">Фамилия</IonLabel>
@@ -83,16 +98,6 @@ export function PutWorkerModal(
           <IonInput ref={inputEmail} clearInput={true} type="text" placeholder="Введите почту" required/>
           <IonInput type="number" ng-pattern="/^[0-9]+(\.[0-9]{1,2})/" step="0.01" placeholder="0.00"></IonInput>
           <IonInput type="text" onChange={(e) => console.log('click')} value={tagInputVal} step="0.01" placeholder="0.00"></IonInput>
-          <IonLabel position="stacked" >Роль</IonLabel>
-          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
-            {
-              roles ? 
-                roles.map((element) => {
-                  return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
-                }) :
-                <IonText>Загрузка...</IonText>
-            }
-          </IonSelect>
         </IonItem>
       </IonContent>
     </>
