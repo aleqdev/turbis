@@ -17,19 +17,19 @@ import { DeleteToursModalController } from '../components/tour/DeleteTours';
 import { PutTourModalController } from '../components/tour/PutTour';
 
 const Page: React.FC = () => {
-  const [selected_workers, set_selected_workers] = useState(Array<WorkerJoinedFetch>);
+  const [selected_tours, set_selected_tours] = useState(Array<WorkerJoinedFetch>);
 
-  const [{ data: workers }, refetch_workers]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
+  const [{ data: tours }, refetch_tours]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
     'https://api.necrom.ru/worker?join=true'
   );
 
   useEffect(
     () => {
-      set_selected_workers(s => s.map((selected_worker) => {
-        return workers?.find((w) => w.id === selected_worker.id)
+      set_selected_tours(s => s.map((selected_tours) => {
+        return tours?.find((w) => w.id === selected_tours.id)
       }).filter((w) => w !== undefined).map((w) => w!));
     },
-    [workers]
+    [tours]
   );
   
   return (
@@ -43,23 +43,23 @@ const Page: React.FC = () => {
             <IonTitle>Туры</IonTitle>
             <IonList>
               {
-                (selected_workers?.length === 1 ) ? 
-                  <PatchTourModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+                (selected_tours?.length === 1 ) ? 
+                  <PatchTourModalController refetch_workers={refetch_tours} selected_workers={selected_tours}/>
                   : ""
               }
               {
-                (selected_workers?.length > 0 ) ? 
-                  <DeleteToursModalController refetch_workers={refetch_workers} selected_workers={selected_workers}/>
+                (selected_tours?.length > 0 ) ? 
+                  <DeleteToursModalController refetch_workers={refetch_tours} selected_workers={selected_tours}/>
                   : ""
               }
-              <PutTourModalController refetch_workers={refetch_workers} />
+              <PutTourModalController refetch_workers={refetch_tours} />
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <ToursList workers={workers!} on_selected_change={set_selected_workers}></ToursList>
+        <ToursList workers={tours!} on_selected_change={set_selected_tours}></ToursList>
       </IonContent>
     </IonPage>
   );
