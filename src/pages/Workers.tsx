@@ -17,8 +17,8 @@ const Page: React.FC = () => {
   const [selected_workers, set_selected_workers] = useState(Array<WorkerJoinedFetch>);
   const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
-  const [{ data: workers }, refetch_workers]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
-    atLocation('worker?join=true')
+  const [{ data: workers}, refetch_workers]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
+    {url: atLocation('db/hotel?join=true'), headers: {"DB-User-Email": "primitive_email@not.even.valid", "DB-User-Password": "primitive_password"}}
   );
 
   useEffect(
