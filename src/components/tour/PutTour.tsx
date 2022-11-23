@@ -1,10 +1,10 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
+import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal, IonDatetime, IonTextarea } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
-import DateRangePicker from 'rsuite/DateRangePicker';
+import CurrencyInput from 'react-currency-input-field';
 import { AuthProps } from '../../interface/props/auth';
 
 /*
@@ -19,7 +19,7 @@ export function PutWorkerModal(
   const inputLastName = useRef<HTMLIonInputElement>(null);
   const inputEmail = useRef<HTMLIonInputElement>(null);
   const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
-  const [inputRole, setInputRole] = useState(null as EmployeeRole | null);
+  const [inputRole, setInputRole] = useState(null as WorkerRole | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   React.useEffect(() => {
@@ -53,8 +53,9 @@ export function PutWorkerModal(
   
   const [tagInputVal, setTagInputVal] = useState("");
   function onChangeTagInput(e:any) {
-    console.log(e.target)
-    // setTagInputVal(e.target.value);
+    if (e.target.value.split('.')[1].length > 2) {
+      e.target.value = e.target.value.split('.')[0] + '.' + e.target.value.split('.')[1].slice(0, 2)
+    }
 }
   return (
     <>
@@ -87,19 +88,31 @@ export function PutWorkerModal(
                 <IonText>Загрузка...</IonText>
             }
           </IonSelect>
-          <DateRangePicker />
-          <IonLabel position="stacked">Имя</IonLabel>
-          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" required/>
-          <IonLabel position="stacked">Фамилия</IonLabel>
+          <IonDatetime presentation="date"><span slot="title">Дата заезда</span></IonDatetime>
+          <IonDatetime presentation="date" ><span slot="title">Дата выезда</span></IonDatetime>
+          
+          <IonLabel position="stacked" >Вид питания</IonLabel>
+          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
+            <IonSelectOption key={'Без питания'} value={'Без питания'}>{'Без питания'}</IonSelectOption>
+            <IonSelectOption key={'С завтраком'} value={'С завтраком'}>{'С завтраком'}</IonSelectOption>
+            <IonSelectOption key={'3-х разовое'} value={'3-х разовое'}>{'3-х разовое'}</IonSelectOption>
+          </IonSelect>
+          {/* <IonLabel position="stacked">Фамилия</IonLabel>
           <IonInput ref={inputSurname} clearInput={true} type="text" placeholder="Введите фамилию" required/>
           <IonLabel position="stacked">Отчество</IonLabel>
           <IonInput ref={inputLastName} clearInput={true} type="text" placeholder="Введите отчество" required/>
           <IonLabel position="stacked">Телефон</IonLabel>
-          <IonInput ref={inputPhoneNumber} clearInput={true} type="text" placeholder="Введите телефон" required/>
-          <IonLabel position="stacked">Почта</IonLabel>
-          <IonInput ref={inputEmail} clearInput={true} type="text" placeholder="Введите почту" required/>
-          <IonInput type="number" ng-pattern="/^[0-9]+(\.[0-9]{1,2})/" step="0.01" placeholder="0.00"></IonInput>
-          <IonInput type="text" onChange={(e) => console.log('click')} value={tagInputVal} step="0.01" placeholder="0.00"></IonInput>
+          <IonInput ref={inputPhoneNumber} clearInput={true} type="text" placeholder="Введите телефон" required/> */}
+          {/* <IonInput type="text" value={''} onKeyPress={(event) => { if (!/[0-9.]/.test(event.key) && (event?.target as HTMLInputElement)?.value.match(/\./g)?.length == 1) { event.preventDefault();}}} onIonChange={(e) => onChangeTagInput(e)} step="0.01" placeholder="0.00"></IonInput> */}
+          <CurrencyInput
+            placeholder="Введите стоимость тура"
+            decimalsLimit={2}
+            decimalSeparator='.'
+            suffix=' ₽'
+            // onValueChange={(value:any, name:any) => console.log(value, name)}
+          />
+          <IonLabel position="stacked">Описание тура</IonLabel>
+          <IonTextarea ref={inputDescription} auto-grow={true} placeholder="Введите описание" required/>
         </IonItem>
       </IonContent>
     </>
@@ -158,4 +171,3 @@ export const PutTourModalController: React.FC<PutWorkerModalControllerProps & Au
     </IonButton>
   )
 }
-*/
