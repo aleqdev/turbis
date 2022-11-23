@@ -4,13 +4,13 @@ import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
-import { EmployeeRole } from '../../interface/employee_role';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
+import ClientType from '../../interface/client_type';
 
-export function DeleteEmployeeRolesModal(
-  {selected_employee_roles, onDismiss}: {
-    selected_employee_roles: Array<EmployeeRole>
+export function DeleteClientTypesModal(
+  {selected_client_types, onDismiss}: {
+    selected_client_types: Array<ClientType>
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -23,9 +23,9 @@ export function DeleteEmployeeRolesModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление Ролей</IonTitle>
+          <IonTitle>Удаление типов клиентов</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_employee_roles, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selected_client_types, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -33,9 +33,9 @@ export function DeleteEmployeeRolesModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить роли? (${selected_employee_roles.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить типы клиентов? (${selected_client_types.length})`}</IonText>
         <IonList>
-          {selected_employee_roles.map((role) => {
+          {selected_client_types.map((role) => {
             return <IonItem key={role.id}>{`- ${role.name}`}</IonItem>
           })}
         </IonList>
@@ -44,15 +44,15 @@ export function DeleteEmployeeRolesModal(
   )
 }
 
-export interface DeleteWorkerRolesModalControllerProps {
-  refetch_employee_roles: RefetchFunction<any, any>,
-  selected_employee_roles: Array<EmployeeRole>,
+export interface DeleteClientTypesModalControllerProps {
+  refetch_client_types: RefetchFunction<any, any>,
+  selected_client_types: Array<ClientType>,
 }
 
-export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalControllerProps & AuthProps> = (props) => {
-  const [present, dismiss] = useIonModal(DeleteEmployeeRolesModal, {
-    selected_employee_roles: props.selected_employee_roles,
-    onDismiss: (data: Array<EmployeeRole> | null, role: string) => dismiss(data, role),
+export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalControllerProps & AuthProps> = (props) => {
+  const [present, dismiss] = useIonModal(DeleteClientTypesModal, {
+    selected_client_types: props.selected_client_types,
+    onDismiss: (data: Array<ClientType> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -60,14 +60,14 @@ export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalCo
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          Promise.allSettled(ev.detail.data.map(async (role: EmployeeRole) => {
+          Promise.allSettled(ev.detail.data.map(async (role: ClientType) => {
             await API
-              .delete_with_auth(props.auth, `employee_role?id=eq.${role.id}`)
+              .delete_with_auth(props.auth, `client_type?id=eq.${role.id}`)
           }))
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_employee_roles();
+                props.refetch_client_types();
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -77,9 +77,9 @@ export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalCo
                 return;
               }
             }
-            props.refetch_employee_roles();
+            props.refetch_client_types();
             presentAlert({
-              header: "Роли удалены",
+              header: "Типы клиентов удалены",
               buttons: ["Ок"]
             });
           })

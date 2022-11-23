@@ -3,8 +3,8 @@ import React, { Dispatch } from "react";
 import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
+import ClientType from "../../interface/client_type";
 import { AuthProps } from "../../interface/props/auth";
-import { EmployeeRole } from "../../interface/employee_role";
 
 const listColumns = [
   {
@@ -22,27 +22,27 @@ const listColumns = [
 ];
 
 export interface EmployeeRolesListProps {
-  employee_roles: Array<EmployeeRole> | null,
-  on_selected_change: Dispatch<React.SetStateAction<Array<EmployeeRole>>>
+  client_types: Array<ClientType> | null,
+  on_selected_change: Dispatch<React.SetStateAction<Array<ClientType>>>
 }
 
-export const EmployeeRolesList: React.FC<EmployeeRolesListProps & AuthProps> = (props) => {
+export const ClientTypesList: React.FC<EmployeeRolesListProps & AuthProps> = (props) => {
   return (
-    <IonList id="employee-roles-list">
+    <IonList id="client-types-list">
       {
-        (props.employee_roles === null) ?
+        (props.client_types === null) ?
           <IonTitle>Загрузка...</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.employee_roles}
+            data={props.client_types}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
           >
             <DataTable
-            title="Список ролей:"
+            title="Список типов клиентов:"
             columns={listColumns as any}
-            data={props.employee_roles}
+            data={props.client_types}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination

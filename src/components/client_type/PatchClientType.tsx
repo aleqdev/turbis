@@ -1,16 +1,20 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
+import ClientType from '../../interface/client_type';
 
-export function PutEmployeeRoleModal(
-  {onDismiss}: {
+export function PatchEmployeeRoleModal(
+  {selected_client_types, onDismiss}: {
+    selected_client_types: Array<ClientType>,
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const client_type = selected_client_types[0];
+
   const inputName = useRef<HTMLIonInputElement>(null);
 
   const [errorMessage, setErrorMessage] = useState(null as string | null);
@@ -20,6 +24,7 @@ export function PutEmployeeRoleModal(
 
     if (name) {
       onDismiss({
+        id: client_type.id,
         name,
       }, 'confirm');
     } else {
@@ -36,10 +41,10 @@ export function PutEmployeeRoleModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Создать Роль</IonTitle>
+          <IonTitle>Изменить тип клиента</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
-              Создать
+              Изменить
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -49,19 +54,21 @@ export function PutEmployeeRoleModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите название" required/>
+          <IonInput ref={inputName} type="text" placeholder="Введите название" value={client_type.name} required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PutEmployeeRoleModalControllerProps {
-  refetch_employee_roles: RefetchFunction<any, any>,
+export interface PatchClientTypeModalControllerProps {
+  refetch_client_types: RefetchFunction<any, any>,
+  selected_client_types: Array<ClientType>,
 }
 
-export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalControllerProps & AuthProps> = (props) => {
-  const [present, dismiss] = useIonModal(PutEmployeeRoleModal, {
+export const PatchClientTypeModalController: React.FC<PatchClientTypeModalControllerProps & AuthProps> = (props) => {
+  const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
+    selected_client_types: props.selected_client_types,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -71,18 +78,18 @@ export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalContro
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, 'employee_role', {
-              name: ev.detail.data.name
+            .patch_with_auth(props.auth, `client_type?id=eq.${ev.detail.data.id}`, {
+              name: ev.detail.data.name,
             })
             .then((_) => {
-              props.refetch_employee_roles();
+              props.refetch_client_types();
               presentAlert({
-                header: "Роль добавлена",
+                header: "Данные типа клиента изменены",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_employee_roles();
+              props.refetch_client_types();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
@@ -96,8 +103,8 @@ export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalContro
   }
 
   return (
-    <IonButton routerDirection="none" onClick={openModal}>
-      <IonLabel>Добавить роль</IonLabel>
+    <IonButton routerDirection="none" color="secondary" onClick={openModal}>
+      <IonLabel>Изменить тип клиента</IonLabel>
     </IonButton>
   )
 }

@@ -3,7 +3,7 @@ import TourFeedingType from "./tour_feeding_type"
 
 export type Tour = {
     id: number,
-    hotel_id: string,
+    hotel_id: number,
     arrival_date: Date,
     departure_date: Date,
     feeding_type_id: number,

@@ -15,7 +15,7 @@ import {
 } from '@ionic/react';
 
 import { useLocation } from 'react-router-dom';
-import { personOutline, homeOutline, earthOutline, settingsOutline, radioOutline, airplaneOutline } from 'ionicons/icons';
+import { personOutline, homeOutline, earthOutline, settingsOutline, callOutline, airplaneOutline, accessibilityOutline } from 'ionicons/icons';
 import './Menu.css';
 import { useRef } from 'react';
 import { useHistory } from 'react-router'
@@ -44,8 +44,8 @@ const appPages: AppPage[] = [
   {
     title: 'Контактные лица',
     url: '/page/Persons',
-    iosIcon: radioOutline,
-    mdIcon: radioOutline
+    iosIcon: callOutline,
+    mdIcon: callOutline
   },
   {
     title: 'Сотрудники',
@@ -62,6 +62,26 @@ const appPages: AppPage[] = [
       {
         title: 'Роли',
         url: '/page/EmployeeRoles',
+        iosIcon: settingsOutline,
+        mdIcon: settingsOutline,
+      },
+    ]
+  },
+  {
+    title: 'Клиенты',
+    url: '/page/Clients',
+    iosIcon: accessibilityOutline,
+    mdIcon: accessibilityOutline,
+    children: [
+      {
+        title: 'Клиенты',
+        url: '/page/Clients',
+        iosIcon: accessibilityOutline,
+        mdIcon: accessibilityOutline,
+      },
+      {
+        title: 'Типы Клиентов',
+        url: '/page/ClientTypes',
         iosIcon: settingsOutline,
         mdIcon: settingsOutline,
       },

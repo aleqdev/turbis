@@ -6,6 +6,8 @@ import Hotels from './pages/Hotels';
 import Regions from './pages/Regions'
 import Employees from './pages/Employees'
 import EmployeeRoles from './pages/EmployeeRoles'
+import Clients from './pages/Clients'
+import ClientTypes from './pages/ClientTypes'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -26,7 +28,7 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import Persons from './pages/Persons';
-//import Tours from './pages/Tours';
+import Tours from './pages/Tours';
 
 setupIonicReact();
 
@@ -50,9 +52,9 @@ const App: React.FC = () => {
               <Hotels auth={auth} />
             </Route>
             {
-         //   <Route path="/page/Tours" exact={true}>
-         //     <Tours  />
-         //  </Route>
+            <Route path="/page/Tours" exact={true}>
+              <Tours auth={auth} />
+            </Route>
             }
             <Route path="/page/Regions" exact={true}>
               <Regions auth={auth} />
@@ -65,6 +67,12 @@ const App: React.FC = () => {
             </Route>
             <Route path="/page/Persons" exact={true}>
               <Persons auth={auth} />
+            </Route>
+            <Route path="/page/Clients" exact={true}>
+              <Clients auth={auth} />
+            </Route>
+            <Route path="/page/ClientTypes" exact={true}>
+              <ClientTypes auth={auth} />
             </Route>
           </IonRouterOutlet>
         </IonSplitPane>

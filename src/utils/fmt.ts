@@ -8,3 +8,8 @@ export function formatPerson(w: Person): string {
 export function formatCity(c: City): string {
   return `${c.region!.country!.name}, ${c.region!.name}, ${c.name}`;
 }
+
+export function formatDate(c: any): string {
+  let x = new Date(c);
+  return `${x.getDate()}.${x.getMonth()+1}.${x.getFullYear()}`;
+}
