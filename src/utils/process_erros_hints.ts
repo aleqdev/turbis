@@ -13,7 +13,19 @@ export function process_error_hint(body: any): string {
           default:
             return "Один из объектов является ссылаемым из другой таблицы и не может быть удалён."
         }
-    
+
+        case "check_violation":
+          switch (body.check) {
+            case "phone_number_check":
+              return `Введённый номер телефона не соответствует стандарту. (Используйте только цифры, без знака "+", пробелов и скобок)`
+
+            case "email_check":
+              return `Введённая почта не соответствует стандарту.`
+
+            default:
+              return "Одно из полей набрано неправильно."
+          }
+      
       default:
         return "Неизвестная ошибка"
     }

@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { atLocation } from '../../utils/server_url';
+import { process_error_hint } from '../../utils/process_erros_hints';
 
 export function PutWorkerRoleModal(
   {onDismiss}: {
@@ -87,7 +88,7 @@ export const PutWorkerRoleModalController: React.FC<PutWorkerRoleModalController
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: process_error_hint(error.response.data),
                 buttons: ["Ок"]
               });
             });
