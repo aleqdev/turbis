@@ -1,21 +1,23 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useMemo, useRef, useState } from 'react'
-import { WorkerRole } from '../../interface/worker_role';
+import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WorkerJoinedFetch } from '../../interface/worker';
 import { RefetchFunction } from 'axios-hooks'
+import { AuthProps } from '../../interface/props/auth';
+
+/*
 
 export function PatchWorkerModal(
   {selected_workers, onDismiss}: {
-    selected_workers: Array<WorkerJoinedFetch>,
+    selected_workers: Array<EmployeeJoinedFetch>,
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
   const worker = selected_workers[0];
   const prevRole = useMemo(() => {return {id: worker.role_id, name: worker.role_name}}, [worker]);
 
-  const [roles, setRoles] = React.useState(null as Array<WorkerRole> | null);
+  const [roles, setRoles] = React.useState(null as Array<EmployeeRole> | null);
   const inputName = useRef<HTMLIonInputElement>(null);
   const inputSurname = useRef<HTMLIonInputElement>(null);
   const inputLastName = useRef<HTMLIonInputElement>(null);
@@ -107,10 +109,10 @@ export function PatchWorkerModal(
 
 export interface PatchWorkerModalControllerProps {
   refetch_workers: RefetchFunction<any, any>,
-  selected_workers: Array<WorkerJoinedFetch>,
+  selected_workers: Array<EmployeeJoinedFetch>,
 }
 
-export const PatchTourModalController: React.FC<PatchWorkerModalControllerProps> = (props) => {
+export const PatchTourModalController: React.FC<PatchWorkerModalControllerProps & AuthProps> = (props) => {
   const [present, dismiss] = useIonModal(PatchWorkerModal, {
     selected_workers: props.selected_workers,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -159,3 +161,4 @@ export const PatchTourModalController: React.FC<PatchWorkerModalControllerProps>
     </IonButton>
   )
 }
+*/

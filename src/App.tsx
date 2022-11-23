@@ -4,8 +4,8 @@ import { Redirect, Route } from 'react-router-dom';
 import Menu from './components/Menu';
 import Hotels from './pages/Hotels';
 import Regions from './pages/Regions'
-import Workers from './pages/Workers'
-import WorkerRoles from './pages/WorkerRoles'
+import Employees from './pages/Employees'
+import EmployeeRoles from './pages/EmployeeRoles'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -25,12 +25,18 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import Tours from './pages/Tours';
+import Persons from './pages/Persons';
+//import Tours from './pages/Tours';
 
 setupIonicReact();
 
 
 const App: React.FC = () => {
+  let auth = {
+    email: "primitive_email@not.even.valid",
+    password: "primitive_password"
+  }
+
   return (
     <IonApp>
       <IonReactRouter>
@@ -41,19 +47,24 @@ const App: React.FC = () => {
               <Redirect to="/page/hotels" />
             </Route>
             <Route path="/page/Hotels" exact={true}>
-              <Hotels />
+              <Hotels auth={auth} />
             </Route>
-            <Route path="/page/Tours" exact={true}>
-              <Tours />
-            </Route>
+            {
+         //   <Route path="/page/Tours" exact={true}>
+         //     <Tours  />
+         //  </Route>
+            }
             <Route path="/page/Regions" exact={true}>
-              <Regions />
+              <Regions auth={auth} />
             </Route>
-            <Route path="/page/Workers" exact={true}>
-              <Workers />
+            <Route path="/page/Employees" exact={true}>
+              <Employees auth={auth} />
             </Route>
-            <Route path="/page/WorkerRole" exact={true}>
-              <WorkerRoles />
+            <Route path="/page/EmployeeRoles" exact={true}>
+              <EmployeeRoles auth={auth} />
+            </Route>
+            <Route path="/page/Persons" exact={true}>
+              <Persons auth={auth} />
             </Route>
           </IonRouterOutlet>
         </IonSplitPane>

@@ -1,3 +1,5 @@
+export {}
+/*
 import { IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
@@ -5,21 +7,22 @@ import {
   IonList,
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import { WorkerJoinedFetch } from '../interface/worker';
-import { PutWorkerModalController } from '../components/worker/PutWorker';
-import { PatchWorkerModalController } from '../components/worker/PatchWorker';
-import { DeleteWorkersModalController } from '../components/worker/DeleteWorkers';
-import { WorkersList } from '../components/worker/WorkersList';
+import { EmployeeJoinedFetch } from '../interface/employee';
+import { PutWorkerModalController } from '../components/employee/PutEmployee';
+import { PatchEmployeesModalController } from '../components/employee/PatchEmployee';
+import { DeleteEmployeesModalController } from '../components/employee/DeleteEmployees';
+import { WorkersList } from '../components/employee/EmployeesList';
 import useAxios from 'axios-hooks'
 import { ToursList } from '../components/tour/ToursList';
 import { PatchTourModalController } from '../components/tour/PatchTour';
 import { DeleteToursModalController } from '../components/tour/DeleteTours';
 import { PutTourModalController } from '../components/tour/PutTour';
+import { AuthProps } from '../interface/props/auth';
 
-const Page: React.FC = () => {
-  const [selected_tours, set_selected_tours] = useState(Array<WorkerJoinedFetch>);
+const Page: React.FC<AuthProps> = (props) => {
+  const [selected_tours, set_selected_tours] = useState(Array<EmployeeJoinedFetch>);
 
-  const [{ data: tours }, refetch_tours]: [{data?: Array<WorkerJoinedFetch>}, ...any] = useAxios(
+  const [{ data: tours }, refetch_tours]: [{data?: Array<EmployeeJoinedFetch>}, ...any] = useAxios(
     'https://api.necrom.ru/worker?join=true'
   );
 
@@ -44,25 +47,26 @@ const Page: React.FC = () => {
             <IonList>
               {
                 (selected_tours?.length === 1 ) ? 
-                  <PatchTourModalController refetch_workers={refetch_tours} selected_workers={selected_tours}/>
+                  <PatchTourModalController auth={props.auth} refetch_workers={refetch_tours} selected_workers={selected_tours}/>
                   : ""
               }
               {
                 (selected_tours?.length > 0 ) ? 
-                  <DeleteToursModalController refetch_workers={refetch_tours} selected_workers={selected_tours}/>
+                  <DeleteToursModalController auth={props.auth} refetch_workers={refetch_tours} selected_workers={selected_tours}/>
                   : ""
               }
-              <PutTourModalController refetch_workers={refetch_tours} />
+              <PutTourModalController auth={props.auth} refetch_workers={refetch_tours} />
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <ToursList workers={tours!} on_selected_change={set_selected_tours}></ToursList>
+        <ToursList auth={props.auth} workers={tours!} on_selected_change={set_selected_tours}></ToursList>
       </IonContent>
     </IonPage>
   );
 };
 
 export default Page;
+*/

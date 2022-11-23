@@ -1,15 +1,16 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
+import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
+import { EmployeeRole } from '../../interface/employee_role';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import Hotel from '../../interface/hotel';
 
-export function DeleteHotelsModal(
-  {selected_hotels, onDismiss}: {
-    selected_hotels: Array<Hotel>
+export function DeleteEmployeeRolesModal(
+  {selected_employee_roles, onDismiss}: {
+    selected_employee_roles: Array<EmployeeRole>
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -22,9 +23,9 @@ export function DeleteHotelsModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление Отелей</IonTitle>
+          <IonTitle>Удаление Ролей</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_hotels, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selected_employee_roles, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -32,10 +33,10 @@ export function DeleteHotelsModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить отели? (${selected_hotels.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить роли? (${selected_employee_roles.length})`}</IonText>
         <IonList>
-          {selected_hotels.map((hotel) => {
-            return <IonItem key={hotel.id}>{`- ${hotel.name} в городе ${hotel.city?.name} (${hotel.city?.region?.name})`}</IonItem>
+          {selected_employee_roles.map((role) => {
+            return <IonItem key={role.id}>{`- ${role.name}`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -43,15 +44,15 @@ export function DeleteHotelsModal(
   )
 }
 
-export type DeleteHotelsModalControllerProps = {
-  refetch_hotels: RefetchFunction<any, any>,
-  selected_hotels: Array<Hotel>
+export interface DeleteWorkerRolesModalControllerProps {
+  refetch_employee_roles: RefetchFunction<any, any>,
+  selected_employee_roles: Array<EmployeeRole>,
 }
 
-export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerProps & AuthProps> = (props) => {
-  const [present, dismiss] = useIonModal(DeleteHotelsModal, {
-    selected_hotels: props.selected_hotels,
-    onDismiss: (data: Array<Hotel> | null, role: string) => dismiss(data, role),
+export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalControllerProps & AuthProps> = (props) => {
+  const [present, dismiss] = useIonModal(DeleteEmployeeRolesModal, {
+    selected_employee_roles: props.selected_employee_roles,
+    onDismiss: (data: Array<EmployeeRole> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -59,13 +60,14 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          Promise.allSettled(ev.detail.data.map(async (hotel: Hotel) => {
-            await API.delete_with_auth(props.auth, `hotel?id=eq.${hotel.id}`);
+          Promise.allSettled(ev.detail.data.map(async (role: EmployeeRole) => {
+            await API
+              .delete_with_auth(props.auth, `employee_role?id=eq.${role.id}`)
           }))
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_hotels();
+                props.refetch_employee_roles();
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -75,9 +77,9 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
                 return;
               }
             }
-            props.refetch_hotels();
+            props.refetch_employee_roles();
             presentAlert({
-              header: "Отели удалены",
+              header: "Роли удалены",
               buttons: ["Ок"]
             });
           })

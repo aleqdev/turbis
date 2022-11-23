@@ -5,10 +5,11 @@ import {
 } from '@ionic/react';
 import React from 'react';
 import { RegionsList } from '../components/region/RegionsList';
-import { RegionJoinedFetch } from '../interface/region';
+import { AuthProps } from '../interface/props/auth';
+import Region from '../interface/region';
 
-const Page: React.FC = () => {
-  const [_, set_selected_regions] = React.useState(Array<RegionJoinedFetch>);
+const Page: React.FC<AuthProps> = (props) => {
+  const [_, set_selected_regions] = React.useState(Array<Region>);
   
   return (
     <IonPage>
@@ -24,7 +25,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <RegionsList on_selected_change={set_selected_regions}></RegionsList>
+        <RegionsList auth={props.auth} on_selected_change={set_selected_regions}></RegionsList>
       </IonContent>
     </IonPage>
   );

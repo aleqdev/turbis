@@ -1,14 +1,15 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WorkerJoinedFetch } from '../../interface/worker';
 import React from 'react';
 import axios, { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
+import { AuthProps } from '../../interface/props/auth';
 
+/*
 export function DeleteWorkersModal(
   {selected_workers, onDismiss}: {
-    selected_workers: Array<WorkerJoinedFetch>
+    selected_workers: Array<EmployeeJoinedFetch>
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -44,13 +45,13 @@ export function DeleteWorkersModal(
 
 export interface DeleteWorkersModalControllerProps {
   refetch_workers: RefetchFunction<any, any>,
-  selected_workers: Array<WorkerJoinedFetch>,
+  selected_workers: Array<EmployeeJoinedFetch>,
 }
 
-export const DeleteToursModalController: React.FC<DeleteWorkersModalControllerProps> = (props) => {
+export const DeleteToursModalController: React.FC<DeleteWorkersModalControllerProps & AuthProps> = (props) => {
   const [present, dismiss] = useIonModal(DeleteWorkersModal, {
     selected_workers: props.selected_workers,
-    onDismiss: (data: Array<WorkerJoinedFetch> | null, role: string) => dismiss(data, role),
+    onDismiss: (data: Array<EmployeeJoinedFetch> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -58,7 +59,7 @@ export const DeleteToursModalController: React.FC<DeleteWorkersModalControllerPr
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          Promise.allSettled(ev.detail.data.map(async (worker: WorkerJoinedFetch) => {
+          Promise.allSettled(ev.detail.data.map(async (worker: EmployeeJoinedFetch) => {
             await axios
               .delete(`https://api.necrom.ru/worker/${worker.id}`, {data: {
                 db_user_email: "primitive_email@not.even.valid",
@@ -95,3 +96,4 @@ export const DeleteToursModalController: React.FC<DeleteWorkersModalControllerPr
     </IonButton>
   )
 }
+*/

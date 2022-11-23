@@ -1,11 +1,11 @@
 import { IonList, IonTitle } from "@ionic/react";
-import axios from "axios";
 import React, { Dispatch } from "react";
 import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
-import { RegionJoinedFetch } from "../../interface/region";
 import 'react-data-table-component-extensions/dist/index.css';
-import { atLocation } from "../../utils/server_url";
+import { AuthProps } from "../../interface/props/auth";
+import Region from "../../interface/region";
+import API from "../../utils/server";
 
 const listColumns = [
   {
@@ -13,27 +13,27 @@ const listColumns = [
     selector: "name",
     sortable: true,
     wrap: true,
-    cell: (d: RegionJoinedFetch) => d.name === "None" ? "-" : d.name
+    cell: (d: Region) => d.name === "None" ? "-" : d.name
   },
   {
     name: "Страна",
-    selector: "country_name",
+    selector: "country.name",
     sortable: true,
     wrap: true
   }
 ];
 
 export interface RegionsListProps {
-  on_selected_change: Dispatch<React.SetStateAction<Array<RegionJoinedFetch>>>
+  on_selected_change: Dispatch<React.SetStateAction<Array<Region>>>
 }
 
-export const RegionsList: React.FC<RegionsListProps> = (props) => {
-  const [regions, set_regions] = React.useState(null as Array<RegionJoinedFetch> | null);
+export const RegionsList: React.FC<RegionsListProps & AuthProps> = (props) => {
+  const [regions, set_regions] = React.useState(null as Array<Region> | null);
 
   React.useEffect(() => {
-    axios
-      .get(atLocation('region?join=true'))
-      .then((response) => set_regions(response.data));
+    API
+      .get_with_auth(props.auth, 'region?select=*,country(*)')
+      .then((response: any) => set_regions(response.data));
   }, [])
   
   return (

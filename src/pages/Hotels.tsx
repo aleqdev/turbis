@@ -5,20 +5,21 @@ import {
   IonList,
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import { HotelJoinedFetch } from '../interface/hotel';
 import { PatchHotelModalController } from '../components/hotel/PatchHotel';
-import useAxios from 'axios-hooks'
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
 import { HotelsList } from '../components/hotel/HotelsList';
 import { PutHotelModalController } from '../components/hotel/PutHotel';
-import { atLocation } from '../utils/server_url';
+import { AuthProps } from '../interface/props/auth';
+import API from '../utils/server';
+import Hotel from '../interface/hotel';
 
-const Page: React.FC = () => {
-  const [selected_hotels, set_selected_hotels] = useState(Array<HotelJoinedFetch>);
+const Page: React.FC<AuthProps> = (props) => {
+  const [selected_hotels, set_selected_hotels] = useState(Array<Hotel>);
   const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
-  const [{ data: hotels }, refetch_hotels]: [{data?: Array<HotelJoinedFetch>}, ...any] = useAxios(
-    atLocation('hotel?join=true')
+  const [{ data: hotels }, refetch_hotels]: [{data?: Array<Hotel>}, ...any] = API.use_hook(
+    props.auth,
+    'hotel?select=*,city(*,region(*,country(*))),owner:person(*)'
   );
 
   useEffect(
@@ -49,15 +50,15 @@ const Page: React.FC = () => {
             <IonList>
               {
                 (selected_hotels?.length === 1) ? 
-                  <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                  <PatchHotelModalController auth={props.auth} refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
                   : ""
               }
               {
                 (selected_hotels?.length > 0) ? 
-                  <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                  <DeleteHotelsModalController auth={props.auth} refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
                   : ""
               }
-              <PutHotelModalController refetch_hotels={refetch_hotels} />
+              <PutHotelModalController auth={props.auth} refetch_hotels={refetch_hotels} />
             </IonList>
           </IonItem>
         </IonToolbar>

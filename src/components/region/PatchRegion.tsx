@@ -1,13 +1,13 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
-import axios from 'axios';
 import React, { Dispatch, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RegionJoinedFetch } from '../../interface/region';
-import { atLocation } from '../../utils/server_url';
+import { AuthProps } from '../../interface/props/auth';
+import API from '../../utils/server';
+import Region from '../../interface/region';
 
 export function PatchRegionModal(
   {selected_regions, onDismiss}: {
-    selected_regions: Array<RegionJoinedFetch>,
+    selected_regions: Array<Region>,
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -64,19 +64,19 @@ export function PatchRegionModal(
           <IonLabel position="stacked">Регион</IonLabel>
           <IonInput ref={inputName} type="text" placeholder="Введите Регион" value={region.name} required/>
           <IonLabel position="stacked">Страна</IonLabel>
-          <IonInput ref={inputCountryName} type="text" placeholder="Введите Страна" value={region.country_name} required/>
+          <IonInput ref={inputCountryName} type="text" placeholder="Введите Страну" value={region.country!.name} required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PatchRegionModalControllerProps {
-    selected_regions: Array<RegionJoinedFetch>,
-    set_selected_region: Dispatch<React.SetStateAction<Array<RegionJoinedFetch>>>
+export type PatchRegionModalControllerProps = {
+    selected_regions: Array<Region>,
+    set_selected_region: Dispatch<React.SetStateAction<Array<Region>>>
 }
 
-export const PatchRegionModalController: React.FC<PatchRegionModalControllerProps> = (props) => {
+export const PatchRegionModalController: React.FC<PatchRegionModalControllerProps & AuthProps> = (props) => {
   const [present, dismiss] = useIonModal(PatchRegionModal, {
     selected_regions: props.selected_regions,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -88,8 +88,8 @@ export const PatchRegionModalController: React.FC<PatchRegionModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           props.set_selected_region([]);
-          axios
-            .patch(`${atLocation('region')}/${props.selected_regions[0].id}`, {
+          API
+            .patch_with_auth(props.auth, `region/${props.selected_regions[0].id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

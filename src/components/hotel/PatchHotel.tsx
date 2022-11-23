@@ -1,56 +1,56 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
-import axios from 'axios';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
-import { HotelJoinedFetch } from '../../interface/hotel';
-import { WorkerJoinedFetch } from '../../interface/worker';
-import { CityJoinedFetch } from '../../interface/city';
 import { SelectWithSearchModal } from '../SelectWithSearch';
-import { formatCity, formatWorker } from '../../utils/fmt';
-import { atLocation } from '../../utils/server_url';
+import { formatCity, formatPerson } from '../../utils/fmt';
 import { process_error_hint } from '../../utils/process_erros_hints';
+import { AuthProps } from '../../interface/props/auth';
+import API from '../../utils/server';
+import Hotel from '../../interface/hotel';
+import City from '../../interface/city';
+import Person from '../../interface/person';
 
 export function PatchHotelModal(
-  {selected_hotels, onDismiss}: {
-    selected_hotels: Array<HotelJoinedFetch>,
+  {auth, selected_hotels, onDismiss}: AuthProps & {
+    selected_hotels: Array<Hotel>,
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
   const hotel = selected_hotels[0];
 
-  const [workers, setWorkers] = React.useState(null as Array<WorkerJoinedFetch> | null);
-  const [cities, setCities] = React.useState(null as Array<CityJoinedFetch> | null);
+  const [persons, setPersons] = React.useState(null as Array<Person> | null);
+  const [cities, setCities] = React.useState(null as Array<City> | null);
 
   const inputName = useRef<HTMLIonInputElement>(null);
   const inputDescription = useRef<HTMLIonTextareaElement>(null);
-  const [cityInput, setCityInput] = useState(null as CityJoinedFetch | null);
-  const [ownerInput, setOwnerInput] = useState(null as WorkerJoinedFetch | null);
+  const [cityInput, setCityInput] = useState(null as City | null);
+  const [ownerInput, setOwnerInput] = useState(null as Person | null);
 
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentCityChoice, dismissCityChoice] = useIonModal(SelectWithSearchModal, {
     elements: cities,
     title: "Выберите город",
-    formatter: (e: CityJoinedFetch) => formatCity(e),
-    sorter: (e: CityJoinedFetch, query: string) => {
+    formatter: (e: City) => formatCity(e),
+    sorter: (e: City, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
         return value + 
           +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() === element) + 
-          +e.region_name.toLowerCase().includes(element) + 10 * +(e.region_name.toLowerCase() === element) +
-          +e.country_name.toLowerCase().includes(element) + 10 * +(e.country_name.toLowerCase() === element);
+          +e.region!.name.toLowerCase().includes(element) + 10 * +(e.region!.name.toLowerCase() === element) +
+          +e.region!.name.toLowerCase().includes(element) + 10 * +(e.region!.name.toLowerCase() === element);
       }, 0);
     },
-    keyer: (e: CityJoinedFetch) => e.id,
+    keyer: (e: City) => e.id,
     onDismiss: (data: object | null, role: string) => dismissCityChoice(data, role),
   });
 
   const [presentOwnerChoice, dismissOwnerChoice] = useIonModal(SelectWithSearchModal, {
-    elements: workers,
+    elements: persons,
     title: "Выберите контактное лицо",
-    formatter: (e: WorkerJoinedFetch) => formatWorker(e),
-    sorter: (e: WorkerJoinedFetch, query: string) => {
+    formatter: (e: Person) => formatPerson(e),
+    sorter: (e: Person, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
         return value + 
@@ -60,7 +60,7 @@ export function PatchHotelModal(
           +e.phone_number.includes(element);
       }, 0);
     },
-    keyer: (e: WorkerJoinedFetch) => e.id,
+    keyer: (e: Person) => e.id,
     onDismiss: (data: object | null, role: string) => dismissOwnerChoice(data, role),
   });
 
@@ -85,20 +85,20 @@ export function PatchHotelModal(
   }
 
   React.useEffect(() => {
-    axios
-      .get(atLocation('worker'))
-      .then((response) => {
-        setWorkers(response.data);
-        setOwnerInput(response.data.find((e: WorkerJoinedFetch) => e.id === hotel.owner_id));
+    API 
+      .get_with_auth(auth, 'person')
+      .then((response: any) => {
+        setPersons(response.data);
+        setOwnerInput(response.data.find((e: Person) => e.id === hotel.owner_id));
       });
   }, [hotel.owner_id]);
 
   React.useEffect(() => {
-    axios
-      .get(atLocation('city?join=true'))
-      .then((response) => {
+    API 
+      .get_with_auth(auth, 'city?select=*,region(*,country(*))')
+      .then((response: any) => {
         setCities(response.data);
-        setCityInput(response.data.find((e: CityJoinedFetch) => e.id === hotel.city_id));
+        setCityInput(response.data.find((e: City) => e.id === hotel.city_id));
       });
   }, [hotel.city_id]);
 
@@ -153,8 +153,8 @@ export function PatchHotelModal(
             {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : formatCity(cityInput))}
           </IonButton>
           <IonLabel position="stacked" >Владелец</IonLabel>
-          <IonButton disabled={workers === null} onClick={() => openOwnerSelectModal()}>
-            {workers === null ? "Загрузка..." : (ownerInput === null ? "Выбрать" : formatWorker(ownerInput))}
+          <IonButton disabled={persons === null} onClick={() => openOwnerSelectModal()}>
+            {persons === null ? "Загрузка..." : (ownerInput === null ? "Выбрать" : formatPerson(ownerInput))}
           </IonButton>
           <IonLabel position="stacked">Описание</IonLabel>
           <IonTextarea ref={inputDescription} auto-grow={true} value={hotel.description} placeholder="Введите описание" required/>
@@ -164,13 +164,14 @@ export function PatchHotelModal(
   )
 }
 
-export interface PatchHotelModalControllerProps {
+export type PatchHotelModalControllerProps = {
   refetch_hotels: RefetchFunction<any, any>,
-  selected_hotels: Array<HotelJoinedFetch>,
+  selected_hotels: Array<Hotel>,
 }
 
-export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps> = (props) => {
+export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps & AuthProps> = (props) => {
   const [present, dismiss] = useIonModal(PatchHotelModal, {
+    auth: props.auth,
     selected_hotels: props.selected_hotels,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -180,14 +181,12 @@ export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps>
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          axios
-            .patch(`${atLocation('hotel')}/${ev.detail.data.id}`, {
+          API
+            .patch_with_auth(props.auth, `hotel?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               description: ev.detail.data.description,
               city_id: ev.detail.data.city_id,
               owner_id: ev.detail.data.owner_id,
-              db_user_email: "primitive_email@not.even.valid",
-              db_user_password: "primitive_password",
             })
             .then((_) => {
               props.refetch_hotels();

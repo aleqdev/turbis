@@ -1,16 +1,20 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
-import axios from 'axios';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import React, { useRef, useState } from 'react'
+import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
-import { atLocation } from '../../utils/server_url';
 import { process_error_hint } from '../../utils/process_erros_hints';
+import { AuthProps } from '../../interface/props/auth';
+import API from '../../utils/server';
 
-export function PutWorkerRoleModal(
-  {onDismiss}: {
+export function PatchEmployeeRoleModal(
+  {selected_employee_roles, onDismiss}: {
+    selected_employee_roles: Array<EmployeeRole>,
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const employee_role = selected_employee_roles[0];
+
   const inputName = useRef<HTMLIonInputElement>(null);
 
   const [errorMessage, setErrorMessage] = useState(null as string | null);
@@ -20,6 +24,7 @@ export function PutWorkerRoleModal(
 
     if (name) {
       onDismiss({
+        id: employee_role.id,
         name,
       }, 'confirm');
     } else {
@@ -36,10 +41,10 @@ export function PutWorkerRoleModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Создать Роль</IonTitle>
+          <IonTitle>Изменить Роль</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
-              Создать
+              Изменить
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -49,19 +54,21 @@ export function PutWorkerRoleModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите название" required/>
+          <IonInput ref={inputName} type="text" placeholder="Введите название" value={employee_role.name} required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PutWorkerRoleModalControllerProps {
-  refetch_worker_roles: RefetchFunction<any, any>,
+export interface PatchWorkerRoleModalControllerProps {
+  refetch_employee_roles: RefetchFunction<any, any>,
+  selected_employee_roles: Array<EmployeeRole>,
 }
 
-export const PutWorkerRoleModalController: React.FC<PutWorkerRoleModalControllerProps> = (props) => {
-  const [present, dismiss] = useIonModal(PutWorkerRoleModal, {
+export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalControllerProps & AuthProps> = (props) => {
+  const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
+    selected_employee_roles: props.selected_employee_roles,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -70,21 +77,19 @@ export const PutWorkerRoleModalController: React.FC<PutWorkerRoleModalController
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          axios
-            .put(atLocation('worker_role'), {
+          API
+            .patch_with_auth(props.auth, `employee_role?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
-              db_user_email: "primitive_email@not.even.valid",
-              db_user_password: "primitive_password",
             })
             .then((_) => {
-              props.refetch_worker_roles();
+              props.refetch_employee_roles();
               presentAlert({
-                header: "Роль добавлена",
+                header: "Данные роли изменены",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_worker_roles();
+              props.refetch_employee_roles();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
@@ -98,8 +103,8 @@ export const PutWorkerRoleModalController: React.FC<PutWorkerRoleModalController
   }
 
   return (
-    <IonButton routerDirection="none" onClick={openModal}>
-      <IonLabel>Добавить роль</IonLabel>
+    <IonButton routerDirection="none" color="secondary" onClick={openModal}>
+      <IonLabel>Изменить роль</IonLabel>
     </IonButton>
   )
 }

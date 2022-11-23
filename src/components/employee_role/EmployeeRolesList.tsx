@@ -4,70 +4,45 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { AuthProps } from "../../interface/props/auth";
+import { EmployeeRole } from "../../interface/employee_role";
 
-/*
 const listColumns = [
   {
-    name: "Имя",
+    name: "ID",
+    selector: "id",
+    sortable: true,
+    wrap: true
+  },
+  {
+    name: "Название",
     selector: "name",
-    sortable: true,
-    wrap: true
-  },
-  {
-    name: "Фамилия",
-    selector: "surname",
-    sortable: true,
-    wrap: true
-  },
-  {
-    name: "Отчество",
-    selector: "last_name",
-    sortable: true,
-    wrap: true
-  },
-  {
-    name: "Телефон",
-    selector: "phone_number",
-    sortable: true,
-    wrap: true,
-    cell: (e: EmployeeJoinedFetch) => `+${e.phone_number}`
-  },
-  {
-    name: "Почта",
-    selector: "email",
-    sortable: true,
-    wrap: true
-  },
-  {
-    name: "Роль",
-    selector: "role_name",
     sortable: true,
     wrap: true
   }
 ];
 
-export interface WorkersListProps {
-  workers: Array<EmployeeJoinedFetch> | null,
-  on_selected_change: Dispatch<React.SetStateAction<Array<EmployeeJoinedFetch>>>
+export interface EmployeeRolesListProps {
+  employee_roles: Array<EmployeeRole> | null,
+  on_selected_change: Dispatch<React.SetStateAction<Array<EmployeeRole>>>
 }
 
-export const ToursList: React.FC<WorkersListProps & AuthProps> = (props) => {
+export const EmployeeRolesList: React.FC<EmployeeRolesListProps & AuthProps> = (props) => {
   return (
-    <IonList id="workers-list">
+    <IonList id="employee-roles-list">
       {
-        (props.workers === null) ?
+        (props.employee_roles === null) ?
           <IonTitle>Загрузка...</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.workers}
+            data={props.employee_roles}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
           >
             <DataTable
-            title="Список туров:"
+            title="Список ролей:"
             columns={listColumns as any}
-            data={props.workers}
+            data={props.employee_roles}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination
@@ -80,4 +55,3 @@ export const ToursList: React.FC<WorkersListProps & AuthProps> = (props) => {
     </IonList>
   );
 }
-*/

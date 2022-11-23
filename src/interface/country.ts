@@ -1,4 +1,7 @@
-export interface Country {
+export type Country = {
     id: number,
-    name: string
+    name: string,
+    crt_date: Date
 }
+
+export default Country;

@@ -3,7 +3,8 @@ import React, { Dispatch } from "react";
 import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
-import { WorkerRole } from "../../interface/worker_role";
+import { AuthProps } from "../../interface/props/auth";
+import { EmployeeRole } from "../../interface/employee_role";
 
 const listColumns = [
   {
@@ -20,20 +21,20 @@ const listColumns = [
   }
 ];
 
-export interface WorkerRolesListProps {
-  worker_roles: Array<WorkerRole> | null,
-  on_selected_change: Dispatch<React.SetStateAction<Array<WorkerRole>>>
+export interface EmployeeRolesListProps {
+  employee_roles: Array<EmployeeRole> | null,
+  on_selected_change: Dispatch<React.SetStateAction<Array<EmployeeRole>>>
 }
 
-export const WorkerRolesList: React.FC<WorkerRolesListProps> = (props) => {
+export const EmployeeRolesList: React.FC<EmployeeRolesListProps & AuthProps> = (props) => {
   return (
-    <IonList id="workers-roles-list">
+    <IonList id="employee-roles-list">
       {
-        (props.worker_roles === null) ?
+        (props.employee_roles === null) ?
           <IonTitle>Загрузка...</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.worker_roles}
+            data={props.employee_roles}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
@@ -41,7 +42,7 @@ export const WorkerRolesList: React.FC<WorkerRolesListProps> = (props) => {
             <DataTable
             title="Список ролей:"
             columns={listColumns as any}
-            data={props.worker_roles}
+            data={props.employee_roles}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination
