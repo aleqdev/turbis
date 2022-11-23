@@ -25,6 +25,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import Tours from './pages/Tours';
 
 setupIonicReact();
 
@@ -41,6 +42,9 @@ const App: React.FC = () => {
             </Route>
             <Route path="/page/Hotels" exact={true}>
               <Hotels />
+            </Route>
+            <Route path="/page/Tours" exact={true}>
+              <Tours />
             </Route>
             <Route path="/page/Regions" exact={true}>
               <Regions />
