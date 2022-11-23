@@ -9,6 +9,7 @@ import { CityJoinedFetch } from '../../interface/city';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatCity, formatWorker } from '../../utils/fmt';
 import { atLocation } from '../../utils/server_url';
+import { process_error_hint } from '../../utils/process_erros_hints';
 
 export function PatchHotelModal(
   {selected_hotels, onDismiss}: {
@@ -200,7 +201,7 @@ export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps>
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: process_error_hint(error.response.data),
                 buttons: ["Ок"]
               });
             });

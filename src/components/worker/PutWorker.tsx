@@ -5,6 +5,7 @@ import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { atLocation } from '../../utils/server_url';
+import { process_error_hint } from '../../utils/process_erros_hints';
 
 export function PutWorkerModal(
   {onDismiss}: {
@@ -75,9 +76,9 @@ export function PutWorkerModal(
           <IonLabel position="stacked">Отчество</IonLabel>
           <IonInput ref={inputLastName} clearInput={true} type="text" placeholder="Введите отчество" required/>
           <IonLabel position="stacked">Телефон</IonLabel>
-          <IonInput ref={inputPhoneNumber} clearInput={true} type="text" placeholder="Введите телефон" required/>
+          <IonInput pattern="email" type="email" ref={inputPhoneNumber} clearInput={true} placeholder="Введите телефон" required/>
           <IonLabel position="stacked">Почта</IonLabel>
-          <IonInput ref={inputEmail} clearInput={true} type="text" placeholder="Введите почту" required/>
+          <IonInput ref={inputEmail} clearInput={true} type="email" placeholder="Введите почту" required/>
           <IonLabel position="stacked" >Роль</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
             {
@@ -131,7 +132,7 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: process_error_hint(error.response.data),
                 buttons: ["Ок"]
               });
             });

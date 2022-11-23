@@ -5,6 +5,7 @@ import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { atLocation } from '../../utils/server_url';
+import { process_error_hint } from '../../utils/process_erros_hints';
 
 export function PatchWorkerRoleModal(
   {selected_worker_roles, onDismiss}: {
@@ -94,7 +95,7 @@ export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalContro
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: process_error_hint(error.response.data),
                 buttons: ["Ок"]
               });
             });

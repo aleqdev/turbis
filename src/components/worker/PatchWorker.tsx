@@ -6,6 +6,7 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import { WorkerJoinedFetch } from '../../interface/worker';
 import { RefetchFunction } from 'axios-hooks'
 import { atLocation } from '../../utils/server_url';
+import { process_error_hint } from '../../utils/process_erros_hints';
 
 export function PatchWorkerModal(
   {selected_workers, onDismiss}: {
@@ -145,7 +146,7 @@ export const PatchWorkerModalController: React.FC<PatchWorkerModalControllerProp
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: process_error_hint(error.response.data),
                 buttons: ["Ок"]
               });
             });
