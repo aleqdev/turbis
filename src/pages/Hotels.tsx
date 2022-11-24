@@ -12,13 +12,16 @@ import { PutHotelModalController } from '../components/hotel/PutHotel';
 import { AuthProps } from '../interface/props/auth';
 import API from '../utils/server';
 import Hotel from '../interface/hotel';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC<AuthProps> = (props) => {
+const Page: React.FC = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
   const [selected_hotels, set_selected_hotels] = useState(Array<Hotel>);
   const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
   const [{ data: hotels }, refetch_hotels]: [{data?: Array<Hotel>}, ...any] = API.use_hook(
-    props.auth,
+    auth!,
     'hotel?select=*,city(*,region(*,country(*))),owner:person(*)'
   );
 
@@ -50,15 +53,15 @@ const Page: React.FC<AuthProps> = (props) => {
             <IonList>
               {
                 (selected_hotels?.length === 1) ? 
-                  <PatchHotelModalController auth={props.auth} refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                  <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
                   : ""
               }
               {
                 (selected_hotels?.length > 0) ? 
-                  <DeleteHotelsModalController auth={props.auth} refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                  <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
                   : ""
               }
-              <PutHotelModalController auth={props.auth} refetch_hotels={refetch_hotels} />
+              <PutHotelModalController refetch_hotels={refetch_hotels} />
             </IonList>
           </IonItem>
         </IonToolbar>

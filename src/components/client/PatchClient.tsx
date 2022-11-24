@@ -1,5 +1,5 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
@@ -10,6 +10,7 @@ import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatPerson } from '../../utils/fmt';
 import Client from '../../interface/client';
 import ClientType from '../../interface/client_type';
+import { useAppSelector } from '../../redux/store';
 
 export function PatchClientModal(
   {auth, selected_clients, onDismiss}: AuthProps & {
@@ -122,9 +123,11 @@ export interface PatchClientModalControllerProps {
   selected_clients: Array<Client>,
 }
 
-export const PatchClientModalController: React.FC<PatchClientModalControllerProps & AuthProps> = (props) => {
+export const PatchClientModalController: React.FC<PatchClientModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchClientModal, {
-    auth: props.auth,
+    auth: auth!,
     selected_clients: props.selected_clients,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -135,7 +138,7 @@ export const PatchClientModalController: React.FC<PatchClientModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .patch_with_auth(props.auth, `client?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `client?id=eq.${ev.detail.data.id}`, {
               type_id: ev.detail.data.type.id,
               person_id: ev.detail.data.person.id,
             })

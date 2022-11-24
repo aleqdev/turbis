@@ -12,12 +12,15 @@ import { ClientTypesList } from '../components/client_type/ClientTypesList';
 import { PutClientTypeModalController } from '../components/client_type/PutClientType';
 import { DeleteClientTypesModalController } from '../components/client_type/DeleteClientTypes';
 import { PatchClientTypeModalController } from '../components/client_type/PatchClientType';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC<AuthProps> = (props) => {
+const Page: React.FC = () => {
   const [selected_client_types, set_selected_client_types] = useState(Array<ClientType>);
 
+  const auth = useAppSelector(state => state.auth);
+  
   const [{ data: client_types }, refetch_client_types]: [{data?: Array<ClientType>}, ...any] = API.use_hook(
-    props.auth,
+    auth!,
     'client_type'
   );
 
@@ -42,22 +45,22 @@ const Page: React.FC<AuthProps> = (props) => {
             <IonList>
               {
                 (selected_client_types?.length === 1 ) ? 
-                  <PatchClientTypeModalController auth={props.auth} refetch_client_types={refetch_client_types} selected_client_types={selected_client_types}/>
+                  <PatchClientTypeModalController refetch_client_types={refetch_client_types} selected_client_types={selected_client_types}/>
                   : ""
               }
               {
                 (selected_client_types?.length > 0 ) ? 
-                  <DeleteClientTypesModalController auth={props.auth} refetch_client_types={refetch_client_types} selected_client_types={selected_client_types}/>
+                  <DeleteClientTypesModalController refetch_client_types={refetch_client_types} selected_client_types={selected_client_types}/>
                   : ""
               }
-              <PutClientTypeModalController auth={props.auth} refetch_client_types={refetch_client_types} />
+              <PutClientTypeModalController refetch_client_types={refetch_client_types} />
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <ClientTypesList auth={props.auth} client_types={client_types!} on_selected_change={set_selected_client_types} />
+        <ClientTypesList client_types={client_types!} on_selected_change={set_selected_client_types} />
       </IonContent>
     </IonPage>
   );

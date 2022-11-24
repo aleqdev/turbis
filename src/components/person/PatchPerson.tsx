@@ -6,6 +6,7 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Person from '../../interface/person';
+import { useAppSelector } from '../../redux/store';
 
 export function PatchPersonModal(
   {selected_persons, onDismiss}: {
@@ -86,7 +87,9 @@ export interface PatchPersonModalControllerProps {
   selected_persons: Array<Person>,
 }
 
-export const PatchPersonModalController: React.FC<PatchPersonModalControllerProps & AuthProps> = (props) => {
+export const PatchPersonModalController: React.FC<PatchPersonModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchPersonModal, {
     selected_persons: props.selected_persons,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -98,7 +101,7 @@ export const PatchPersonModalController: React.FC<PatchPersonModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .patch_with_auth(props.auth, `person?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `person?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

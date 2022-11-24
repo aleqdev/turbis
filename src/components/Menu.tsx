@@ -116,40 +116,40 @@ const Menu: React.FC = () => {
     <IonMenu contentId="main" type="overlay">
       <IonContent>
         <IonList id="inbox-list">
-          <IonListHeader>Туристическая компания</IonListHeader>
-          <IonNote>turbis@turbis.com</IonNote>
-          {appPages.map((appPage, index) => {
-            return (
-              <IonMenuToggle key={index} autoHide={false}>
-                {
-                  appPage.children === undefined ? 
-                    <IonItem className={location.pathname === appPage.url ? 'selected' : ''} onClick={toggleAccordion} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
-                      <IonIcon slot="start" ios={appPage.iosIcon} md={appPage.mdIcon} />
-                      <IonLabel>{appPage.title}</IonLabel>
-                    </IonItem> :
-                    <IonAccordionGroup ref={accordionGroup} color='white' onIonChange={accordionGroupChange}>
-                      <IonAccordion value={appPage.url}>
-                        <IonItem slot="header">
-                          <IonIcon slot="start" ios={appPage.iosIcon} md={appPage.mdIcon} />
-                          <IonLabel>{appPage.title}</IonLabel>
-                        </IonItem>
-                        {
-                          appPage.children.map(c => {
-                            return (
-                              <IonItem slot="content" className={location.pathname === c.url ? 'selected' : ''} routerLink={c.url} routerDirection="none" lines="none" detail={false}>
-                                <IonIcon slot="start" />
-                                <IonIcon slot="start" ios={c.iosIcon} md={c.mdIcon} />
-                                <IonLabel>{c.title}</IonLabel>
-                              </IonItem>
-                            )
-                          })
-                        }
-                      </IonAccordion>
-                    </IonAccordionGroup>
-                }
-              </IonMenuToggle>
-            );
-          })}
+          <IonAccordionGroup ref={accordionGroup} color='white' onIonChange={accordionGroupChange}>
+            <IonListHeader>Туристическая компания</IonListHeader>
+            <IonNote>turbis@turbis.com</IonNote>
+            {appPages.map((appPage, index) => {
+              return (
+                <IonMenuToggle key={index} autoHide={false}>
+                  {
+                    appPage.children === undefined ? 
+                      <IonItem className={location.pathname === appPage.url ? 'selected' : ''} onClick={toggleAccordion} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
+                        <IonIcon slot="start" ios={appPage.iosIcon} md={appPage.mdIcon} />
+                        <IonLabel>{appPage.title}</IonLabel>
+                      </IonItem> :
+                        <IonAccordion value={appPage.url}>
+                          <IonItem slot="header">
+                            <IonIcon slot="start" ios={appPage.iosIcon} md={appPage.mdIcon} />
+                            <IonLabel>{appPage.title}</IonLabel>
+                          </IonItem>
+                          {
+                            appPage.children.map(c => {
+                              return (
+                                <IonItem slot="content" className={location.pathname === c.url ? 'selected' : ''} routerLink={c.url} routerDirection="none" lines="none" detail={false}>
+                                  <IonIcon slot="start" />
+                                  <IonIcon slot="start" ios={c.iosIcon} md={c.mdIcon} />
+                                  <IonLabel>{c.title}</IonLabel>
+                                </IonItem>
+                              )
+                            })
+                          }
+                        </IonAccordion>
+                  }
+                </IonMenuToggle>
+              );
+            })}
+          </IonAccordionGroup>
         </IonList>
       </IonContent>
     </IonMenu>

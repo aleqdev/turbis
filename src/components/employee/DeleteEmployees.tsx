@@ -7,6 +7,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Employee from '../../interface/employee';
+import { useAppSelector } from '../../redux/store';
 
 export function DeleteEmployeesModal(
   {selected_employees, onDismiss}: {
@@ -49,7 +50,9 @@ export interface DeleteEmployeesModalControllerProps {
   selected_employees: Array<Employee>,
 }
 
-export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalControllerProps & AuthProps> = (props) => {
+export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(DeleteEmployeesModal, {
     selected_employees: props.selected_employees,
     onDismiss: (data: Array<Employee> | null, role: string) => dismiss(data, role),
@@ -62,7 +65,7 @@ export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalContro
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (employee: Employee) => {
             await API
-              .delete_with_auth(props.auth, `employee?id=eq.${employee.id}`)
+              .delete_with_auth(auth!, `employee?id=eq.${employee.id}`)
           }))
           .then((results) => {
             for (const result of results) {

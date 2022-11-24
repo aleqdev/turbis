@@ -12,13 +12,16 @@ import { EmployeesList } from '../components/employee/EmployeesList';
 import API from '../utils/server';
 import { AuthProps } from '../interface/props/auth';
 import Employee from '../interface/employee';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC<AuthProps> = (props) => {
+const Page: React.FC = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
   const [selected_employees, set_selected_employees] = useState(Array<Employee>);
   const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
   const [{ data: employees }, refetch_employees]: [{data?: Array<Employee>}, ...any] = API.use_hook(
-    props.auth,
+    auth!,
     'employee?select=*,person(*),role:employee_role(*)'
   );
 
@@ -50,22 +53,22 @@ const Page: React.FC<AuthProps> = (props) => {
             <IonList>
               {
                 (selected_employees?.length === 1 ) ? 
-                  <PatchEmployeesModalController auth={props.auth} refetch_employees={refetch_employees} selected_employees={selected_employees}/>
+                  <PatchEmployeesModalController refetch_employees={refetch_employees} selected_employees={selected_employees}/>
                   : ""
               }
               {
                 (selected_employees?.length > 0 ) ? 
-                  <DeleteEmployeesModalController auth={props.auth} refetch_employees={refetch_employees} selected_employees={selected_employees}/>
+                  <DeleteEmployeesModalController refetch_employees={refetch_employees} selected_employees={selected_employees}/>
                   : ""
               }
-              <PutEmployeeModalController auth={props.auth} refetch_workers={refetch_employees} />
+              <PutEmployeeModalController refetch_workers={refetch_employees} />
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <EmployeesList auth={props.auth} clear_selection_trigger={clear_selection_trigger} employees={employees!} on_selected_change={set_selected_employees} />
+        <EmployeesList clear_selection_trigger={clear_selection_trigger} employees={employees!} on_selected_change={set_selected_employees} />
       </IonContent>
     </IonPage>
   );

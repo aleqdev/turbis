@@ -6,6 +6,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
+import { useAppSelector } from '../../redux/store';
 
 export function PatchEmployeeRoleModal(
   {selected_employee_roles, onDismiss}: {
@@ -66,7 +67,9 @@ export interface PatchWorkerRoleModalControllerProps {
   selected_employee_roles: Array<EmployeeRole>,
 }
 
-export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalControllerProps & AuthProps> = (props) => {
+export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
     selected_employee_roles: props.selected_employee_roles,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -78,7 +81,7 @@ export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalContro
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .patch_with_auth(props.auth, `employee_role?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `employee_role?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
             })
             .then((_) => {

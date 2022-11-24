@@ -46,7 +46,7 @@ export interface PersonsListProps {
   clear_selection_trigger: boolean
 }
 
-export const PersonsList: React.FC<PersonsListProps & AuthProps> = (props) => {
+export const PersonsList: React.FC<PersonsListProps> = (props) => {
   return (
     <IonList id="persons-list">
       {

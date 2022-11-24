@@ -9,6 +9,9 @@ import Hotel from '../../interface/hotel';
 import TourFeedingType from '../../interface/tour_feeding_type';
 import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
+import { useAppSelector } from '../../redux/store';
+import { formatDateDiff } from '../../utils/fmt';
+import moment from 'moment';
 
 export function PutTourModal(
   {auth, onDismiss}: AuthProps & {
@@ -25,8 +28,7 @@ export function PutTourModal(
 
   const [inputHotel, setInputHotel] = React.useState(null as Hotel | null);
   const [inputFeedingType, setInputFeedingType] = React.useState(null as TourFeedingType | null);
-  const [diffDay, setDiffDay] = React.useState(null as number | null);
-  const [diffNight, setDiffNight] = React.useState(null as number | null);
+  const [diff, setDiff] = React.useState(null as string | null);
 
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
@@ -120,12 +122,11 @@ export function PutTourModal(
 
   function calcDiff() {
     if (inputDepartureDate?.current?.value && inputArrivalDate?.current?.value) {
-      const diffInMs = Date.parse(inputDepartureDate.current.value as string) - Date.parse(inputArrivalDate.current.value as string)
-      if (diffInMs < 0) {
-        return
+      const inputArrival = moment(inputArrivalDate.current.value as string, "DD-MM-YYYY").toDate();
+      const inputDeparture = moment(inputDepartureDate.current.value as string, "DD-MM-YYYY").toDate();
+      if (inputDeparture.getTime() - inputArrival.getTime() > 0) {
+        setDiff(formatDateDiff(inputArrival, inputDeparture));
       }
-      setDiffDay(diffInMs / (1000 * 60 * 60 * 24));
-      setDiffNight(diffInMs / (1000 * 60 * 60 * 24));
     }
   }
 
@@ -154,11 +155,11 @@ export function PutTourModal(
           <IonButton disabled={hotels === null} onClick={() => openHotelSelectModal()}>
             {hotels === null ? "Загрузка..." : (inputHotel === null ? "Выбрать" : `${inputHotel.name}`)}
           </IonButton>
-          <IonLabel position="stacked">{"Дата заезда (месяц, день, год)"}</IonLabel>
+          <IonLabel position="stacked">{"Дата заезда (дд-мм-гггг)"}</IonLabel>
           <IonInput ref={inputArrivalDate} clearInput={true} type="text" placeholder="Введите дату" onIonChange={calcDiff} required/>
-          <IonLabel position="stacked">{"Дата выезда (месяц, день, год)"}</IonLabel>
+          <IonLabel position="stacked">{"Дата выезда (дд-мм-гггг)"}</IonLabel>
           <IonInput ref={inputDepartureDate} clearInput={true} type="text" placeholder="Введите дату" onIonChange={calcDiff} required/>
-          <IonLabel position="stacked">{`Количество дней: ${diffDay ?? "..."}, Количество ночей: ${diffNight ?? "..."}`}</IonLabel>
+          <IonLabel position="stacked">{`Количество дней/ночей: ${diff ?? "..."}`}</IonLabel>
           <IonLabel position="stacked" >Вид питания</IonLabel>
           <IonButton disabled={feedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
             {feedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
@@ -177,9 +178,11 @@ export interface PutTourModalControllerProps {
   refetch_tours: RefetchFunction<any, any>,
 }
 
-export const PutTourModalController: React.FC<PutTourModalControllerProps & AuthProps> = (props) => {
+export const PutTourModalController: React.FC<PutTourModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PutTourModal, {
-    auth: props.auth,
+    auth: auth!,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -189,7 +192,7 @@ export const PutTourModalController: React.FC<PutTourModalControllerProps & Auth
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, `tour`, {
+            .post_with_auth(auth!, `tour`, {
               hotel_id: ev.detail.data.hotel.id,
               feeding_type_id: ev.detail.data.feedingType.id,
               arrival_date: ev.detail.data.arrivalDate,
@@ -219,7 +222,7 @@ export const PutTourModalController: React.FC<PutTourModalControllerProps & Auth
   }
 
   return (
-    <IonButton routerDirection="none" color="secondary" onClick={openModal}>
+    <IonButton routerDirection="none" onClick={openModal}>
       <IonLabel>Добавить тур</IonLabel>
     </IonButton>
   )

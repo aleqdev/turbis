@@ -9,6 +9,7 @@ import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import Person from '../../interface/person';
 import { formatPerson } from '../../utils/fmt';
+import { useAppSelector } from '../../redux/store';
 //import { createPutComponent } from '../TableManagement';
 
 export function PutEmployeeModal(
@@ -117,9 +118,11 @@ export interface PutEmployeeModalControllerProps {
   refetch_workers: RefetchFunction<any, any>,
 }
 
-export const PutEmployeeModalController: React.FC<PutEmployeeModalControllerProps & AuthProps> = (props) => {
+export const PutEmployeeModalController: React.FC<PutEmployeeModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PutEmployeeModal, {
-    auth: props.auth,
+    auth: auth!,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -129,7 +132,7 @@ export const PutEmployeeModalController: React.FC<PutEmployeeModalControllerProp
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, 'employee', {
+            .post_with_auth(auth!, 'employee', {
               person_id: ev.detail.data.person.id,
               role_id: ev.detail.data.role.id
             })

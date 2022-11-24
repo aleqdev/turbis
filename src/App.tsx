@@ -8,6 +8,9 @@ import Employees from './pages/Employees'
 import EmployeeRoles from './pages/EmployeeRoles'
 import Clients from './pages/Clients'
 import ClientTypes from './pages/ClientTypes'
+import { Provider } from 'react-redux'
+import { store } from './redux/store'
+import { set as setAuth } from './redux/auth';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -34,50 +37,52 @@ setupIonicReact();
 
 
 const App: React.FC = () => {
-  let auth = {
+  store.dispatch(setAuth({
     email: "primitive_email@not.even.valid",
     password: "primitive_password"
-  }
+  }));
 
   return (
-    <IonApp>
-      <IonReactRouter>
-        <IonSplitPane contentId="main">
-          <Menu/>
-          <IonRouterOutlet id="main">
-            <Route path="/" exact={true}>
-              <Redirect to="/page/hotels" />
-            </Route>
-            <Route path="/page/Hotels" exact={true}>
-              <Hotels auth={auth} />
-            </Route>
-            {
-            <Route path="/page/Tours" exact={true}>
-              <Tours auth={auth} />
-            </Route>
-            }
-            <Route path="/page/Regions" exact={true}>
-              <Regions auth={auth} />
-            </Route>
-            <Route path="/page/Employees" exact={true}>
-              <Employees auth={auth} />
-            </Route>
-            <Route path="/page/EmployeeRoles" exact={true}>
-              <EmployeeRoles auth={auth} />
-            </Route>
-            <Route path="/page/Persons" exact={true}>
-              <Persons auth={auth} />
-            </Route>
-            <Route path="/page/Clients" exact={true}>
-              <Clients auth={auth} />
-            </Route>
-            <Route path="/page/ClientTypes" exact={true}>
-              <ClientTypes auth={auth} />
-            </Route>
-          </IonRouterOutlet>
-        </IonSplitPane>
-      </IonReactRouter>
-    </IonApp>
+    <Provider store={store}>
+      <IonApp>
+        <IonReactRouter>
+          <IonSplitPane contentId="main">
+            <Menu/>
+            <IonRouterOutlet id="main">
+              <Route path="/" exact={true}>
+                <Redirect to="/page/hotels" />
+              </Route>
+              <Route path="/page/Hotels" exact={true}>
+                <Hotels/>
+              </Route>
+              {
+              <Route path="/page/Tours" exact={true}>
+                <Tours/>
+              </Route>
+              }
+              <Route path="/page/Regions" exact={true}>
+                <Regions/>
+              </Route>
+              <Route path="/page/Employees" exact={true}>
+                <Employees/>
+              </Route>
+              <Route path="/page/EmployeeRoles" exact={true}>
+                <EmployeeRoles/>
+              </Route>
+              <Route path="/page/Persons" exact={true}>
+                <Persons/>
+              </Route>
+              <Route path="/page/Clients" exact={true}>
+                <Clients/>
+              </Route>
+              <Route path="/page/ClientTypes" exact={true}>
+                <ClientTypes/>
+              </Route>
+            </IonRouterOutlet>
+          </IonSplitPane>
+        </IonReactRouter>
+      </IonApp>
+    </Provider>
   );
 };
 

@@ -5,7 +5,7 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { AuthProps } from "../../interface/props/auth";
 import Tour from "../../interface/tour";
-import { formatPerson, formatCity, formatDate } from "../../utils/fmt";
+import { formatPerson, formatCity, formatDate, formatDateDiff } from "../../utils/fmt";
 
 const listColumns = [
   {
@@ -39,10 +39,7 @@ const listColumns = [
     selector: "departure_date",
     sortable: true,
     wrap: true,
-    cell: (e: Tour) => {
-      const diffInMs = Date.parse(e.departure_date as unknown as string) - Date.parse(e.arrival_date as unknown as string)
-      return `${diffInMs / (1000 * 60 * 60 * 24)}/${diffInMs / (1000 * 60 * 60 * 24)}`;
-    }
+    cell: (e: Tour) => formatDateDiff(e.arrival_date, e.departure_date)
   },
   {
     name: "Вид питания",
@@ -83,10 +80,7 @@ const ExpandedTour = ({ data }: { data: any}) => {
           <IonCol>{'Кол-во дней/ночей:'}</IonCol>
           <IonCol size='10'>
             {
-              (() => {
-                const diffInMs = Date.parse(data.departure_date as string) - Date.parse(data.arrival_date as string)
-                return `${diffInMs / (1000 * 60 * 60 * 24)}/${diffInMs / (1000 * 60 * 60 * 24)}`;
-              })()
+              formatDateDiff(data.arrival_date, data.departure_date)
             }
           </IonCol>
         </IonRow>
@@ -96,7 +90,7 @@ const ExpandedTour = ({ data }: { data: any}) => {
         </IonRow>
         <IonRow>
           <IonCol>{'Стоимость:'}</IonCol>
-          <IonCol size='10'>{data.cost}</IonCol>
+          <IonCol size='10'>{`${data.cost} руб.`}</IonCol>
         </IonRow>
         <IonRow>
           <IonCol>{'Описание:'}</IonCol>
@@ -112,7 +106,7 @@ export interface ToursListProps {
   on_selected_change: Dispatch<React.SetStateAction<Array<Tour>>>
 }
 
-export const ToursList: React.FC<ToursListProps & AuthProps> = (props) => {
+export const ToursList: React.FC<ToursListProps> = (props) => {
   return (
     <IonList id="tours-list">
       {

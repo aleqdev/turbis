@@ -5,6 +5,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
+import { useAppSelector } from '../../redux/store';
 
 export function PutClientTypeModal(
   {onDismiss}: {
@@ -60,7 +61,9 @@ export interface PutClientTypeModalControllerProps {
   refetch_client_types: RefetchFunction<any, any>,
 }
 
-export const PutClientTypeModalController: React.FC<PutClientTypeModalControllerProps & AuthProps> = (props) => {
+export const PutClientTypeModalController: React.FC<PutClientTypeModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PutClientTypeModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -71,7 +74,7 @@ export const PutClientTypeModalController: React.FC<PutClientTypeModalController
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, 'client_type', {
+            .post_with_auth(auth!, 'client_type', {
               name: ev.detail.data.name
             })
             .then((_) => {

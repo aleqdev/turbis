@@ -7,6 +7,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import ClientType from '../../interface/client_type';
+import { useAppSelector } from '../../redux/store';
 
 export function DeleteClientTypesModal(
   {selected_client_types, onDismiss}: {
@@ -49,7 +50,9 @@ export interface DeleteClientTypesModalControllerProps {
   selected_client_types: Array<ClientType>,
 }
 
-export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalControllerProps & AuthProps> = (props) => {
+export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(DeleteClientTypesModal, {
     selected_client_types: props.selected_client_types,
     onDismiss: (data: Array<ClientType> | null, role: string) => dismiss(data, role),
@@ -62,7 +65,7 @@ export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalCo
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (role: ClientType) => {
             await API
-              .delete_with_auth(props.auth, `client_type?id=eq.${role.id}`)
+              .delete_with_auth(auth!, `client_type?id=eq.${role.id}`)
           }))
           .then((results) => {
             for (const result of results) {

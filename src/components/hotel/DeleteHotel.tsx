@@ -6,6 +6,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Hotel from '../../interface/hotel';
+import { useAppSelector } from '../../redux/store';
 
 export function DeleteHotelsModal(
   {selected_hotels, onDismiss}: {
@@ -48,7 +49,9 @@ export type DeleteHotelsModalControllerProps = {
   selected_hotels: Array<Hotel>
 }
 
-export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerProps & AuthProps> = (props) => {
+export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(DeleteHotelsModal, {
     selected_hotels: props.selected_hotels,
     onDismiss: (data: Array<Hotel> | null, role: string) => dismiss(data, role),
@@ -60,7 +63,7 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (hotel: Hotel) => {
-            await API.delete_with_auth(props.auth, `hotel?id=eq.${hotel.id}`);
+            await API.delete_with_auth(auth!, `hotel?id=eq.${hotel.id}`);
           }))
           .then((results) => {
             for (const result of results) {

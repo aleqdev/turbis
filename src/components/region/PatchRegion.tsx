@@ -4,6 +4,7 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Region from '../../interface/region';
+import { useAppSelector } from '../../redux/store';
 
 export function PatchRegionModal(
   {selected_regions, onDismiss}: {
@@ -76,7 +77,9 @@ export type PatchRegionModalControllerProps = {
     set_selected_region: Dispatch<React.SetStateAction<Array<Region>>>
 }
 
-export const PatchRegionModalController: React.FC<PatchRegionModalControllerProps & AuthProps> = (props) => {
+export const PatchRegionModalController: React.FC<PatchRegionModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchRegionModal, {
     selected_regions: props.selected_regions,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -89,7 +92,7 @@ export const PatchRegionModalController: React.FC<PatchRegionModalControllerProp
         if (ev.detail.role === 'confirm') {
           props.set_selected_region([]);
           API
-            .patch_with_auth(props.auth, `region/${props.selected_regions[0].id}`, {
+            .patch_with_auth(auth!, `region/${props.selected_regions[0].id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

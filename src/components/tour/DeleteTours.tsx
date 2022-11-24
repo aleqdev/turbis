@@ -7,6 +7,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
 import Tour from '../../interface/tour';
 import API from '../../utils/server';
+import { useAppSelector } from '../../redux/store';
 
 
 export function DeleteToursModal(
@@ -50,7 +51,9 @@ export interface DeleteToursModalControllerProps {
   selected_tours: Array<Tour>,
 }
 
-export const DeleteToursModalController: React.FC<DeleteToursModalControllerProps & AuthProps> = (props) => {
+export const DeleteToursModalController: React.FC<DeleteToursModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(DeleteToursModal, {
     selected_tours: props.selected_tours,
     onDismiss: (data: Array<Tour> | null, role: string) => dismiss(data, role),
@@ -63,7 +66,7 @@ export const DeleteToursModalController: React.FC<DeleteToursModalControllerProp
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (worker: Tour) => {
             await API
-              .delete_with_auth(props.auth, `tour?id=eq.${worker.id}`)
+              .delete_with_auth(auth!, `tour?id=eq.${worker.id}`)
           }))
           .then((results) => {
             for (const result of results) {

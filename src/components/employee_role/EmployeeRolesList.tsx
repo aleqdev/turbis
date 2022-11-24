@@ -26,7 +26,7 @@ export interface EmployeeRolesListProps {
   on_selected_change: Dispatch<React.SetStateAction<Array<EmployeeRole>>>
 }
 
-export const EmployeeRolesList: React.FC<EmployeeRolesListProps & AuthProps> = (props) => {
+export const EmployeeRolesList: React.FC<EmployeeRolesListProps> = (props) => {
   return (
     <IonList id="employee-roles-list">
       {

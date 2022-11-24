@@ -9,7 +9,9 @@ import Hotel from '../../interface/hotel';
 import TourFeedingType from '../../interface/tour_feeding_type';
 import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
-import { formatDate } from '../../utils/fmt';
+import { formatDate, formatDateDiff } from '../../utils/fmt';
+import { useAppSelector } from '../../redux/store';
+import moment from 'moment';
 
 export function PatchTourModal(
   {auth, selected_tours, onDismiss}: AuthProps & {
@@ -29,9 +31,7 @@ export function PatchTourModal(
 
   const [inputHotel, setInputHotel] = React.useState(null as Hotel | null);
   const [inputFeedingType, setInputFeedingType] = React.useState(null as TourFeedingType | null);
-  const [diffDay, setDiffDay] = React.useState(null as number | null);
-  const [diffNight, setDiffNight] = React.useState(null as number | null);
-
+  const [diff, setDiff] = React.useState(null as string | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectWithSearchModal, {
@@ -127,12 +127,11 @@ export function PatchTourModal(
 
   function calcDiff() {
     if (inputDepartureDate?.current?.value && inputArrivalDate?.current?.value) {
-      const diffInMs = Date.parse(inputDepartureDate.current.value as string) - Date.parse(inputArrivalDate.current.value as string);
-      if (diffInMs < 0) {
-        return
+      const inputArrival = moment(inputArrivalDate.current.value as string, "DD-MM-YYYY").toDate();
+      const inputDeparture = moment(inputDepartureDate.current.value as string, "DD-MM-YYYY").toDate();
+      if (inputDeparture.getTime() - inputArrival.getTime() > 0) {
+        setDiff(formatDateDiff(inputArrival, inputDeparture));
       }
-      setDiffDay(diffInMs / (1000 * 60 * 60 * 24));
-      setDiffNight(diffInMs / (1000 * 60 * 60 * 24));
     }
   }
 
@@ -161,11 +160,11 @@ export function PatchTourModal(
           <IonButton disabled={hotels === null} onClick={() => openHotelSelectModal()}>
             {hotels === null ? "Загрузка..." : (inputHotel === null ? "Выбрать" : `${inputHotel.name}`)}
           </IonButton>
-          <IonLabel position="stacked">{"Дата заезда (месяц, день, год)"}</IonLabel>
+          <IonLabel position="stacked">{"Дата заезда (дд-мм-гггг)"}</IonLabel>
           <IonInput ref={inputArrivalDate} clearInput={true} type="text" placeholder="Введите дату" defaultValue={formatDate(tour.arrival_date)} onIonChange={calcDiff} required/>
-          <IonLabel position="stacked">Д{"Дата выезда (месяц, день, год)"}</IonLabel>
+          <IonLabel position="stacked">{"Дата выезда (дд-мм-гггг)"}</IonLabel>
           <IonInput ref={inputDepartureDate} clearInput={true} type="text" placeholder="Введите дату" defaultValue={formatDate(tour.departure_date)} onIonChange={calcDiff} required/>
-          <IonLabel position="stacked">{`Количество дней: ${diffDay ?? "..."}, Количество ночей: ${diffNight ?? "..."}`}</IonLabel>
+          <IonLabel position="stacked">{`Количество дней/ночей: ${diff ?? "..."}`}</IonLabel>
           <IonLabel position="stacked" >Вид питания</IonLabel>
           <IonButton disabled={feedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
             {feedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
@@ -185,9 +184,11 @@ export interface PatchTourModalControllerProps {
   selected_tours: Array<Tour>,
 }
 
-export const PatchTourModalController: React.FC<PatchTourModalControllerProps & AuthProps> = (props) => {
+export const PatchTourModalController: React.FC<PatchTourModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchTourModal, {
-    auth: props.auth,
+    auth: auth!,
     selected_tours: props.selected_tours,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -198,7 +199,7 @@ export const PatchTourModalController: React.FC<PatchTourModalControllerProps & 
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .patch_with_auth(props.auth, `tour?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `tour?id=eq.${ev.detail.data.id}`, {
               hotel_id: ev.detail.data.hotel.id,
               feeding_type_id: ev.detail.data.feedingType.id,
               arrival_date: ev.detail.data.arrivalDate,

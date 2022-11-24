@@ -4,7 +4,6 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import ClientType from "../../interface/client_type";
-import { AuthProps } from "../../interface/props/auth";
 
 const listColumns = [
   {
@@ -26,7 +25,7 @@ export interface EmployeeRolesListProps {
   on_selected_change: Dispatch<React.SetStateAction<Array<ClientType>>>
 }
 
-export const ClientTypesList: React.FC<EmployeeRolesListProps & AuthProps> = (props) => {
+export const ClientTypesList: React.FC<EmployeeRolesListProps> = (props) => {
   return (
     <IonList id="client-types-list">
       {

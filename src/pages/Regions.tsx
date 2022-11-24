@@ -7,8 +7,9 @@ import React from 'react';
 import { RegionsList } from '../components/region/RegionsList';
 import { AuthProps } from '../interface/props/auth';
 import Region from '../interface/region';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC<AuthProps> = (props) => {
+const Page: React.FC = (props) => {
   const [_, set_selected_regions] = React.useState(Array<Region>);
   
   return (
@@ -25,7 +26,7 @@ const Page: React.FC<AuthProps> = (props) => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <RegionsList auth={props.auth} on_selected_change={set_selected_regions}></RegionsList>
+        <RegionsList on_selected_change={set_selected_regions}></RegionsList>
       </IonContent>
     </IonPage>
   );

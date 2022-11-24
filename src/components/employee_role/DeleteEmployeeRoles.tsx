@@ -7,6 +7,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { EmployeeRole } from '../../interface/employee_role';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
+import { useAppSelector } from '../../redux/store';
 
 export function DeleteEmployeeRolesModal(
   {selected_employee_roles, onDismiss}: {
@@ -49,7 +50,9 @@ export interface DeleteWorkerRolesModalControllerProps {
   selected_employee_roles: Array<EmployeeRole>,
 }
 
-export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalControllerProps & AuthProps> = (props) => {
+export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(DeleteEmployeeRolesModal, {
     selected_employee_roles: props.selected_employee_roles,
     onDismiss: (data: Array<EmployeeRole> | null, role: string) => dismiss(data, role),
@@ -62,7 +65,7 @@ export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalCo
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (role: EmployeeRole) => {
             await API
-              .delete_with_auth(props.auth, `employee_role?id=eq.${role.id}`)
+              .delete_with_auth(auth!, `employee_role?id=eq.${role.id}`)
           }))
           .then((results) => {
             for (const result of results) {

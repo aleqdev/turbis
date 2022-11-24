@@ -6,6 +6,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
+import { useAppSelector } from '../../redux/store';
 
 export function PutPersonModal(
   {onDismiss}: {
@@ -80,7 +81,9 @@ export interface PutPersonModalControllerProps {
   refetch_persons: RefetchFunction<any, any>,
 }
 
-export const PutPersonModalController: React.FC<PutPersonModalControllerProps & AuthProps> = (props) => {
+export const PutPersonModalController: React.FC<PutPersonModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PutPersonModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -91,7 +94,7 @@ export const PutPersonModalController: React.FC<PutPersonModalControllerProps & 
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, 'person', {
+            .post_with_auth(auth!, 'person', {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,

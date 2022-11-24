@@ -9,6 +9,7 @@ import { SelectWithSearchModal } from '../SelectWithSearch';
 import Person from '../../interface/person';
 import { formatPerson } from '../../utils/fmt';
 import ClientType from '../../interface/client_type';
+import { useAppSelector } from '../../redux/store';
 //import { createPutComponent } from '../TableManagement';
 
 export function PutClientModal(
@@ -117,9 +118,11 @@ export interface PutClientModalControllerProps {
   refetch_clients: RefetchFunction<any, any>,
 }
 
-export const PutClientModalController: React.FC<PutClientModalControllerProps & AuthProps> = (props) => {
+export const PutClientModalController: React.FC<PutClientModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
   const [present, dismiss] = useIonModal(PutClientModal, {
-    auth: props.auth,
+    auth: auth!,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -129,7 +132,7 @@ export const PutClientModalController: React.FC<PutClientModalControllerProps & 
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, 'client', {
+            .post_with_auth(auth!, 'client', {
               person_id: ev.detail.data.person.id,
               type_id: ev.detail.data.type.id
             })

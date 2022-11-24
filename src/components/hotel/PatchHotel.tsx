@@ -10,6 +10,7 @@ import API from '../../utils/server';
 import Hotel from '../../interface/hotel';
 import City from '../../interface/city';
 import Person from '../../interface/person';
+import { useAppSelector } from '../../redux/store';
 
 export function PatchHotelModal(
   {auth, selected_hotels, onDismiss}: AuthProps & {
@@ -169,9 +170,11 @@ export type PatchHotelModalControllerProps = {
   selected_hotels: Array<Hotel>,
 }
 
-export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps & AuthProps> = (props) => {
+export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchHotelModal, {
-    auth: props.auth,
+    auth: auth!,
     selected_hotels: props.selected_hotels,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -182,7 +185,7 @@ export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps 
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .patch_with_auth(props.auth, `hotel?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `hotel?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               description: ev.detail.data.description,
               city_id: ev.detail.data.city_id,

@@ -6,6 +6,7 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import ClientType from '../../interface/client_type';
+import { useAppSelector } from '../../redux/store';
 
 export function PatchEmployeeRoleModal(
   {selected_client_types, onDismiss}: {
@@ -66,7 +67,9 @@ export interface PatchClientTypeModalControllerProps {
   selected_client_types: Array<ClientType>,
 }
 
-export const PatchClientTypeModalController: React.FC<PatchClientTypeModalControllerProps & AuthProps> = (props) => {
+export const PatchClientTypeModalController: React.FC<PatchClientTypeModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
     selected_client_types: props.selected_client_types,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -78,7 +81,7 @@ export const PatchClientTypeModalController: React.FC<PatchClientTypeModalContro
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .patch_with_auth(props.auth, `client_type?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `client_type?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
             })
             .then((_) => {

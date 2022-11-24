@@ -5,6 +5,7 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { AuthProps } from "../../interface/props/auth";
 import Region from "../../interface/region";
+import { useAppSelector } from "../../redux/store";
 import API from "../../utils/server";
 
 const listColumns = [
@@ -27,12 +28,14 @@ export interface RegionsListProps {
   on_selected_change: Dispatch<React.SetStateAction<Array<Region>>>
 }
 
-export const RegionsList: React.FC<RegionsListProps & AuthProps> = (props) => {
+export const RegionsList: React.FC<RegionsListProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
   const [regions, set_regions] = React.useState(null as Array<Region> | null);
 
   React.useEffect(() => {
     API
-      .get_with_auth(props.auth, 'region?select=*,country(*)')
+      .get_with_auth(auth!, 'region?select=*,country(*)')
       .then((response: any) => set_regions(response.data));
   }, [])
   

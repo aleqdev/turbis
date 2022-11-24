@@ -4,9 +4,9 @@ import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Client from '../../interface/client';
+import { useAppSelector } from '../../redux/store';
 
 export function DeleteClientsModal(
   {selected_clients, onDismiss}: {
@@ -49,12 +49,14 @@ export interface DeleteClientsModalControllerProps {
   selected_clients: Array<Client>,
 }
 
-export const DeleteClientsModalController: React.FC<DeleteClientsModalControllerProps & AuthProps> = (props) => {
+export const DeleteClientsModalController: React.FC<DeleteClientsModalControllerProps> = (props) => {
   const [present, dismiss] = useIonModal(DeleteClientsModal, {
     selected_clients: props.selected_clients,
     onDismiss: (data: Array<Client> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
+
+  const auth = useAppSelector(state => state.auth);
 
   function openModal() {
     present({
@@ -62,7 +64,7 @@ export const DeleteClientsModalController: React.FC<DeleteClientsModalController
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (employee: Client) => {
             await API
-              .delete_with_auth(props.auth, `client?id=eq.${employee.id}`)
+              .delete_with_auth(auth!, `client?id=eq.${employee.id}`)
           }))
           .then((results) => {
             for (const result of results) {

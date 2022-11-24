@@ -10,6 +10,7 @@ import Employee from '../../interface/employee';
 import { Person } from '../../interface/person';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatPerson } from '../../utils/fmt';
+import { useAppSelector } from '../../redux/store';
 
 export function PatchEmployeeModal(
   {auth, selected_employees, onDismiss}: AuthProps & {
@@ -122,9 +123,11 @@ export interface PatchEmployeeModalControllerProps {
   selected_employees: Array<Employee>,
 }
 
-export const PatchEmployeesModalController: React.FC<PatchEmployeeModalControllerProps & AuthProps> = (props) => {
+export const PatchEmployeesModalController: React.FC<PatchEmployeeModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PatchEmployeeModal, {
-    auth: props.auth,
+    auth: auth!,
     selected_employees: props.selected_employees,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -135,7 +138,7 @@ export const PatchEmployeesModalController: React.FC<PatchEmployeeModalControlle
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .patch_with_auth(props.auth, `employee?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `employee?id=eq.${ev.detail.data.id}`, {
               role_id: ev.detail.data.role.id,
               person_id: ev.detail.data.person.id,
             })

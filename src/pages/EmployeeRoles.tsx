@@ -12,12 +12,25 @@ import { EmployeeRolesList } from '../components/employee_role/EmployeeRolesList
 import { DeleteWorkerRolesModalController } from '../components/employee_role/DeleteEmployeeRoles';
 import { AuthProps } from '../interface/props/auth';
 import API from '../utils/server';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC<AuthProps> = (props) => {
+const Page: React.FC = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
+  if (auth === null) {
+    return (
+      <IonPage>
+        <IonHeader>
+          Авторизация не найдена
+        </IonHeader>
+      </IonPage>
+    )
+  }
+
   const [selected_employee_roles, set_selected_employee_roles] = useState(Array<EmployeeRole>);
 
   const [{ data: employee_roles }, refetch_employee_roles]: [{data?: Array<EmployeeRole>}, ...any] = API.use_hook(
-    props.auth,
+    auth!,
     'employee_role'
   );
 
@@ -42,22 +55,22 @@ const Page: React.FC<AuthProps> = (props) => {
             <IonList>
               {
                 (selected_employee_roles?.length === 1 ) ? 
-                  <PatchWorkerRoleModalController auth={props.auth} refetch_employee_roles={refetch_employee_roles} selected_employee_roles={selected_employee_roles}/>
+                  <PatchWorkerRoleModalController refetch_employee_roles={refetch_employee_roles} selected_employee_roles={selected_employee_roles}/>
                   : ""
               }
               {
                 (selected_employee_roles?.length > 0 ) ? 
-                  <DeleteWorkerRolesModalController auth={props.auth} refetch_employee_roles={refetch_employee_roles} selected_employee_roles={selected_employee_roles}/>
+                  <DeleteWorkerRolesModalController refetch_employee_roles={refetch_employee_roles} selected_employee_roles={selected_employee_roles}/>
                   : ""
               }
-              <PutEmployeeRoleModalController auth={props.auth} refetch_employee_roles={refetch_employee_roles} />
+              <PutEmployeeRoleModalController refetch_employee_roles={refetch_employee_roles} />
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <EmployeeRolesList auth={props.auth} employee_roles={employee_roles!} on_selected_change={set_selected_employee_roles} />
+        <EmployeeRolesList employee_roles={employee_roles!} on_selected_change={set_selected_employee_roles} />
       </IonContent>
     </IonPage>
   );

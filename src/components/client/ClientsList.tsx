@@ -4,7 +4,6 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import Client from "../../interface/client";
-import { AuthProps } from "../../interface/props/auth";
 
 const listColumns = [
   {
@@ -52,7 +51,7 @@ export interface ClientsListProps {
   clear_selection_trigger: boolean
 }
 
-export const ClientsList: React.FC<ClientsListProps & AuthProps> = (props) => {
+export const ClientsList: React.FC<ClientsListProps> = (props) => {
   return (
     <IonList id="clients-list">
       {

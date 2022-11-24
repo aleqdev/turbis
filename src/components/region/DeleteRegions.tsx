@@ -6,6 +6,7 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Region from '../../interface/region';
+import { useAppSelector } from '../../redux/store';
 
 export function DeleteRegionsModal(
   {selected_regions, onDismiss}: {
@@ -49,7 +50,9 @@ export type RemoveRegionsModalControllerProps = {
   set_selected_regions: Dispatch<React.SetStateAction<Array<Region>>>
 }
 
-export const DeleteRegionsModalController: React.FC<RemoveRegionsModalControllerProps & AuthProps> = (props) => {
+export const DeleteRegionsModalController: React.FC<RemoveRegionsModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
   const [present, dismiss] = useIonModal(DeleteRegionsModal, {
     selected_workers: props.selected_regions,
     onDismiss: (data: Array<Region> | null, role: string) => dismiss(data, role),
@@ -63,7 +66,7 @@ export const DeleteRegionsModalController: React.FC<RemoveRegionsModalController
           props.set_selected_regions([]);
           Promise.allSettled(ev.detail.data.map(async (region: Region) => {
             await API
-              .delete_with_auth(props.auth, `region?id=eq.${region.id}`)
+              .delete_with_auth(auth!, `region?id=eq.${region.id}`)
           }))
           .then((results) => {
             for (const result of results) {

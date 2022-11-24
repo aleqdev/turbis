@@ -9,6 +9,7 @@ import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Person from '../../interface/person';
 import City from '../../interface/city';
+import { useAppSelector } from '../../redux/store';
 
 export function PutHotelModal(
   {auth, onDismiss}: AuthProps & {
@@ -161,9 +162,11 @@ export type PutHotelModalControllerProps = {
   refetch_hotels: RefetchFunction<any, any>,
 }
 
-export const PutHotelModalController: React.FC<PutHotelModalControllerProps & AuthProps> = (props) => {
+export const PutHotelModalController: React.FC<PutHotelModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [present, dismiss] = useIonModal(PutHotelModal, {
-    auth: props.auth,
+    auth: auth!,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -173,7 +176,7 @@ export const PutHotelModalController: React.FC<PutHotelModalControllerProps & Au
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, 'hotel', {
+            .post_with_auth(auth!, 'hotel', {
               name: ev.detail.data.name,
               description: ev.detail.data.description,
               city_id: ev.detail.data.city_id,

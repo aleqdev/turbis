@@ -5,6 +5,7 @@ import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
+import { useAppSelector } from '../../redux/store';
 
 export function PutEmployeeRoleModal(
   {onDismiss}: {
@@ -60,7 +61,9 @@ export interface PutEmployeeRoleModalControllerProps {
   refetch_employee_roles: RefetchFunction<any, any>,
 }
 
-export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalControllerProps & AuthProps> = (props) => {
+export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
   const [present, dismiss] = useIonModal(PutEmployeeRoleModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -71,7 +74,7 @@ export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalContro
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           API
-            .post_with_auth(props.auth, 'employee_role', {
+            .post_with_auth(auth!, 'employee_role', {
               name: ev.detail.data.name
             })
             .then((_) => {

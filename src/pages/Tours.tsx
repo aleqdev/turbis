@@ -15,12 +15,15 @@ import { PutTourModalController } from '../components/tour/PutTour';
 import { AuthProps } from '../interface/props/auth';
 import Tour from '../interface/tour';
 import API from '../utils/server';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC<AuthProps> = (props) => {
+const Page: React.FC = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [selected_tours, set_selected_tours] = useState(Array<Tour>);
 
   const [{ data: tours }, refetch_tours]: [{data?: Array<Tour>}, ...any] = API.use_hook(
-    props.auth,
+    auth!,
     'tour?select=*,hotel(*,city(*)),feeding_type:tour_feeding_type(*)'
   );
 
@@ -45,22 +48,22 @@ const Page: React.FC<AuthProps> = (props) => {
             <IonList>
               {
                 (selected_tours?.length === 1 ) ? 
-                  <PatchTourModalController auth={props.auth} refetch_tours={refetch_tours} selected_tours={selected_tours}/>
+                  <PatchTourModalController refetch_tours={refetch_tours} selected_tours={selected_tours}/>
                   : ""
               }
               {
                 (selected_tours?.length > 0 ) ? 
-                  <DeleteToursModalController auth={props.auth} refetch_tours={refetch_tours} selected_tours={selected_tours}/>
+                  <DeleteToursModalController refetch_tours={refetch_tours} selected_tours={selected_tours}/>
                   : ""
               }
-              <PutTourModalController auth={props.auth} refetch_tours={refetch_tours} />
+              <PutTourModalController refetch_tours={refetch_tours} />
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <ToursList auth={props.auth} tours={tours!} on_selected_change={set_selected_tours}></ToursList>
+        <ToursList tours={tours!} on_selected_change={set_selected_tours}></ToursList>
       </IonContent>
     </IonPage>
   );

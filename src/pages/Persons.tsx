@@ -12,13 +12,16 @@ import { DeletePersonsModalController } from '../components/person/DeletePersons
 import { PersonsList } from '../components/person/PersonsList';
 import { PutPersonModalController } from '../components/person/PutPerson';
 import { PatchPersonModalController } from '../components/person/PatchPerson';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC<AuthProps> = (props) => {
+const Page: React.FC = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
   const [selected_persons, set_selected_persons] = useState(Array<Person>);
   const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
   const [{ data: persons }, refetch_persons]: [{data?: Array<Person>}, ...any] = API.use_hook(
-    props.auth,
+    auth!,
     'person'
   );
 
@@ -50,22 +53,22 @@ const Page: React.FC<AuthProps> = (props) => {
             <IonList>
               {
                 (selected_persons?.length === 1 ) ? 
-                  <PatchPersonModalController auth={props.auth} refetch_persons={refetch_persons} selected_persons={selected_persons}/>
+                  <PatchPersonModalController refetch_persons={refetch_persons} selected_persons={selected_persons}/>
                   : ""
               }
               {
                 (selected_persons?.length > 0 ) ? 
-                  <DeletePersonsModalController auth={props.auth} refetch_persons={refetch_persons} selected_persons={selected_persons}/>
+                  <DeletePersonsModalController refetch_persons={refetch_persons} selected_persons={selected_persons}/>
                   : ""
               }
-              <PutPersonModalController auth={props.auth} refetch_persons={refetch_persons} />
+              <PutPersonModalController refetch_persons={refetch_persons} />
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <PersonsList auth={props.auth} clear_selection_trigger={clear_selection_trigger} persons={persons!} on_selected_change={set_selected_persons} />
+        <PersonsList clear_selection_trigger={clear_selection_trigger} persons={persons!} on_selected_change={set_selected_persons} />
       </IonContent>
     </IonPage>
   );
