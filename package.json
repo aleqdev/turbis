@@ -32,6 +32,7 @@
     "react-currency-input-field": "^3.6.9",
     "react-data-table-component": "^7.5.3",
     "react-data-table-component-extensions": "^1.6.0",
+    "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",

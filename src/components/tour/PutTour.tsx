@@ -5,6 +5,8 @@ import { WorkerRole } from '../../interface/worker_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import CurrencyInput from 'react-currency-input-field';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export function PutWorkerModal(
   {onDismiss}: {
@@ -20,6 +22,9 @@ export function PutWorkerModal(
   const inputDescription = useRef<HTMLIonTextareaElement>(null);
   const [inputRole, setInputRole] = useState(null as WorkerRole | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
+  const [fromDate, setFromDate] = useState(0);
+  const [endDate, setEndDate] = useState(0);
+  const diffInputDate = useRef<HTMLIonInputElement>(null);
 
   React.useEffect(() => {
     axios
@@ -56,6 +61,32 @@ export function PutWorkerModal(
       e.target.value = e.target.value.split('.')[0] + '.' + e.target.value.split('.')[1].slice(0, 2)
     }
 }
+
+function onChangeEndDate(e:any) {
+  console.log('change_end_date', endDate)
+  if (fromDate != 0) {
+    diffDate()
+  }
+}
+function onChangeFromDate(e:any) {
+  // const date = Date.parse(e.detail.value as string)/1000
+  // setFromDate(date);
+  console.log('change_from_date', fromDate)
+  if (endDate !== 0) {
+    diffDate()
+  }
+}
+
+function diffDate() {
+  let timestamp1 = fromDate
+  let timestamp2 = endDate
+  var difference = (timestamp2 - timestamp1) * 1000;
+  console.log(timestamp1, timestamp2)
+  var daysDifference = Math.floor(difference / (1000 * 60 * 60 * 24));
+  console.log('change', daysDifference)
+  diffInputDate.current!.value = daysDifference
+  console.log('change', diffInputDate.current!.value) 
+}
   return (
     <>
       <IonHeader>
@@ -79,6 +110,7 @@ export function PutWorkerModal(
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked" >Отель</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
+            <IonSelectOption key={'Gold'} value={'Gold'}>{'Gold'}</IonSelectOption>
             {
               hotels ? 
                 hotels.map((element) => {
@@ -87,23 +119,20 @@ export function PutWorkerModal(
                 <IonText>Загрузка...</IonText>
             }
           </IonSelect>
-          <IonDatetime presentation="date"><span slot="title">Дата заезда</span></IonDatetime>
-          <IonDatetime presentation="date" ><span slot="title">Дата выезда</span></IonDatetime>
-          
           <IonLabel position="stacked" >Вид питания</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
             <IonSelectOption key={'Без питания'} value={'Без питания'}>{'Без питания'}</IonSelectOption>
             <IonSelectOption key={'С завтраком'} value={'С завтраком'}>{'С завтраком'}</IonSelectOption>
             <IonSelectOption key={'3-х разовое'} value={'3-х разовое'}>{'3-х разовое'}</IonSelectOption>
           </IonSelect>
-          {/* <IonLabel position="stacked">Фамилия</IonLabel>
-          <IonInput ref={inputSurname} clearInput={true} type="text" placeholder="Введите фамилию" required/>
-          <IonLabel position="stacked">Отчество</IonLabel>
-          <IonInput ref={inputLastName} clearInput={true} type="text" placeholder="Введите отчество" required/>
-          <IonLabel position="stacked">Телефон</IonLabel>
-          <IonInput ref={inputPhoneNumber} clearInput={true} type="text" placeholder="Введите телефон" required/> */}
-          {/* <IonInput type="text" value={''} onKeyPress={(event) => { if (!/[0-9.]/.test(event.key) && (event?.target as HTMLInputElement)?.value.match(/\./g)?.length == 1) { event.preventDefault();}}} onIonChange={(e) => onChangeTagInput(e)} step="0.01" placeholder="0.00"></IonInput> */}
+          <IonDatetime onIonChange={(e) =>{setFromDate(Date.parse(e.detail.value as string)/1000); onChangeFromDate(e)}} presentation="date"><span slot="title">Дата заезда</span></IonDatetime>
+          <IonDatetime onIonChange={(e) => onChangeEndDate(e)} presentation="date" ><span slot="title">Дата выезда</span></IonDatetime>
+          <IonInput ref={diffInputDate} value=''>
+            {diffInputDate.current?.value}
+          </IonInput>
+          <IonLabel position="stacked">Стоимость тура</IonLabel><br />
           <CurrencyInput
+            id="currencyinput"
             placeholder="Введите стоимость тура"
             decimalsLimit={2}
             decimalSeparator='.'
