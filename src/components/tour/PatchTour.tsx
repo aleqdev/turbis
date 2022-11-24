@@ -170,7 +170,7 @@ export function PatchTourModal(
           <IonButton disabled={feedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
             {feedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
           </IonButton>
-          <IonLabel position="stacked">Стоимость тура</IonLabel>
+          <IonLabel position="stacked">{"Стоимость тура (руб.)"}</IonLabel>
           <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" value={tour.cost} required/>
           <IonLabel position="stacked">Описание</IonLabel>
           <IonTextarea ref={inputDescription} auto-grow={true} value={tour.description} placeholder="Введите описание" required/>

@@ -55,6 +55,7 @@ const listColumns = [
     selector: "cost",
     sortable: true,
     wrap: true,
+    cell: (e: Tour) => `${e.cost} руб.`
   },
 ];
 
