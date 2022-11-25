@@ -1,64 +1,138 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal, IonDatetime, IonTextarea } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
-import React, { useRef, useState } from 'react'
-import { WorkerRole } from '../../interface/worker_role';
+import React, { useMemo, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import CurrencyInput from 'react-currency-input-field';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { AuthProps } from '../../interface/props/auth';
+import Tour from '../../interface/tour';
+import Hotel from '../../interface/hotel';
+import TourFeedingType from '../../interface/tour_feeding_type';
+import API from '../../utils/server';
+import { SelectWithSearchModal } from '../SelectWithSearch';
+import { useAppSelector } from '../../redux/store';
+import { formatDateDiff } from '../../utils/fmt';
+import moment from 'moment';
 
-export function PutWorkerModal(
-  {onDismiss}: {
+export function PutTourModal(
+  {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [hotels, setHotels] = React.useState(null as Array<WorkerRole> | null);
-  const inputName = useRef<HTMLIonInputElement>(null);
-  const inputSurname = useRef<HTMLIonInputElement>(null);
-  const inputLastName = useRef<HTMLIonInputElement>(null);
-  const inputEmail = useRef<HTMLIonInputElement>(null);
-  const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
+  const [hotels, setHotels] = React.useState(null as Array<Hotel> | null);
+  const [feedingTypes, setFeedingTypes] = React.useState(null as Array<TourFeedingType> | null);
+
+  const inputArrivalDate = useRef<HTMLIonInputElement>(null);
+  const inputDepartureDate = useRef<HTMLIonInputElement>(null);
+  const inputCost = useRef<HTMLIonInputElement>(null);
   const inputDescription = useRef<HTMLIonTextareaElement>(null);
-  const [inputRole, setInputRole] = useState(null as WorkerRole | null);
+
+  const [inputHotel, setInputHotel] = React.useState(null as Hotel | null);
+  const [inputFeedingType, setInputFeedingType] = React.useState(null as TourFeedingType | null);
+  const [diff, setDiff] = React.useState(null as string | null);
+
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [fromDate, setFromDate] = useState(0);
   const [endDate, setEndDate] = useState(0);
   const diffInputDate = useRef<HTMLIonInputElement>(null);
 
+  const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectWithSearchModal, {
+    elements: hotels,
+    title: "Выберите отель",
+    formatter: (e: Hotel) => `${e.name} ( ${e.city!.name} )`,
+    sorter: (e: Hotel, query: string) => {
+      return query.split(' ').reduce((value, element) => {
+        element = element.toLowerCase();
+        return value + 
+          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() === element) + 
+          +e.city!.name.toLowerCase().includes(element) + 10 * +(e.city!.name.toLowerCase() === element)
+      }, 0);
+    },
+    keyer: (e: Hotel) => e.id,
+    onDismiss: (data: object | null, role: string) => dismissHotelChoice(data, role),
+  });
+
+  const [presentFeedingTypeChoice, dismissFeedingTypeChoice] = useIonModal(SelectWithSearchModal, {
+    elements: feedingTypes,
+    title: "Выберите тип питания",
+    formatter: (e: TourFeedingType) => `${e.name}`,
+    sorter: (e: TourFeedingType, query: string) => {
+      return query.split(' ').reduce((value, element) => {
+        element = element.toLowerCase();
+        return value + 
+          +e.name.toLowerCase().includes(element)
+      }, 0);
+    },
+    keyer: (e: TourFeedingType) => e.id,
+    onDismiss: (data: object | null, role: string) => dismissFeedingTypeChoice(data, role),
+  });
+
+  function openHotelSelectModal() {
+    presentHotelChoice({
+      onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (ev.detail.role === 'confirm') {
+          setInputHotel(ev.detail.data.value);
+        }
+      },
+    });
+  }
+
+  function openFeedingTypeSelectModal() {
+    presentFeedingTypeChoice({
+      onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (ev.detail.role === 'confirm') {
+          setInputFeedingType(ev.detail.data.value);
+        }
+      },
+    });
+  }
+
   React.useEffect(() => {
-    axios
-      .get("https://api.necrom.ru/worker_role")
-      .then((response) => setHotels(response.data));
-  }, [])
-  
+    API 
+      .get_with_auth(auth, 'hotel?select=*,city(*),owner:person(*)')
+      .then((response: any) => {
+        setHotels(response.data);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    API 
+      .get_with_auth(auth, 'tour_feeding_type')
+      .then((response: any) => {
+        setFeedingTypes(response.data);
+      });
+  }, []);
+
 
   function confirm() {
-    const name = inputName.current?.value;
-    const surname = inputSurname.current?.value
-    const last_name = inputLastName.current?.value
-    const email = inputEmail.current?.value;
-    const phone_number = inputPhoneNumber.current?.value;
+    const arrivalDate = inputArrivalDate.current?.value;
+    const departureDate = inputDepartureDate.current?.value;
+    const cost = inputCost.current?.value;
+    const description = inputDescription.current?.value;
 
-    if (name && surname && last_name && email && phone_number && inputRole) {
+    if (inputHotel && inputFeedingType && arrivalDate && departureDate && cost && description) {
       onDismiss({
-        name,
-        surname,
-        last_name,
-        email,
-        phone_number,
-        role: inputRole
+        arrivalDate,
+        departureDate,
+        description,
+        cost,
+        feedingType: inputFeedingType,
+        hotel: inputHotel
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
     }
   }
 
-  
-  const [tagInputVal, setTagInputVal] = useState("");
-  function onChangeTagInput(e:any) {
-    if (e.target.value.split('.')[1].length > 2) {
-      e.target.value = e.target.value.split('.')[0] + '.' + e.target.value.split('.')[1].slice(0, 2)
+  function calcDiff() {
+    if (inputDepartureDate?.current?.value && inputArrivalDate?.current?.value) {
+      const inputArrival = moment(inputArrivalDate.current.value as string, "DD-MM-YYYY").toDate();
+      const inputDeparture = moment(inputDepartureDate.current.value as string, "DD-MM-YYYY").toDate();
+      if (inputDeparture.getTime() - inputArrival.getTime() > 0) {
+        setDiff(formatDateDiff(inputArrival, inputDeparture));
+      }
     }
 }
 
@@ -87,6 +161,7 @@ function diffDate() {
   diffInputDate.current!.value = daysDifference
   console.log('change', diffInputDate.current!.value) 
 }
+
   return (
     <>
       <IonHeader>
@@ -109,8 +184,8 @@ function diffDate() {
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked" >Отель</IonLabel>
-          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
-            <IonSelectOption key={'Gold'} value={'Gold'}>{'Gold'}</IonSelectOption>
+          {/* <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}> */}
+            {/* <IonSelectOption key={'Gold'} value={'Gold'}>{'Gold'}</IonSelectOption>
             {
               hotels ? 
                 hotels.map((element) => {
@@ -118,8 +193,8 @@ function diffDate() {
                 }) :
                 <IonText>Загрузка...</IonText>
             }
-          </IonSelect>
-          <IonLabel position="stacked" >Вид питания</IonLabel>
+          </IonSelect> */}
+          {/* <IonLabel position="stacked" >Вид питания</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
             <IonSelectOption key={'Без питания'} value={'Без питания'}>{'Без питания'}</IonSelectOption>
             <IonSelectOption key={'С завтраком'} value={'С завтраком'}>{'С завтраком'}</IonSelectOption>
@@ -139,7 +214,22 @@ function diffDate() {
             suffix=' ₽'
             // onValueChange={(value:any, name:any) => console.log(value, name)}
           />
-          <IonLabel position="stacked">Описание тура</IonLabel>
+          <IonLabel position="stacked">Описание тура</IonLabel> */}
+          <IonButton disabled={hotels === null} onClick={() => openHotelSelectModal()}>
+            {hotels === null ? "Загрузка..." : (inputHotel === null ? "Выбрать" : `${inputHotel.name}`)}
+          </IonButton>
+          <IonLabel position="stacked">{"Дата заезда (дд-мм-гггг)"}</IonLabel>
+          <IonInput ref={inputArrivalDate} clearInput={true} type="text" placeholder="Введите дату" onIonChange={calcDiff} required/>
+          <IonLabel position="stacked">{"Дата выезда (дд-мм-гггг)"}</IonLabel>
+          <IonInput ref={inputDepartureDate} clearInput={true} type="text" placeholder="Введите дату" onIonChange={calcDiff} required/>
+          <IonLabel position="stacked">{`Количество дней/ночей: ${diff ?? "..."}`}</IonLabel>
+          <IonLabel position="stacked" >Вид питания</IonLabel>
+          <IonButton disabled={feedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
+            {feedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
+          </IonButton>
+          <IonLabel position="stacked">{"Стоимость тура (руб.)"}</IonLabel>
+          <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" required/>
+          <IonLabel position="stacked">Описание</IonLabel>
           <IonTextarea ref={inputDescription} auto-grow={true} placeholder="Введите описание" required/>
         </IonItem>
       </IonContent>
@@ -147,12 +237,15 @@ function diffDate() {
   )
 }
 
-export interface PutWorkerModalControllerProps {
-  refetch_workers: RefetchFunction<any, any>,
+export interface PutTourModalControllerProps {
+  refetch_tours: RefetchFunction<any, any>,
 }
 
-export const PutTourModalController: React.FC<PutWorkerModalControllerProps> = (props) => {
-  const [present, dismiss] = useIonModal(PutWorkerModal, {
+export const PutTourModalController: React.FC<PutTourModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
+  const [present, dismiss] = useIonModal(PutTourModal, {
+    auth: auth!,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -161,26 +254,24 @@ export const PutTourModalController: React.FC<PutWorkerModalControllerProps> = (
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          axios
-            .put("https://api.necrom.ru/worker", {
-              name: ev.detail.data.name,
-              surname: ev.detail.data.surname,
-              last_name: ev.detail.data.last_name,
-              email: ev.detail.data.email,
-              phone_number: ev.detail.data.phone_number,
-              role_id: ev.detail.data.role.id,
-              db_user_email: "primitive_email@not.even.valid",
-              db_user_password: "primitive_password",
+          API
+            .post_with_auth(auth!, `tour`, {
+              hotel_id: ev.detail.data.hotel.id,
+              feeding_type_id: ev.detail.data.feedingType.id,
+              arrival_date: ev.detail.data.arrivalDate,
+              departure_date: ev.detail.data.departureDate,
+              cost: ev.detail.data.cost,
+              description: ev.detail.data.description,
             })
             .then((_) => {
-              props.refetch_workers();
+              props.refetch_tours();
               presentAlert({
                 header: "Тур добавлен",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_workers();
+              props.refetch_tours();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,

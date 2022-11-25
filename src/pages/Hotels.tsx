@@ -5,20 +5,24 @@ import {
   IonList,
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import { HotelJoinedFetch } from '../interface/hotel';
 import { PatchHotelModalController } from '../components/hotel/PatchHotel';
-import useAxios from 'axios-hooks'
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
 import { HotelsList } from '../components/hotel/HotelsList';
 import { PutHotelModalController } from '../components/hotel/PutHotel';
-import { atLocation } from '../utils/server_url';
+import { AuthProps } from '../interface/props/auth';
+import API from '../utils/server';
+import Hotel from '../interface/hotel';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC = () => {
-  const [selected_hotels, set_selected_hotels] = useState(Array<HotelJoinedFetch>);
+const Page: React.FC = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
+  const [selected_hotels, set_selected_hotels] = useState(Array<Hotel>);
   const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
-  const [{ data: hotels }, refetch_hotels]: [{data?: Array<HotelJoinedFetch>}, ...any] = useAxios(
-    atLocation('hotel?join=true')
+  const [{ data: hotels }, refetch_hotels]: [{data?: Array<Hotel>}, ...any] = API.use_hook(
+    auth!,
+    'hotel?select=*,city(*,region(*,country(*))),owner:person(*)'
   );
 
   useEffect(

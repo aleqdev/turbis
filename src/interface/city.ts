@@ -1,11 +1,11 @@
-export interface City {
+import Region from "./region";
+
+export type City = {
     id: number,
     name: string,
-    region_id: number
+    region_id: number,
+    crt_date: Date,
+    region?: Region
 }
 
-export interface CityJoinedFetch extends City {
-    region_name: string,
-    country_id: number,
-    country_name: string
-}
+export default City;

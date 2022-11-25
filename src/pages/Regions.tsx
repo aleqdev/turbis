@@ -5,10 +5,12 @@ import {
 } from '@ionic/react';
 import React from 'react';
 import { RegionsList } from '../components/region/RegionsList';
-import { RegionJoinedFetch } from '../interface/region';
+import { AuthProps } from '../interface/props/auth';
+import Region from '../interface/region';
+import { useAppSelector } from '../redux/store';
 
-const Page: React.FC = () => {
-  const [_, set_selected_regions] = React.useState(Array<RegionJoinedFetch>);
+const Page: React.FC = (props) => {
+  const [_, set_selected_regions] = React.useState(Array<Region>);
   
   return (
     <IonPage>

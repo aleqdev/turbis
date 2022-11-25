@@ -1,16 +1,17 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
+import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import Hotel from '../../interface/hotel';
+import ClientType from '../../interface/client_type';
 import { useAppSelector } from '../../redux/store';
 
-export function DeleteHotelsModal(
-  {selected_hotels, onDismiss}: {
-    selected_hotels: Array<Hotel>
+export function DeleteClientTypesModal(
+  {selected_client_types, onDismiss}: {
+    selected_client_types: Array<ClientType>
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -23,9 +24,9 @@ export function DeleteHotelsModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление Отелей</IonTitle>
+          <IonTitle>Удаление типов клиентов</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_hotels, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selected_client_types, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -33,10 +34,10 @@ export function DeleteHotelsModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить отели? (${selected_hotels.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить типы клиентов? (${selected_client_types.length})`}</IonText>
         <IonList>
-          {selected_hotels.map((hotel) => {
-            return <IonItem key={hotel.id}>{`- ${hotel.name} в городе ${hotel.city?.name} (${hotel.city?.region?.name})`}</IonItem>
+          {selected_client_types.map((role) => {
+            return <IonItem key={role.id}>{`- ${role.name}`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -44,17 +45,17 @@ export function DeleteHotelsModal(
   )
 }
 
-export type DeleteHotelsModalControllerProps = {
-  refetch_hotels: RefetchFunction<any, any>,
-  selected_hotels: Array<Hotel>
+export interface DeleteClientTypesModalControllerProps {
+  refetch_client_types: RefetchFunction<any, any>,
+  selected_client_types: Array<ClientType>,
 }
 
-export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerProps> = (props) => {
+export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
   
-  const [present, dismiss] = useIonModal(DeleteHotelsModal, {
-    selected_hotels: props.selected_hotels,
-    onDismiss: (data: Array<Hotel> | null, role: string) => dismiss(data, role),
+  const [present, dismiss] = useIonModal(DeleteClientTypesModal, {
+    selected_client_types: props.selected_client_types,
+    onDismiss: (data: Array<ClientType> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -62,13 +63,14 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          Promise.allSettled(ev.detail.data.map(async (hotel: Hotel) => {
-            await API.delete_with_auth(auth!, `hotel?id=eq.${hotel.id}`);
+          Promise.allSettled(ev.detail.data.map(async (role: ClientType) => {
+            await API
+              .delete_with_auth(auth!, `client_type?id=eq.${role.id}`)
           }))
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_hotels();
+                props.refetch_client_types();
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -78,9 +80,9 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
                 return;
               }
             }
-            props.refetch_hotels();
+            props.refetch_client_types();
             presentAlert({
-              header: "Отели удалены",
+              header: "Типы клиентов удалены",
               buttons: ["Ок"]
             });
           })

@@ -1,31 +1,28 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
-import axios from 'axios';
-import React, { useRef, useState } from 'react'
-import { WorkerRole } from '../../interface/worker_role';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import React, { useMemo, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
-import { atLocation } from '../../utils/server_url';
 import { process_error_hint } from '../../utils/process_erros_hints';
+import { AuthProps } from '../../interface/props/auth';
+import API from '../../utils/server';
+import Person from '../../interface/person';
+import { useAppSelector } from '../../redux/store';
 
-export function PutWorkerModal(
-  {onDismiss}: {
+export function PatchPersonModal(
+  {selected_persons, onDismiss}: {
+    selected_persons: Array<Person>,
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [roles, setRoles] = React.useState(null as Array<WorkerRole> | null);
+  const person = selected_persons[0];
+
   const inputName = useRef<HTMLIonInputElement>(null);
   const inputSurname = useRef<HTMLIonInputElement>(null);
   const inputLastName = useRef<HTMLIonInputElement>(null);
   const inputEmail = useRef<HTMLIonInputElement>(null);
   const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
-  const [inputRole, setInputRole] = useState(null as WorkerRole | null);
-  const [errorMessage, setErrorMessage] = useState(null as string | null);
 
-  React.useEffect(() => {
-    axios
-      .get(atLocation('worker_role'))
-      .then((response) => setRoles(response.data));
-  }, [])
+  const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   function confirm() {
     const name = inputName.current?.value;
@@ -34,14 +31,14 @@ export function PutWorkerModal(
     const email = inputEmail.current?.value;
     const phone_number = inputPhoneNumber.current?.value;
 
-    if (name && surname && last_name && email && phone_number && inputRole) {
+    if (name && surname && last_name && email && phone_number) {
       onDismiss({
+        id: person.id,
         name,
         surname,
         last_name,
         email,
-        phone_number,
-        role: inputRole
+        phone_number
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -57,10 +54,10 @@ export function PutWorkerModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Создать контактное лицо</IonTitle>
+          <IonTitle>Изменить контактное лицо</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
-              Создать
+              Изменить
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -70,37 +67,31 @@ export function PutWorkerModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Имя</IonLabel>
-          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" required/>
+          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" value={person.name} required/>
           <IonLabel position="stacked">Фамилия</IonLabel>
-          <IonInput ref={inputSurname} clearInput={true} type="text" placeholder="Введите фамилию" required/>
+          <IonInput ref={inputSurname} clearInput={true} type="text" placeholder="Введите фамилию" value={person.surname} required/>
           <IonLabel position="stacked">Отчество</IonLabel>
-          <IonInput ref={inputLastName} clearInput={true} type="text" placeholder="Введите отчество" required/>
+          <IonInput ref={inputLastName} clearInput={true} type="text" placeholder="Введите отчество" value={person.last_name} required/>
           <IonLabel position="stacked">Телефон</IonLabel>
-          <IonInput pattern="email" type="email" ref={inputPhoneNumber} clearInput={true} placeholder="Введите телефон" required/>
+          <IonInput ref={inputPhoneNumber} clearInput={true} type="text" placeholder="Введите телефон" value={person.phone_number} required/>
           <IonLabel position="stacked">Почта</IonLabel>
-          <IonInput ref={inputEmail} clearInput={true} type="email" placeholder="Введите почту" required/>
-          <IonLabel position="stacked" >Роль</IonLabel>
-          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
-            {
-              roles ? 
-                roles.map((element) => {
-                  return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
-                }) :
-                <IonText>Загрузка...</IonText>
-            }
-          </IonSelect>
+          <IonInput ref={inputEmail} clearInput={true} type="text" placeholder="Введите почту" value={person.email} required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PutWorkerModalControllerProps {
-  refetch_workers: RefetchFunction<any, any>,
+export interface PatchPersonModalControllerProps {
+  refetch_persons: RefetchFunction<any, any>,
+  selected_persons: Array<Person>,
 }
 
-export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> = (props) => {
-  const [present, dismiss] = useIonModal(PutWorkerModal, {
+export const PatchPersonModalController: React.FC<PatchPersonModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  
+  const [present, dismiss] = useIonModal(PatchPersonModal, {
+    selected_persons: props.selected_persons,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -109,26 +100,23 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          axios
-            .put(atLocation('worker'), {
+          API
+            .patch_with_auth(auth!, `person?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
               surname: ev.detail.data.surname,
               last_name: ev.detail.data.last_name,
               email: ev.detail.data.email,
-              phone_number: ev.detail.data.phone_number,
-              role_id: ev.detail.data.role.id,
-              db_user_email: "primitive_email@not.even.valid",
-              db_user_password: "primitive_password",
+              phone_number: ev.detail.data.phone_number
             })
             .then((_) => {
-              props.refetch_workers();
+              props.refetch_persons();
               presentAlert({
-                header: "Сотрудник добавлен",
+                header: "Данные контактного лица изменены",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_workers();
+              props.refetch_persons();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
@@ -142,8 +130,8 @@ export const PutWorkerModalController: React.FC<PutWorkerModalControllerProps> =
   }
 
   return (
-    <IonButton routerDirection="none" onClick={openModal}>
-      <IonLabel>Добавить контактное лицо</IonLabel>
+    <IonButton routerDirection="none" color="secondary" onClick={openModal}>
+      <IonLabel>Изменить контактное лицо</IonLabel>
     </IonButton>
   )
 }

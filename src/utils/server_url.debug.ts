@@ -1,4 +1,4 @@
 
 export function atLocation(location: string): string {
-  return "https://api-debug.necrom.ru/"+ location;
+  return "https://api-debug.necrom.ru/db/"+ location;
 }

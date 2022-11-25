@@ -1,19 +1,19 @@
-import { CityJoinedFetch } from "../interface/city";
-import { HotelJoinedFetch } from "../interface/hotel";
-import { WorkerJoinedFetch } from "../interface/worker";
+import City from "../interface/city";
+import Person from "../interface/person";
 
-export function formatWorker(w: WorkerJoinedFetch): string {
+export function formatPerson(w: Person): string {
   return `${w.surname} ${w.name[0]}. ${w.last_name[0]}. (+${w.phone_number})`;
 }
 
-export function formatHotelOwner(w: HotelJoinedFetch): string {
-  return `${w.owner_surname} ${w.owner_name[0]}. ${w.owner_last_name[0]}. (+${w.owner_phone_number})`;
+export function formatCity(c: City): string {
+  return `${c.region!.country!.name}, ${c.region!.name}, ${c.name}`;
 }
 
-export function formatCity(c: CityJoinedFetch): string {
-  return `${c.country_name}, ${c.region_name}, ${c.name}`;
+export function formatDate(c: Date): string {
+  return `${c.getDate()}.${c.getMonth()+1}.${c.getFullYear()}`;
 }
 
-export function formatHotelCity(c: HotelJoinedFetch): string {
-  return `${c.country_name}, ${c.region_name}, ${c.city_name}`;
+export function formatDateDiff(arrive: Date, deparure: Date): string {
+  const diffInMs = deparure.getTime() - arrive.getTime()
+  return `${Math.round(diffInMs / (1000 * 60 * 60 * 24))}/${Math.round(diffInMs / (1000 * 60 * 60 * 24)) - 1}`;
 }

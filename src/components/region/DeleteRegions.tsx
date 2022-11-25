@@ -1,14 +1,16 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonLabel, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
 import React, { Dispatch } from 'react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { RegionJoinedFetch } from '../../interface/region';
-import { atLocation } from '../../utils/server_url';
+import { AuthProps } from '../../interface/props/auth';
+import API from '../../utils/server';
+import Region from '../../interface/region';
+import { useAppSelector } from '../../redux/store';
 
 export function DeleteRegionsModal(
   {selected_regions, onDismiss}: {
-    selected_regions: Array<RegionJoinedFetch>
+    selected_regions: Array<Region>
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
@@ -43,15 +45,17 @@ export function DeleteRegionsModal(
   )
 }
 
-export interface RemoveRegionsModalControllerProps {
-  selected_regions: Array<RegionJoinedFetch>,
-  set_selected_regions: Dispatch<React.SetStateAction<Array<RegionJoinedFetch>>>
+export type RemoveRegionsModalControllerProps = {
+  selected_regions: Array<Region>,
+  set_selected_regions: Dispatch<React.SetStateAction<Array<Region>>>
 }
 
 export const DeleteRegionsModalController: React.FC<RemoveRegionsModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+
   const [present, dismiss] = useIonModal(DeleteRegionsModal, {
     selected_workers: props.selected_regions,
-    onDismiss: (data: Array<RegionJoinedFetch> | null, role: string) => dismiss(data, role),
+    onDismiss: (data: Array<Region> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -60,12 +64,9 @@ export const DeleteRegionsModalController: React.FC<RemoveRegionsModalController
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           props.set_selected_regions([]);
-          Promise.allSettled(ev.detail.data.map(async (region: RegionJoinedFetch) => {
-            await axios
-              .delete(`${atLocation('region')}/${region.id}`, {data: {
-                db_user_email: "primitive_email@not.even.valid",
-                db_user_password: "primitive_password",
-              }})
+          Promise.allSettled(ev.detail.data.map(async (region: Region) => {
+            await API
+              .delete_with_auth(auth!, `region?id=eq.${region.id}`)
           }))
           .then((results) => {
             for (const result of results) {

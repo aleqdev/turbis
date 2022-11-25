@@ -1,21 +1,24 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
+export {}
+/*import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
 import axios from 'axios';
 import React, { useRef, useState } from 'react'
-import { WorkerRole } from '../../interface/worker_role';
+import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
+import { DatabaseAuth } from '../../interface/database_auth';
+import { AuthProps } from '../../interface/props/auth';
 
 export function PutWorkerModal(
   {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [roles, setRoles] = React.useState(null as Array<WorkerRole> | null);
+  const [roles, setRoles] = React.useState(null as Array<EmployeeRole> | null);
   const inputName = useRef<HTMLIonInputElement>(null);
   const inputSurname = useRef<HTMLIonInputElement>(null);
   const inputLastName = useRef<HTMLIonInputElement>(null);
   const inputEmail = useRef<HTMLIonInputElement>(null);
   const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
-  const [inputRole, setInputRole] = useState(null as WorkerRole | null);
+  const [inputRole, setInputRole] = useState(null as EmployeeRole | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   React.useEffect(() => {
@@ -92,7 +95,7 @@ export function PutWorkerModal(
   )
 }
 
-export const PutWorkerModalController: React.FC = () => {
+export const PutWorkerModalController: React.FC<AuthProps> = (props) => {
   const [present, dismiss] = useIonModal(PutWorkerModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
@@ -134,3 +137,4 @@ export const PutWorkerModalController: React.FC = () => {
     </IonButton>
   )
 }
+*/

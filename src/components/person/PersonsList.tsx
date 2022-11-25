@@ -1,9 +1,10 @@
 import { IonList, IonTitle } from "@ionic/react";
 import React, { Dispatch } from "react";
 import DataTable from "react-data-table-component";
-import { WorkerJoinedFetch } from "../../interface/worker";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
+import Person from "../../interface/person";
+import { AuthProps } from "../../interface/props/auth";
 
 const listColumns = [
   {
@@ -29,37 +30,31 @@ const listColumns = [
     selector: "phone_number",
     sortable: true,
     wrap: true,
-    cell: (e: WorkerJoinedFetch) => `+${e.phone_number}`
+    cell: (e: Person) => `+${e.phone_number}`
   },
   {
     name: "Почта",
     selector: "email",
     sortable: true,
     wrap: true
-  },
-  {
-    name: "Роль",
-    selector: "role_name",
-    sortable: true,
-    wrap: true
   }
 ];
 
-export interface WorkersListProps {
-  workers: Array<WorkerJoinedFetch> | null,
-  on_selected_change: Dispatch<React.SetStateAction<Array<WorkerJoinedFetch>>>,
+export interface PersonsListProps {
+  persons: Array<Person> | null,
+  on_selected_change: Dispatch<React.SetStateAction<Array<Person>>>,
   clear_selection_trigger: boolean
 }
 
-export const WorkersList: React.FC<WorkersListProps> = (props) => {
+export const PersonsList: React.FC<PersonsListProps> = (props) => {
   return (
-    <IonList id="workers-list">
+    <IonList id="persons-list">
       {
-        (props.workers === null) ?
+        (props.persons === null) ?
           <IonTitle>Загрузка...</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.workers}
+            data={props.persons}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
@@ -67,7 +62,7 @@ export const WorkersList: React.FC<WorkersListProps> = (props) => {
             <DataTable
             title="Список контактных лиц:"
             columns={listColumns as any}
-            data={props.workers}
+            data={props.persons}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination

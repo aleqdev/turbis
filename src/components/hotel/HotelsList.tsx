@@ -1,10 +1,10 @@
 import { IonCol, IonGrid, IonList, IonRow, IonTitle } from "@ionic/react";
 import React, { Dispatch } from "react";
 import DataTable from "react-data-table-component";
-import { HotelJoinedFetch } from "../../interface/hotel";
-import { formatHotelCity, formatHotelOwner } from "../../utils/fmt";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
+import Hotel from "../../interface/hotel";
+import { formatCity, formatPerson } from "../../utils/fmt";
 
 const listColumns = [
   {
@@ -14,15 +14,15 @@ const listColumns = [
   },
   {
     name: "Местоположение",
-    selector: "city_name",
+    selector: "city.name",
     sortable: true,
-    cell: (row: HotelJoinedFetch) => formatHotelCity(row)
+    cell: (row: Hotel) => formatCity(row.city!)
   },
   {
     name: "Владелец",
-    selector: "owner_phone_number",
+    selector: "owner.phone_number",
     sortable: true,
-    cell: (row: HotelJoinedFetch) => formatHotelOwner(row)
+    cell: (row: Hotel) => formatPerson(row.owner!)
   },
 ];
 
@@ -40,11 +40,11 @@ const ExpandedHotel = ({ data }: { data: any}) => {
         </IonRow>
         <IonRow>
           <IonCol>{'Владелец:'}</IonCol>
-          <IonCol size='10'>{formatHotelOwner(data)}</IonCol>
+          <IonCol size='10'>{formatPerson(data.owner)}</IonCol>
         </IonRow>
         <IonRow>
           <IonCol>{'Местоположение:'}</IonCol>
-          <IonCol size='10'>{formatHotelCity(data)}</IonCol>
+          <IonCol size='10'>{formatCity(data.city)}</IonCol>
         </IonRow>
         <IonRow>
           <IonCol>{'Описание:'}</IonCol>
@@ -55,9 +55,9 @@ const ExpandedHotel = ({ data }: { data: any}) => {
   );
 }
 
-export interface HotelsListProps {
-  hotels: Array<HotelJoinedFetch> | null,
-  on_selected_change: Dispatch<React.SetStateAction<Array<HotelJoinedFetch>>>,
+export type HotelsListProps = {
+  hotels: Array<Hotel> | null,
+  on_selected_change: Dispatch<React.SetStateAction<Array<Hotel>>>,
   clear_selection_trigger: boolean
 }
 
