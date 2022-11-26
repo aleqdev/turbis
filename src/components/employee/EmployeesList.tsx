@@ -60,8 +60,9 @@ export const EmployeesList: React.FC<EmployeesListProps> = (props) => {
           <DataTableExtensions
             columns={listColumns}
             data={props.employees}
-            print={false}
-            export={false}
+            print={true}
+            export={true}
+            exportHeaders={true}
             filterPlaceholder="Поиск"
           >
             <DataTable

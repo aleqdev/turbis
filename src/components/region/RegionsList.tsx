@@ -47,8 +47,9 @@ export const RegionsList: React.FC<RegionsListProps> = (props) => {
           <DataTableExtensions
           columns={listColumns}
           data={regions}
-          print={false}
-          export={false}
+          print={true}
+          export={true}
+          exportHeaders={true}
           filterPlaceholder="Поиск"
           >
             <DataTable

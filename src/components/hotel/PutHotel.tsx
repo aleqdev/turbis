@@ -10,7 +10,6 @@ import API from '../../utils/server';
 import Person from '../../interface/person';
 import City from '../../interface/city';
 import { useAppSelector } from '../../redux/store';
-// import { useAppSelector } from "redux-store"
 
 export function PutHotelModal(
   {auth, onDismiss}: AuthProps & {
