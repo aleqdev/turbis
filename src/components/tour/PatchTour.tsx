@@ -104,7 +104,7 @@ export function PatchTourModal(
       inputArrivalDate.current.value = formatDate(tour.arrival_date);
     }
     if (inputDepartureDate.current) {
-      inputDepartureDate.current.value = formatDate(tour.arrival_date);
+      inputDepartureDate.current.value = formatDate(tour.departure_date);
     }
     calcDiff();
   }, []);
