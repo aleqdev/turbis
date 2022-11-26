@@ -48,6 +48,8 @@ export const EmployeeRolesList: React.FC<EmployeeRolesListProps> = (props) => {
             pagination
             selectableRows
             highlightOnHover
+            noDataComponent="Пусто"
+            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
           />
          </DataTableExtensions>
   

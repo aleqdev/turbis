@@ -63,7 +63,7 @@ const Page: React.FC = (props) => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <ToursList tours={tours!} on_selected_change={set_selected_tours}></ToursList>
+        <ToursList tours={tours ?? null} on_selected_change={set_selected_tours}></ToursList>
       </IonContent>
     </IonPage>
   );

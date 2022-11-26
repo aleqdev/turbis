@@ -70,7 +70,7 @@ const Page: React.FC = (props) => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <EmployeeRolesList employee_roles={employee_roles!} on_selected_change={set_selected_employee_roles} />
+        <EmployeeRolesList employee_roles={employee_roles ?? null} on_selected_change={set_selected_employee_roles} />
       </IonContent>
     </IonPage>
   );

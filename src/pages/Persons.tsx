@@ -68,7 +68,7 @@ const Page: React.FC = (props) => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <PersonsList clear_selection_trigger={clear_selection_trigger} persons={persons!} on_selected_change={set_selected_persons} />
+        <PersonsList clear_selection_trigger={clear_selection_trigger} persons={persons ?? null} on_selected_change={set_selected_persons} />
       </IonContent>
     </IonPage>
   );

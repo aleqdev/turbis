@@ -130,6 +130,8 @@ export const ToursList: React.FC<ToursListProps> = (props) => {
             expandableRows={true}
             expandableRowsComponent={ExpandedTour}
             highlightOnHover
+            noDataComponent="Пусто"
+            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
           />
          </DataTableExtensions>
   
