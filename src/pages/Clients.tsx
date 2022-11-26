@@ -68,7 +68,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <ClientsList clear_selection_trigger={clear_selection_trigger} clients={clients!} on_selected_change={set_selected_clients} />
+        <ClientsList clear_selection_trigger={clear_selection_trigger} clients={clients ?? null} on_selected_change={set_selected_clients} />
       </IonContent>
     </IonPage>
   );

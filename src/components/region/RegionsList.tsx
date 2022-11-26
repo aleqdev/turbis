@@ -58,6 +58,8 @@ export const RegionsList: React.FC<RegionsListProps> = (props) => {
             defaultSortFieldId="name"
             pagination
             highlightOnHover
+            noDataComponent="Пусто"
+            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
           />
          </DataTableExtensions>
   

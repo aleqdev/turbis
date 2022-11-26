@@ -9,12 +9,11 @@ import { PatchHotelModalController } from '../components/hotel/PatchHotel';
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
 import { HotelsList } from '../components/hotel/HotelsList';
 import { PutHotelModalController } from '../components/hotel/PutHotel';
-import { AuthProps } from '../interface/props/auth';
 import API from '../utils/server';
 import Hotel from '../interface/hotel';
 import { useAppSelector } from '../redux/store';
 
-const Page: React.FC = (props) => {
+const Page: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
 
   const [selected_hotels, set_selected_hotels] = useState(Array<Hotel>);
@@ -68,7 +67,7 @@ const Page: React.FC = (props) => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <HotelsList clear_selection_trigger={clear_selection_trigger} hotels={hotels!} on_selected_change={set_selected_hotels} />
+        <HotelsList clear_selection_trigger={clear_selection_trigger} hotels={hotels ?? null} on_selected_change={set_selected_hotels} />
       </IonContent>
     </IonPage>
   );

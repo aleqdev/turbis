@@ -85,6 +85,8 @@ export const HotelsList: React.FC<HotelsListProps> = (props) => {
               expandableRows={true}
               expandableRowsComponent={ExpandedHotel}
               clearSelectedRows={props.clear_selection_trigger}
+              noDataComponent="Пусто"
+              paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
             />
           </DataTableExtensions>
       }

@@ -60,7 +60,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <ClientTypesList client_types={client_types!} on_selected_change={set_selected_client_types} />
+        <ClientTypesList client_types={client_types ?? null} on_selected_change={set_selected_client_types} />
       </IonContent>
     </IonPage>
   );

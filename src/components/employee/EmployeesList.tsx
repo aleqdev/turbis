@@ -74,6 +74,8 @@ export const EmployeesList: React.FC<EmployeesListProps> = (props) => {
             selectableRows
             highlightOnHover
             clearSelectedRows={props.clear_selection_trigger}
+            noDataComponent="Пусто"
+            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
           />
          </DataTableExtensions>
   
