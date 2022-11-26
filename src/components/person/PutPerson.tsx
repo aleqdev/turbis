@@ -113,7 +113,7 @@ export const PutPersonModalController: React.FC<PutPersonModalControllerProps> =
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: process_error_hint(error.response.data),
+                message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
             });

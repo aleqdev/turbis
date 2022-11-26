@@ -12,6 +12,7 @@ import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatDate, formatDateDiff } from '../../utils/fmt';
 import { useAppSelector } from '../../redux/store';
 import moment from 'moment';
+import { process_error_hint } from '../../utils/process_erros_hints';
 
 export function PatchTourModal(
   {auth, selected_tours, onDismiss}: AuthProps & {
@@ -219,7 +220,7 @@ export const PatchTourModalController: React.FC<PatchTourModalControllerProps> =
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
             });

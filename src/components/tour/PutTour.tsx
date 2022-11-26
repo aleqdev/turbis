@@ -15,6 +15,7 @@ import { SelectWithSearchModal } from '../SelectWithSearch';
 import { useAppSelector } from '../../redux/store';
 import { formatDateDiff } from '../../utils/fmt';
 import moment from 'moment';
+import { process_error_hint } from '../../utils/process_erros_hints';
 
 export function PutTourModal(
   {auth, onDismiss}: AuthProps & {
@@ -275,7 +276,7 @@ export const PutTourModalController: React.FC<PutTourModalControllerProps> = (pr
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
             });

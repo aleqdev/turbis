@@ -55,11 +55,9 @@ const App: React.FC = () => {
               <Route path="/page/Hotels" exact={true}>
                 <Hotels/>
               </Route>
-              {
               <Route path="/page/Tours" exact={true}>
                 <Tours/>
               </Route>
-              }
               <Route path="/page/Regions" exact={true}>
                 <Regions/>
               </Route>
