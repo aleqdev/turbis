@@ -4,6 +4,7 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import Employee from "../../interface/employee";
+import { useAppSelector } from "../../redux/store";
 
 const listColumns = [
   {
@@ -46,20 +47,21 @@ const listColumns = [
 ];
 
 export interface EmployeesListProps {
-  employees: Array<Employee> | null,
   on_selected_change: Dispatch<React.SetStateAction<Array<Employee>>>,
   clear_selection_trigger: boolean
 }
 
 export const EmployeesList: React.FC<EmployeesListProps> = (props) => {
+  const employees = useAppSelector(state => state.employees);
+  
   return (
     <IonList id="employees-list">
       {
-        (props.employees === null) ?
-          <IonTitle>Загрузка...</IonTitle> :
+        (employees.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
+        (employees.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.employees}
+            data={employees.data}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
@@ -67,7 +69,7 @@ export const EmployeesList: React.FC<EmployeesListProps> = (props) => {
             <DataTable
             title="Список сотрудников:"
             columns={listColumns as any}
-            data={props.employees}
+            data={employees.data}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination

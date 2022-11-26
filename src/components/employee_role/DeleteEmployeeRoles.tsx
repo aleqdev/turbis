@@ -3,11 +3,11 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { RefetchFunction } from 'axios-hooks'
 import { EmployeeRole } from '../../interface/employee_role';
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/employee_roles';
 
 export function DeleteEmployeeRolesModal(
   {selected_employee_roles, onDismiss}: {
@@ -46,12 +46,12 @@ export function DeleteEmployeeRolesModal(
 }
 
 export interface DeleteWorkerRolesModalControllerProps {
-  refetch_employee_roles: RefetchFunction<any, any>,
   selected_employee_roles: Array<EmployeeRole>,
 }
 
 export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeleteEmployeeRolesModal, {
     selected_employee_roles: props.selected_employee_roles,
@@ -63,14 +63,18 @@ export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalCo
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+
           Promise.allSettled(ev.detail.data.map(async (role: EmployeeRole) => {
             await API
-              .delete_with_auth(auth!, `employee_role?id=eq.${role.id}`)
+              .delete_with_auth(auth, `employee_role?id=eq.${role.id}`)
           }))
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_employee_roles();
+                dispatch(fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -80,12 +84,12 @@ export const DeleteWorkerRolesModalController: React.FC<DeleteWorkerRolesModalCo
                 return;
               }
             }
-            props.refetch_employee_roles();
+            dispatch(fetch(auth));
             presentAlert({
               header: "Роли удалены",
               buttons: ["Ок"]
             });
-          })
+          });
         }
       },
     });

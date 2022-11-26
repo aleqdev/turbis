@@ -4,6 +4,7 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import Hotel from "../../interface/hotel";
+import { useAppSelector } from "../../redux/store";
 import { formatCity, formatPerson } from "../../utils/fmt";
 
 const listColumns = [
@@ -56,20 +57,21 @@ const ExpandedHotel = ({ data }: { data: any}) => {
 }
 
 export type HotelsListProps = {
-  hotels: Array<Hotel> | null,
   on_selected_change: Dispatch<React.SetStateAction<Array<Hotel>>>,
   clear_selection_trigger: boolean
 }
 
 export const HotelsList: React.FC<HotelsListProps> = (props) => {
+  const hotels = useAppSelector(state => state.hotels);
+  
   return (
     <IonList id="hotels-list">
       {
-        (props.hotels === null) ?
-          <IonTitle>Загрузка...</IonTitle> :
+        (hotels.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
+        (hotels.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.hotels}
+            data={hotels.data}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
@@ -77,7 +79,7 @@ export const HotelsList: React.FC<HotelsListProps> = (props) => {
             <DataTable
               title="Список отелей:"
               columns={listColumns as any}
-              data={props.hotels}
+              data={hotels.data}
               defaultSortFieldId="name"
               onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
               pagination

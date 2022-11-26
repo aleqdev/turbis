@@ -7,7 +7,9 @@ import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Person from '../../interface/person';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/persons';
 
 export function DeletePersonsModal(
   {selected_persons, onDismiss}: {
@@ -46,12 +48,12 @@ export function DeletePersonsModal(
 }
 
 export interface DeletePersonsModalControllerProps {
-  refetch_persons: RefetchFunction<any, any>,
   selected_persons: Array<Person>,
 }
 
 export const DeletePersonsModalController: React.FC<DeletePersonsModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeletePersonsModal, {
     selected_persons: props.selected_persons,
@@ -63,6 +65,10 @@ export const DeletePersonsModalController: React.FC<DeletePersonsModalController
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           Promise.allSettled(ev.detail.data.map(async (person: Person) => {
             await API
               .delete_with_auth(auth!, `person?id=eq.${person.id}`)
@@ -70,7 +76,7 @@ export const DeletePersonsModalController: React.FC<DeletePersonsModalController
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_persons();
+                dispatch(fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -80,7 +86,7 @@ export const DeletePersonsModalController: React.FC<DeletePersonsModalController
                 return;
               }
             }
-            props.refetch_persons();
+            dispatch(fetch(auth));
             presentAlert({
               header: "Контактные лица удалены",
               buttons: ["Ок"]

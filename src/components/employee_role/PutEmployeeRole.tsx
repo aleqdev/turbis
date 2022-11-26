@@ -1,11 +1,11 @@
 import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/employee_roles';
 
 export function PutEmployeeRoleModal(
   {onDismiss}: {
@@ -57,12 +57,9 @@ export function PutEmployeeRoleModal(
   )
 }
 
-export interface PutEmployeeRoleModalControllerProps {
-  refetch_employee_roles: RefetchFunction<any, any>,
-}
-
-export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalControllerProps> = (props) => {
+export const PutEmployeeRoleModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
 
   const [present, dismiss] = useIonModal(PutEmployeeRoleModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -73,25 +70,29 @@ export const PutEmployeeRoleModalController: React.FC<PutEmployeeRoleModalContro
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           API
-            .post_with_auth(auth!, 'employee_role', {
+            .post_with_auth(auth, 'employee_role', {
               name: ev.detail.data.name
             })
             .then((_) => {
-              props.refetch_employee_roles();
               presentAlert({
                 header: "Роль добавлена",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_employee_roles();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
+            }).finally(() => {
+              dispatch(fetch(auth));
             });
         }
       },

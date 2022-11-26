@@ -5,7 +5,9 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
 import API from '../../utils/server';
 import Hotel from '../../interface/hotel';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/hotels';
 
 export function DeleteHotelsModal(
   {selected_hotels, onDismiss}: {
@@ -44,12 +46,12 @@ export function DeleteHotelsModal(
 }
 
 export type DeleteHotelsModalControllerProps = {
-  refetch_hotels: RefetchFunction<any, any>,
   selected_hotels: Array<Hotel>
 }
 
 export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeleteHotelsModal, {
     selected_hotels: props.selected_hotels,
@@ -61,13 +63,17 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           Promise.allSettled(ev.detail.data.map(async (hotel: Hotel) => {
             await API.delete_with_auth(auth!, `hotel?id=eq.${hotel.id}`);
           }))
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_hotels();
+                dispatch(fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -77,7 +83,7 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
                 return;
               }
             }
-            props.refetch_hotels();
+            dispatch(fetch(auth));
             presentAlert({
               header: "Отели удалены",
               buttons: ["Ок"]

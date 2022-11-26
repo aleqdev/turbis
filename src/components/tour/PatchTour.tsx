@@ -1,6 +1,6 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import axios from 'axios';
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
@@ -10,9 +10,13 @@ import TourFeedingType from '../../interface/tour_feeding_type';
 import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatDate, formatDateDiff } from '../../utils/fmt';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import moment from 'moment';
 import { process_error_hint } from '../../utils/process_erros_hints';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch as fetchHotels } from '../../redux/hotels';
+import { fetch as fetchTours } from '../../redux/tours';
+import { fetch as fetchTourFeedingTypes } from '../../redux/tour_feeding_types';
 
 export function PatchTourModal(
   {auth, selected_tours, onDismiss}: AuthProps & {
@@ -20,23 +24,26 @@ export function PatchTourModal(
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const tour = selected_tours[0];
+  const [hotels, tourFeedingTypes] = useAppSelector(state => [state.hotels, state.tourFeedingTypes]);
+  const dispatch = useAppDispatch();
 
-  const [hotels, setHotels] = React.useState(null as Array<Hotel> | null);
-  const [feedingTypes, setFeedingTypes] = React.useState(null as Array<TourFeedingType> | null);
+  const tour = selected_tours[0];
 
   const inputArrivalDate = useRef<HTMLIonInputElement>(null);
   const inputDepartureDate = useRef<HTMLIonInputElement>(null);
   const inputCost = useRef<HTMLIonInputElement>(null);
   const inputDescription = useRef<HTMLIonTextareaElement>(null);
 
-  const [inputHotel, setInputHotel] = React.useState(null as Hotel | null);
-  const [inputFeedingType, setInputFeedingType] = React.useState(null as TourFeedingType | null);
+  const [inputHotel, setInputHotel] = React.useState(tour.hotel as Hotel | null);
+  const [inputFeedingType, setInputFeedingType] = React.useState(tour.feeding_type as TourFeedingType | null);
   const [diff, setDiff] = React.useState(null as string | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectWithSearchModal, {
-    elements: hotels,
+    acquirer: () => {
+      const hotels = useAppSelector(state => state.hotels)
+      return hotels.status === "ok" ? hotels.data : null
+    },
     title: "Выберите отель",
     formatter: (e: Hotel) => `${e.name} ( ${e.city!.name} )`,
     sorter: (e: Hotel, query: string) => {
@@ -52,7 +59,10 @@ export function PatchTourModal(
   });
 
   const [presentFeedingTypeChoice, dismissFeedingTypeChoice] = useIonModal(SelectWithSearchModal, {
-    elements: feedingTypes,
+    acquirer: () => {
+      const tourFeedingTypes = useAppSelector(state => state.tourFeedingTypes)
+      return tourFeedingTypes.status === "ok" ? tourFeedingTypes.data : null
+    },
     title: "Выберите тип питания",
     formatter: (e: TourFeedingType) => `${e.name}`,
     sorter: (e: TourFeedingType, query: string) => {
@@ -86,24 +96,18 @@ export function PatchTourModal(
     });
   }
 
-  React.useEffect(() => {
-    API 
-      .get_with_auth(auth, 'hotel?select=*,city(*)')
-      .then((response: any) => {
-        setHotels(response.data);
-        setInputHotel(response.data.find((e: Hotel) => e.id === tour.hotel_id));
-      });
-  }, [tour.hotel_id]);
+  useEffect(() => {
+    dispatch(fetchHotels(auth));
+    dispatch(fetchTourFeedingTypes(auth));
 
-  React.useEffect(() => {
-    API 
-      .get_with_auth(auth, 'tour_feeding_type')
-      .then((response: any) => {
-        setFeedingTypes(response.data);
-        setInputFeedingType(response.data.find((e: TourFeedingType) => e.id === tour.feeding_type_id));
-      });
-  }, [tour.feeding_type_id]);
-
+    if (inputArrivalDate.current) {
+      inputArrivalDate.current.value = formatDate(tour.arrival_date);
+    }
+    if (inputDepartureDate.current) {
+      inputDepartureDate.current.value = formatDate(tour.arrival_date);
+    }
+    calcDiff();
+  }, []);
 
   function confirm() {
     const arrivalDate = inputArrivalDate.current?.value;
@@ -114,8 +118,8 @@ export function PatchTourModal(
     if (inputHotel && inputFeedingType && arrivalDate && departureDate && cost && description) {
       onDismiss({
         id: tour.id,
-        arrivalDate,
-        departureDate,
+        arrivalDate: moment(arrivalDate, "DD-MM-YYYY"),
+        departureDate: moment(departureDate, "DD-MM-YYYY"),
         description,
         cost,
         feedingType: inputFeedingType,
@@ -162,13 +166,13 @@ export function PatchTourModal(
             {hotels === null ? "Загрузка..." : (inputHotel === null ? "Выбрать" : `${inputHotel.name}`)}
           </IonButton>
           <IonLabel position="stacked">{"Дата заезда (дд-мм-гггг)"}</IonLabel>
-          <IonInput ref={inputArrivalDate} clearInput={true} type="text" placeholder="Введите дату" defaultValue={formatDate(tour.arrival_date)} onIonChange={calcDiff} required/>
+          <IonInput ref={inputArrivalDate} clearInput={true} type="text" placeholder="Введите дату" onIonChange={calcDiff} required/>
           <IonLabel position="stacked">{"Дата выезда (дд-мм-гггг)"}</IonLabel>
-          <IonInput ref={inputDepartureDate} clearInput={true} type="text" placeholder="Введите дату" defaultValue={formatDate(tour.departure_date)} onIonChange={calcDiff} required/>
+          <IonInput ref={inputDepartureDate} clearInput={true} type="text" placeholder="Введите дату" onIonChange={calcDiff} required/>
           <IonLabel position="stacked">{`Количество дней/ночей: ${diff ?? "..."}`}</IonLabel>
           <IonLabel position="stacked" >Вид питания</IonLabel>
-          <IonButton disabled={feedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
-            {feedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
+          <IonButton disabled={tourFeedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
+            {tourFeedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
           </IonButton>
           <IonLabel position="stacked">{"Стоимость тура (руб.)"}</IonLabel>
           <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" value={tour.cost} required/>
@@ -181,12 +185,12 @@ export function PatchTourModal(
 }
 
 export interface PatchTourModalControllerProps {
-  refetch_tours: RefetchFunction<any, any>,
   selected_tours: Array<Tour>,
 }
 
 export const PatchTourModalController: React.FC<PatchTourModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchTourModal, {
     auth: auth!,
@@ -199,6 +203,10 @@ export const PatchTourModalController: React.FC<PatchTourModalControllerProps> =
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+
           API
             .patch_with_auth(auth!, `tour?id=eq.${ev.detail.data.id}`, {
               hotel_id: ev.detail.data.hotel.id,
@@ -209,20 +217,21 @@ export const PatchTourModalController: React.FC<PatchTourModalControllerProps> =
               description: ev.detail.data.description,
             })
             .then((_) => {
-              props.refetch_tours();
               presentAlert({
                 header: "Данные тура изменены",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_tours();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetchTours(auth));
             });
         }
       },

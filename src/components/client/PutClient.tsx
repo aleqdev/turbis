@@ -1,5 +1,5 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
-import React, { useRef, useState } from 'react'
+import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
+import React, { useEffect, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
@@ -9,7 +9,11 @@ import { SelectWithSearchModal } from '../SelectWithSearch';
 import Person from '../../interface/person';
 import { formatPerson } from '../../utils/fmt';
 import ClientType from '../../interface/client_type';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { fetch as fetchClients } from '../../redux/clients';
+import { fetch as fetchClientTypes } from '../../redux/client_types';
+import { fetch as fetchPersons } from '../../redux/persons';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 //import { createPutComponent } from '../TableManagement';
 
 export function PutClientModal(
@@ -17,14 +21,18 @@ export function PutClientModal(
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [types, setTypes] = React.useState(null as Array<ClientType> | null);
-  const [persons, setPersons] = React.useState(null as Array<Person> | null);
+  const [clientTypes, persons] = useAppSelector(state => [state.clientTypes, state.persons]);
+  const dispatch = useAppDispatch();
+
   const [inputType, setInputType] = useState(null as ClientType | null);
   const [inputPerson, setInputPerson] = useState(null as Person | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentPersonChoice, dismissPersonChoice] = useIonModal(SelectWithSearchModal, {
-    elements: persons,
+    acquirer: () => {
+      const persons = useAppSelector(state => state.persons)
+      return persons.status === "ok" ? persons.data : null
+    },
     title: "Выберите контактное лицо",
     formatter: formatPerson,
     sorter: (e: Person, query: string) => {
@@ -50,16 +58,9 @@ export function PutClientModal(
     });
   }
 
-  React.useEffect(() => {
-    API
-      .get_with_auth(auth, 'client_type')
-      .then((response: any) => setTypes(response.data));
-  }, []);
-
-  React.useEffect(() => {
-    API
-      .get_with_auth(auth, 'person')
-      .then((response: any) => setPersons(response.data));
+  useEffect(() => {
+    dispatch(fetchClientTypes(auth));
+    dispatch(fetchPersons(auth));
   }, []);
 
   function confirm() {
@@ -101,8 +102,8 @@ export function PutClientModal(
           <IonLabel position="stacked" >Тип</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputType(ev.target.value)}>
             {
-              types ? 
-                types.map((element) => {
+              clientTypes.status === "ok" ? 
+                clientTypes.data.map((element) => {
                   return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
                 }) :
                 <IonText>Загрузка...</IonText>
@@ -114,12 +115,9 @@ export function PutClientModal(
   )
 }
 
-export interface PutClientModalControllerProps {
-  refetch_clients: RefetchFunction<any, any>,
-}
-
-export const PutClientModalController: React.FC<PutClientModalControllerProps> = (props) => {
+export const PutClientModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
 
   const [present, dismiss] = useIonModal(PutClientModal, {
     auth: auth!,
@@ -131,26 +129,31 @@ export const PutClientModalController: React.FC<PutClientModalControllerProps> =
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           API
             .post_with_auth(auth!, 'client', {
               person_id: ev.detail.data.person.id,
               type_id: ev.detail.data.type.id
             })
             .then((_) => {
-              props.refetch_clients();
               presentAlert({
                 header: "Клиент добавлен",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_clients();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetchClients(auth));
             });
         }
       },

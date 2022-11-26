@@ -5,32 +5,44 @@ import {
   IonList,
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import { AuthProps } from '../interface/props/auth';
-import API from '../utils/server';
 import ClientType from '../interface/client_type';
 import { ClientTypesList } from '../components/client_type/ClientTypesList';
 import { PutClientTypeModalController } from '../components/client_type/PutClientType';
 import { DeleteClientTypesModalController } from '../components/client_type/DeleteClientTypes';
 import { PatchClientTypeModalController } from '../components/client_type/PatchClientType';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import NoAuth from '../components/composite/no_auth';
+import { fetch } from '../redux/client_types';
+
+const MetaPage: React.FC = () => {
+  const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+
+  if (!auth) {
+    return <NoAuth/>
+  }
+
+  dispatch(fetch(auth));
+
+  return <Page/>
+}
 
 const Page: React.FC = () => {
-  const [selected_client_types, set_selected_client_types] = useState(Array<ClientType>);
+  const clientTypes = useAppSelector(state => state.clientTypes);
 
-  const auth = useAppSelector(state => state.auth);
-  
-  const [{ data: client_types }, refetch_client_types]: [{data?: Array<ClientType>}, ...any] = API.use_hook(
-    auth!,
-    'client_type'
-  );
+  const [selectedClientTypes, setSelectedClientTypes] = useState(Array<ClientType>);
 
   useEffect(
     () => {
-      set_selected_client_types(s => s.map((selected_employee_role) => {
-        return client_types?.find((w) => w.id === selected_employee_role.id)
+      if (clientTypes.status !== "ok") {
+        return
+      }
+
+      setSelectedClientTypes(s => s.map((selected_employee_role) => {
+        return clientTypes.data.find((w) => w.id === selected_employee_role.id)
       }).filter((w) => w !== undefined).map((w) => w!));
     },
-    [client_types]
+    [clientTypes]
   );
   
   return (
@@ -44,26 +56,26 @@ const Page: React.FC = () => {
             <IonTitle>Типы клиентов</IonTitle>
             <IonList>
               {
-                (selected_client_types?.length === 1 ) ? 
-                  <PatchClientTypeModalController refetch_client_types={refetch_client_types} selected_client_types={selected_client_types}/>
+                (selectedClientTypes?.length === 1 ) ? 
+                  <PatchClientTypeModalController selected_client_types={selectedClientTypes}/>
                   : ""
               }
               {
-                (selected_client_types?.length > 0 ) ? 
-                  <DeleteClientTypesModalController refetch_client_types={refetch_client_types} selected_client_types={selected_client_types}/>
+                (selectedClientTypes?.length > 0 ) ? 
+                  <DeleteClientTypesModalController selected_client_types={selectedClientTypes}/>
                   : ""
               }
-              <PutClientTypeModalController refetch_client_types={refetch_client_types} />
+              <PutClientTypeModalController/>
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <ClientTypesList client_types={client_types ?? null} on_selected_change={set_selected_client_types} />
+        <ClientTypesList on_selected_change={setSelectedClientTypes} />
       </IonContent>
     </IonPage>
   );
 };
 
-export default Page;
+export default MetaPage;

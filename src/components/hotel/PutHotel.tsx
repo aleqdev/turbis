@@ -1,5 +1,5 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { SelectWithSearchModal } from '../SelectWithSearch';
@@ -9,15 +9,19 @@ import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Person from '../../interface/person';
 import City from '../../interface/city';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch as fetchHotels } from '../../redux/hotels';
+import { fetch as fetchPersons } from '../../redux/persons';
+import { fetch as fetchCities } from '../../redux/cities';
 
 export function PutHotelModal(
   {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [persons, setPersons] = React.useState(null as Array<Person> | null);
-  const [cities, setCities] = React.useState(null as Array<City> | null);
+  const [persons, cities] = useAppSelector(state => [state.persons, state.cities]);
+  const dispatch = useAppDispatch();
 
   const inputName = useRef<HTMLIonInputElement>(null);
   const inputDescription = useRef<HTMLIonTextareaElement>(null);
@@ -27,7 +31,10 @@ export function PutHotelModal(
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentCityChoice, dismissCityChoice] = useIonModal(SelectWithSearchModal, {
-    elements: cities,
+    acquirer: () => {
+      const cities = useAppSelector(state => state.cities)
+      return cities.status === "ok" ? cities.data : null
+    },
     title: "Выберите город",
     formatter: (e: City) => formatCity(e),
     sorter: (e: City, query: string) => {
@@ -44,7 +51,10 @@ export function PutHotelModal(
   });
 
   const [presentOwnerChoice, dismissOwnerChoice] = useIonModal(SelectWithSearchModal, {
-    elements: persons,
+    acquirer: () => {
+      const persons = useAppSelector(state => state.persons)
+      return persons.status === "ok" ? persons.data : null
+    },
     title: "Выберите контактное лицо",
     formatter: (e: Person) => formatPerson(e),
     sorter: (e: Person, query: string) => {
@@ -81,20 +91,9 @@ export function PutHotelModal(
     });
   }
 
-  React.useEffect(() => {
-    API
-      .get_with_auth(auth, 'person')
-      .then((response: any) => {
-        setPersons(response.data);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    API
-      .get_with_auth(auth, 'city?select=*,region(*,country(*))')
-      .then((response: any) => {
-        setCities(response.data);
-      });
+  useEffect(() => {
+    dispatch(fetchPersons(auth));
+    dispatch(fetchCities(auth));
   }, []);
 
   function confirm() {
@@ -158,12 +157,9 @@ export function PutHotelModal(
   )
 }
 
-export type PutHotelModalControllerProps = {
-  refetch_hotels: RefetchFunction<any, any>,
-}
-
-export const PutHotelModalController: React.FC<PutHotelModalControllerProps> = (props) => {
+export const PutHotelModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PutHotelModal, {
     auth: auth!,
@@ -175,6 +171,10 @@ export const PutHotelModalController: React.FC<PutHotelModalControllerProps> = (
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           API
             .post_with_auth(auth!, 'hotel', {
               name: ev.detail.data.name,
@@ -183,20 +183,21 @@ export const PutHotelModalController: React.FC<PutHotelModalControllerProps> = (
               owner_id: ev.detail.data.owner_id
             })
             .then((_) => {
-              props.refetch_hotels();
               presentAlert({
                 header: "Отель добавлен",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_hotels();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetchHotels(auth))
             });
         }
       },

@@ -5,6 +5,7 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { AuthProps } from "../../interface/props/auth";
 import Tour from "../../interface/tour";
+import { useAppSelector } from "../../redux/store";
 import { formatPerson, formatCity, formatDate, formatDateDiff } from "../../utils/fmt";
 
 const listColumns = [
@@ -102,19 +103,20 @@ const ExpandedTour = ({ data }: { data: any}) => {
 }
 
 export interface ToursListProps {
-  tours: Array<Tour> | null,
   on_selected_change: Dispatch<React.SetStateAction<Array<Tour>>>
 }
 
 export const ToursList: React.FC<ToursListProps> = (props) => {
+  const tours = useAppSelector(state => state.tours);
+
   return (
     <IonList id="tours-list">
       {
-        (props.tours === null) ?
-          <IonTitle>Загрузка...</IonTitle> :
+        (tours.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
+        (tours.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.tours}
+            data={tours.data}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
@@ -122,7 +124,7 @@ export const ToursList: React.FC<ToursListProps> = (props) => {
             <DataTable
             title="Список туров:"
             columns={listColumns as any}
-            data={props.tours}
+            data={tours.data}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination
@@ -134,7 +136,6 @@ export const ToursList: React.FC<ToursListProps> = (props) => {
             paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
           />
          </DataTableExtensions>
-  
       }
     </IonList>
   );

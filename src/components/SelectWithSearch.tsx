@@ -1,8 +1,8 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonList, IonSearchbar, IonText, IonTitle, IonToolbar } from "@ionic/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface SelectWithSearchModalParams<T> {
-  elements: Array<T>,
+  acquirer: () => Array<T>,
   title: string,
   cancel_text: string | undefined,
   confirm_text: string | undefined,
@@ -14,7 +14,7 @@ export interface SelectWithSearchModalParams<T> {
 
 export function SelectWithSearchModal<T>(
   {
-    elements,
+    acquirer,
     title,
     cancel_text,
     confirm_text, 
@@ -26,7 +26,13 @@ export function SelectWithSearchModal<T>(
 ) {
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [value, setValue] = useState(null as T | null);
-  const [results, setResults] = useState(elements === null ? [] : [...elements]);
+
+  const elements = acquirer();
+
+  const [results, setResults] = useState(elements === null ? [] : [...elements.slice(0, 10)]);
+  useEffect(() => {
+    setResults(elements === null ? [] : [...elements.slice(0, 10)]);
+  }, [elements]);
 
   const inputQuery = useRef<HTMLIonSearchbarElement>(null);
 
@@ -71,15 +77,19 @@ export function SelectWithSearchModal<T>(
 
         <IonSearchbar placeholder="Поиск" ref={inputQuery} debounce={300} onIonChange={(ev) => handleChange(ev)}></IonSearchbar>
 
-        <IonList>
-          { results.slice(0, 10).map(result => {
-            const label = formatter(result);
-            return <IonButton key={keyer(result)} onClick={(_) => {
-              setValue(result);
-              inputQuery.current!.value = label;
-            }}>{ label }</IonButton>
-          })}
-        </IonList>
+        {
+          elements === null ?
+            <IonTitle>Загрузка...</IonTitle> :
+            <IonList>
+              { results.slice(0, 10).map(result => {
+                const label = formatter(result);
+                return <IonButton key={keyer(result)} onClick={(_) => {
+                  setValue(result);
+                  inputQuery.current!.value = label;
+                }}>{ label }</IonButton>
+              })}
+            </IonList>
+        }
       </IonContent>
     </>
   )

@@ -1,15 +1,18 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
-import React, { useRef, useState } from 'react'
+import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
+import React, { useEffect, useState } from 'react'
 import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import Person from '../../interface/person';
 import { formatPerson } from '../../utils/fmt';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { fetch as fetchEmployees } from '../../redux/employees';
+import { fetch as fetchEmployeeRoles } from '../../redux/employee_roles';
+import { fetch as fetchPersons } from '../../redux/persons';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 //import { createPutComponent } from '../TableManagement';
 
 export function PutEmployeeModal(
@@ -17,14 +20,18 @@ export function PutEmployeeModal(
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [roles, setRoles] = React.useState(null as Array<EmployeeRole> | null);
-  const [persons, setPersons] = React.useState(null as Array<Person> | null);
+  const [employeeRoles, persons] = useAppSelector(state => [state.employeeRoles, state.persons]);
+  const dispatch = useAppDispatch();
+
   const [inputRole, setInputRole] = useState(null as EmployeeRole | null);
   const [inputPerson, setInputPerson] = useState(null as Person | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentPersonChoice, dismissPersonChoice] = useIonModal(SelectWithSearchModal, {
-    elements: persons,
+    acquirer: () => {
+      const persons = useAppSelector(state => state.persons)
+      return persons.status === "ok" ? persons.data : null
+    },
     title: "Выберите контактное лицо",
     formatter: formatPerson,
     sorter: (e: Person, query: string) => {
@@ -50,16 +57,9 @@ export function PutEmployeeModal(
     });
   }
 
-  React.useEffect(() => {
-    API
-      .get_with_auth(auth, 'employee_role')
-      .then((response: any) => setRoles(response.data));
-  }, []);
-
-  React.useEffect(() => {
-    API
-      .get_with_auth(auth, 'person')
-      .then((response: any) => setPersons(response.data));
+  useEffect(() => {
+    dispatch(fetchEmployeeRoles(auth));
+    dispatch(fetchPersons(auth));
   }, []);
 
   function confirm() {
@@ -101,8 +101,8 @@ export function PutEmployeeModal(
           <IonLabel position="stacked" >Роль</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
             {
-              roles ? 
-                roles.map((element) => {
+              employeeRoles.status === "ok" ? 
+                employeeRoles.data.map((element) => {
                   return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
                 }) :
                 <IonText>Загрузка...</IonText>
@@ -114,12 +114,9 @@ export function PutEmployeeModal(
   )
 }
 
-export interface PutEmployeeModalControllerProps {
-  refetch_workers: RefetchFunction<any, any>,
-}
-
-export const PutEmployeeModalController: React.FC<PutEmployeeModalControllerProps> = (props) => {
+export const PutEmployeeModalController: React.FC = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PutEmployeeModal, {
     auth: auth!,
@@ -131,26 +128,31 @@ export const PutEmployeeModalController: React.FC<PutEmployeeModalControllerProp
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+
           API
             .post_with_auth(auth!, 'employee', {
               person_id: ev.detail.data.person.id,
               role_id: ev.detail.data.role.id
             })
             .then((_) => {
-              props.refetch_workers();
               presentAlert({
                 header: "Сотрудник добавлен",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_workers();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: process_error_hint(error.response),
+                message: process_error_hint(error.response.data),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetchEmployees(auth));
             });
         }
       },

@@ -1,4 +1,3 @@
-export {}
 
 import { IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
@@ -7,30 +6,41 @@ import {
   IonList,
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import useAxios from 'axios-hooks'
 import { ToursList } from '../components/tour/ToursList';
 import { PatchTourModalController } from '../components/tour/PatchTour';
 import { DeleteToursModalController } from '../components/tour/DeleteTours';
 import { PutTourModalController } from '../components/tour/PutTour';
-import { AuthProps } from '../interface/props/auth';
 import Tour from '../interface/tour';
-import API from '../utils/server';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import NoAuth from '../components/composite/no_auth';
+import { fetch } from '../redux/tours';
 
-const Page: React.FC = (props) => {
+const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
-  
-  const [selected_tours, set_selected_tours] = useState(Array<Tour>);
+  const dispatch = useAppDispatch();
 
-  const [{ data: tours }, refetch_tours]: [{data?: Array<Tour>}, ...any] = API.use_hook(
-    auth!,
-    'tour?select=*,hotel(*,city(*)),feeding_type:tour_feeding_type(*)'
-  );
+  if (!auth) {
+    return <NoAuth/>
+  }
+
+  dispatch(fetch(auth));
+
+  return <Page/>
+}
+
+const Page: React.FC = () => {
+  const tours = useAppSelector(state => state.tours);
+  
+  const [selectedTours, setSelectedTours] = useState(Array<Tour>);
 
   useEffect(
     () => {
-      set_selected_tours(s => s.map((selected_tours) => {
-        return tours?.find((w) => w.id === selected_tours.id)
+      if (tours.status !== "ok") {
+        return
+      }
+
+      setSelectedTours(s => s.map((selected_tours) => {
+        return tours.data.find((w) => w.id === selected_tours.id)
       }).filter((w) => w !== undefined).map((w) => w!));
     },
     [tours]
@@ -47,26 +57,26 @@ const Page: React.FC = (props) => {
             <IonTitle>Туры</IonTitle>
             <IonList>
               {
-                (selected_tours?.length === 1 ) ? 
-                  <PatchTourModalController refetch_tours={refetch_tours} selected_tours={selected_tours}/>
+                (selectedTours?.length === 1 ) ? 
+                  <PatchTourModalController selected_tours={selectedTours}/>
                   : ""
               }
               {
-                (selected_tours?.length > 0 ) ? 
-                  <DeleteToursModalController refetch_tours={refetch_tours} selected_tours={selected_tours}/>
+                (selectedTours?.length > 0 ) ? 
+                  <DeleteToursModalController selected_tours={selectedTours}/>
                   : ""
               }
-              <PutTourModalController refetch_tours={refetch_tours} />
+              <PutTourModalController/>
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <ToursList tours={tours ?? null} on_selected_change={set_selected_tours}></ToursList>
+        <ToursList on_selected_change={setSelectedTours}></ToursList>
       </IonContent>
     </IonPage>
   );
 };
 
-export default Page;
+export default MetaPage;

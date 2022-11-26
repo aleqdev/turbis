@@ -2,11 +2,11 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLab
 import React, { useRef, useState } from 'react'
 import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/employee_roles';
 
 export function PatchEmployeeRoleModal(
   {selected_employee_roles, onDismiss}: {
@@ -63,12 +63,12 @@ export function PatchEmployeeRoleModal(
 }
 
 export interface PatchWorkerRoleModalControllerProps {
-  refetch_employee_roles: RefetchFunction<any, any>,
   selected_employee_roles: Array<EmployeeRole>,
 }
 
 export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
     selected_employee_roles: props.selected_employee_roles,
@@ -80,25 +80,30 @@ export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalContro
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           API
-            .patch_with_auth(auth!, `employee_role?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth, `employee_role?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
             })
             .then((_) => {
-              props.refetch_employee_roles();
               presentAlert({
                 header: "Данные роли изменены",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_employee_roles();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetch(auth));
             });
         }
       },

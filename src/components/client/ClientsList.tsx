@@ -4,6 +4,7 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import Client from "../../interface/client";
+import { useAppSelector } from "../../redux/store";
 
 const listColumns = [
   {
@@ -46,20 +47,21 @@ const listColumns = [
 ];
 
 export interface ClientsListProps {
-  clients: Array<Client> | null,
   on_selected_change: Dispatch<React.SetStateAction<Array<Client>>>,
   clear_selection_trigger: boolean
 }
 
 export const ClientsList: React.FC<ClientsListProps> = (props) => {
+  const clients = useAppSelector(state => state.clients);
+
   return (
     <IonList id="clients-list">
       {
-        (props.clients === null) ?
-          <IonTitle>Загрузка...</IonTitle> :
+        (clients.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
+        (clients.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
           <DataTableExtensions
             columns={listColumns}
-            data={props.clients}
+            data={clients.data}
             print={false}
             export={false}
             filterPlaceholder="Поиск"
@@ -67,7 +69,7 @@ export const ClientsList: React.FC<ClientsListProps> = (props) => {
             <DataTable
             title="Список клиентов:"
             columns={listColumns as any}
-            data={props.clients}
+            data={clients.data}
             defaultSortFieldId="name"
             onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
             pagination

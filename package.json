@@ -39,6 +39,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.1",
+    "redux-thunk": "^2.4.2",
     "rsuite": "^5.22.2",
     "side-channel": "^1.0.4",
     "sisteransi": "^1.0.5",

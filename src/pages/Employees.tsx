@@ -9,26 +9,38 @@ import { PutEmployeeModalController } from '../components/employee/PutEmployee';
 import { PatchEmployeesModalController } from '../components/employee/PatchEmployee';
 import { DeleteEmployeesModalController } from '../components/employee/DeleteEmployees';
 import { EmployeesList } from '../components/employee/EmployeesList';
-import API from '../utils/server';
-import { AuthProps } from '../interface/props/auth';
 import Employee from '../interface/employee';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import { fetch } from '../redux/employees';
+import NoAuth from '../components/composite/no_auth';
 
-const Page: React.FC = (props) => {
+const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+
+  if (!auth) {
+    return <NoAuth/>
+  }
+
+  dispatch(fetch(auth));
+
+  return <Page/>
+}
+
+const Page: React.FC = () => {
+  const employees = useAppSelector(state => state.employees);
 
   const [selected_employees, set_selected_employees] = useState(Array<Employee>);
   const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
 
-  const [{ data: employees }, refetch_employees]: [{data?: Array<Employee>}, ...any] = API.use_hook(
-    auth!,
-    'employee?select=*,person(*),role:employee_role(*)'
-  );
-
   useEffect(
     () => {
+      if (employees.status !== "ok") {
+        return;
+      }
+
       set_selected_employees(s => s.map((selected_employee) => {
-        return employees?.find((w) => w.id === selected_employee.id)
+        return employees.data.find((w) => w.id === selected_employee.id)
       }).filter((w) => w !== undefined).map((w) => w!));
     },
     [employees]
@@ -53,25 +65,25 @@ const Page: React.FC = (props) => {
             <IonList>
               {
                 (selected_employees?.length === 1 ) ? 
-                  <PatchEmployeesModalController refetch_employees={refetch_employees} selected_employees={selected_employees}/>
+                  <PatchEmployeesModalController selected_employees={selected_employees}/>
                   : ""
               }
               {
                 (selected_employees?.length > 0 ) ? 
-                  <DeleteEmployeesModalController refetch_employees={refetch_employees} selected_employees={selected_employees}/>
+                  <DeleteEmployeesModalController selected_employees={selected_employees}/>
                   : ""
               }
-              <PutEmployeeModalController refetch_workers={refetch_employees} />
+              <PutEmployeeModalController/>
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <EmployeesList clear_selection_trigger={clear_selection_trigger} employees={employees ?? null} on_selected_change={set_selected_employees} />
+        <EmployeesList clear_selection_trigger={clear_selection_trigger} on_selected_change={set_selected_employees} />
       </IonContent>
     </IonPage>
   );
 };
 
-export default Page;
+export default MetaPage;

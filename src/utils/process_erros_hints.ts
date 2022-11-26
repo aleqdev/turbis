@@ -6,9 +6,14 @@ export function process_error_hint(resp: AxiosResponse<any, any>): string {
       case "23503":
         const [[, target],, [, issue]] = body.message.matchAll(/"(.*?)"/g)!;
 
+        console.log([target, issue].join('-'))
+
         switch ([target, issue].join('-')) {
-          case "worker-hotel":
+          case "person-hotel":
             return `Невозможно удалить контактное лицо, так как оно является управляющим отелем. Сначала обновите владельца отеля, а затем удалите контактное лицо.`
+
+          case "person-employee":
+            return `Невозможно удалить контактное лицо, так как оно является сотрудником. Сначала обновите данные сотрудника, а затем удалите контактное лицо.`
 
           case "worker_role-worker":
             return `Невозможно удалить роль, так как существуют сотрудники с данной ролью. Сначала обновите сотрудников с данной ролью, а затем удалите роль.`

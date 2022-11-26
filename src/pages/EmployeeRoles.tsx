@@ -10,37 +10,39 @@ import { PutEmployeeRoleModalController } from '../components/employee_role/PutE
 import { PatchWorkerRoleModalController } from '../components/employee_role/PatchEmployeeRole';
 import { EmployeeRolesList } from '../components/employee_role/EmployeeRolesList';
 import { DeleteWorkerRolesModalController } from '../components/employee_role/DeleteEmployeeRoles';
-import { AuthProps } from '../interface/props/auth';
-import API from '../utils/server';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import NoAuth from '../components/composite/no_auth';
+import { fetch } from '../redux/employee_roles';
 
-const Page: React.FC = (props) => {
+const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
 
-  if (auth === null) {
-    return (
-      <IonPage>
-        <IonHeader>
-          Авторизация не найдена
-        </IonHeader>
-      </IonPage>
-    )
+  if (!auth) {
+    return <NoAuth/>
   }
 
-  const [selected_employee_roles, set_selected_employee_roles] = useState(Array<EmployeeRole>);
+  dispatch(fetch(auth));
 
-  const [{ data: employee_roles }, refetch_employee_roles]: [{data?: Array<EmployeeRole>}, ...any] = API.use_hook(
-    auth!,
-    'employee_role'
-  );
+  return <Page/>
+}
+
+const Page: React.FC = () => {
+  const employeeRoles = useAppSelector(state => state.employeeRoles);
+
+  const [selectedEmployeeRoles, setSelectedEmployeeRoles] = useState(Array<EmployeeRole>);
 
   useEffect(
     () => {
-      set_selected_employee_roles(s => s.map((selected_employee_role) => {
-        return employee_roles?.find((w) => w.id === selected_employee_role.id)
+      if (employeeRoles.status !== "ok") {
+        return
+      }
+
+      setSelectedEmployeeRoles(s => s.map((selected_employee_role) => {
+        return employeeRoles.data.find((w) => w.id === selected_employee_role.id)
       }).filter((w) => w !== undefined).map((w) => w!));
     },
-    [employee_roles]
+    [employeeRoles]
   );
   
   return (
@@ -54,26 +56,26 @@ const Page: React.FC = (props) => {
             <IonTitle>Роли</IonTitle>
             <IonList>
               {
-                (selected_employee_roles?.length === 1 ) ? 
-                  <PatchWorkerRoleModalController refetch_employee_roles={refetch_employee_roles} selected_employee_roles={selected_employee_roles}/>
+                (selectedEmployeeRoles?.length === 1 ) ? 
+                  <PatchWorkerRoleModalController selected_employee_roles={selectedEmployeeRoles}/>
                   : ""
               }
               {
-                (selected_employee_roles?.length > 0 ) ? 
-                  <DeleteWorkerRolesModalController refetch_employee_roles={refetch_employee_roles} selected_employee_roles={selected_employee_roles}/>
+                (selectedEmployeeRoles?.length > 0 ) ? 
+                  <DeleteWorkerRolesModalController selected_employee_roles={selectedEmployeeRoles}/>
                   : ""
               }
-              <PutEmployeeRoleModalController refetch_employee_roles={refetch_employee_roles} />
+              <PutEmployeeRoleModalController/>
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <EmployeeRolesList employee_roles={employee_roles ?? null} on_selected_change={set_selected_employee_roles} />
+        <EmployeeRolesList on_selected_change={setSelectedEmployeeRoles} />
       </IonContent>
     </IonPage>
   );
 };
 
-export default Page;
+export default MetaPage;

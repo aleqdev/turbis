@@ -1,26 +1,27 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
-import axios from 'axios';
-import React, { useMemo, useRef, useState } from 'react'
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import React, { useEffect, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
-import Tour from '../../interface/tour';
 import Hotel from '../../interface/hotel';
 import TourFeedingType from '../../interface/tour_feeding_type';
 import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { formatDateDiff } from '../../utils/fmt';
 import moment from 'moment';
 import { process_error_hint } from '../../utils/process_erros_hints';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch as fetchTours } from '../../redux/tours';
+import { fetch as fetchHotels } from '../../redux/hotels';
+import { fetch as fetchTourFeedingTypes } from '../../redux/tour_feeding_types';
 
 export function PutTourModal(
   {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [hotels, setHotels] = React.useState(null as Array<Hotel> | null);
-  const [feedingTypes, setFeedingTypes] = React.useState(null as Array<TourFeedingType> | null);
+  const [hotels, tourFeedingTypes] = useAppSelector(state => [state.hotels, state.tourFeedingTypes]);
+  const dispatch = useAppDispatch();
 
   const inputArrivalDate = useRef<HTMLIonInputElement>(null);
   const inputDepartureDate = useRef<HTMLIonInputElement>(null);
@@ -34,7 +35,10 @@ export function PutTourModal(
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectWithSearchModal, {
-    elements: hotels,
+    acquirer: () => {
+      const hotels = useAppSelector(state => state.hotels)
+      return hotels.status === "ok" ? hotels.data : null
+    },
     title: "Выберите отель",
     formatter: (e: Hotel) => `${e.name} ( ${e.city!.name} )`,
     sorter: (e: Hotel, query: string) => {
@@ -50,7 +54,10 @@ export function PutTourModal(
   });
 
   const [presentFeedingTypeChoice, dismissFeedingTypeChoice] = useIonModal(SelectWithSearchModal, {
-    elements: feedingTypes,
+    acquirer: () => {
+      const tourFeedingTypes = useAppSelector(state => state.tourFeedingTypes)
+      return tourFeedingTypes.status === "ok" ? tourFeedingTypes.data : null
+    },
     title: "Выберите тип питания",
     formatter: (e: TourFeedingType) => `${e.name}`,
     sorter: (e: TourFeedingType, query: string) => {
@@ -84,23 +91,6 @@ export function PutTourModal(
     });
   }
 
-  React.useEffect(() => {
-    API 
-      .get_with_auth(auth, 'hotel?select=*,city(*),owner:person(*)')
-      .then((response: any) => {
-        setHotels(response.data);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    API 
-      .get_with_auth(auth, 'tour_feeding_type')
-      .then((response: any) => {
-        setFeedingTypes(response.data);
-      });
-  }, []);
-
-
   function confirm() {
     const arrivalDate = inputArrivalDate.current?.value;
     const departureDate = inputDepartureDate.current?.value;
@@ -109,8 +99,8 @@ export function PutTourModal(
 
     if (inputHotel && inputFeedingType && arrivalDate && departureDate && cost && description) {
       onDismiss({
-        arrivalDate,
-        departureDate,
+        arrivalDate: moment(arrivalDate, "DD-MM-YYYY"),
+        departureDate: moment(departureDate, "DD-MM-YYYY"),
         description,
         cost,
         feedingType: inputFeedingType,
@@ -130,6 +120,11 @@ export function PutTourModal(
       }
     }
   }
+
+  useEffect(() => {
+    dispatch(fetchHotels(auth));
+    dispatch(fetchTourFeedingTypes(auth));
+  }, []);
 
   return (
     <>
@@ -162,8 +157,8 @@ export function PutTourModal(
           <IonInput ref={inputDepartureDate} clearInput={true} type="text" placeholder="Введите дату" onIonChange={calcDiff} required/>
           <IonLabel position="stacked">{`Количество дней/ночей: ${diff ?? "..."}`}</IonLabel>
           <IonLabel position="stacked" >Вид питания</IonLabel>
-          <IonButton disabled={feedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
-            {feedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
+          <IonButton disabled={tourFeedingTypes === null} onClick={() => openFeedingTypeSelectModal()}>
+            {tourFeedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
           </IonButton>
           <IonLabel position="stacked">{"Стоимость тура (руб.)"}</IonLabel>
           <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" required/>
@@ -175,12 +170,9 @@ export function PutTourModal(
   )
 }
 
-export interface PutTourModalControllerProps {
-  refetch_tours: RefetchFunction<any, any>,
-}
-
-export const PutTourModalController: React.FC<PutTourModalControllerProps> = (props) => {
+export const PutTourModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PutTourModal, {
     auth: auth!,
@@ -191,6 +183,10 @@ export const PutTourModalController: React.FC<PutTourModalControllerProps> = (pr
   function openModal() {
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (auth === null) {
+          return presentNoAuthAlert(presentAlert);
+        }
+        
         if (ev.detail.role === 'confirm') {
           API
             .post_with_auth(auth!, `tour`, {
@@ -202,20 +198,21 @@ export const PutTourModalController: React.FC<PutTourModalControllerProps> = (pr
               description: ev.detail.data.description,
             })
             .then((_) => {
-              props.refetch_tours();
               presentAlert({
                 header: "Тур добавлен",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_tours();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetchTours(auth));
             });
         }
       },

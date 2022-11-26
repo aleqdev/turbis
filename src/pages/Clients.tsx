@@ -5,30 +5,42 @@ import {
   IonList,
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import API from '../utils/server';
 import Client from '../interface/client';
 import { PutClientModalController } from '../components/client/PutClient';
 import { DeleteClientsModalController } from '../components/client/DeleteClients';
 import { PatchClientModalController } from '../components/client/PatchClient';
 import { ClientsList } from '../components/client/ClientsList';
-import { useSelector } from 'react-redux';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import NoAuth from '../components/composite/no_auth';
+import { fetch } from '../redux/clients';
+
+const MetaPage: React.FC = () => {
+  const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+
+  if (!auth) {
+    return <NoAuth/>
+  }
+
+  dispatch(fetch(auth));
+
+  return <Page/>
+}
 
 const Page: React.FC = () => {
-  const [selected_clients, set_selected_clients] = useState(Array<Client>);
-  const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
-
-  const auth = useAppSelector(state => state.auth);
-
-  const [{ data: clients }, refetch_clients]: [{data?: Array<Client>}, ...any] = API.use_hook(
-    auth!,
-    'client?select=*,person(*),type:client_type(*)'
-  );
+  const clients = useAppSelector(state => state.clients);
+  
+  const [selectedClients, setSelectedClients] = useState(Array<Client>);
+  const [clearSelectionTrigger, setClearSelectionTrigger] = useState(false);
 
   useEffect(
     () => {
-      set_selected_clients(s => s.map((selected_employee) => {
-        return clients?.find((w) => w.id === selected_employee.id)
+      if (clients.status !== "ok") {
+        return
+      }
+
+      setSelectedClients(s => s.map((selected_employee) => {
+        return clients.data.find((w) => w.id === selected_employee.id)
       }).filter((w) => w !== undefined).map((w) => w!));
     },
     [clients]
@@ -36,7 +48,7 @@ const Page: React.FC = () => {
 
   useEffect(
     () => {
-      set_clear_selection_trigger(s => !s);
+      setClearSelectionTrigger(s => !s);
     },
     [clients]
   )
@@ -52,26 +64,26 @@ const Page: React.FC = () => {
             <IonTitle>Клиенты</IonTitle>
             <IonList>
               {
-                (selected_clients?.length === 1 ) ? 
-                  <PatchClientModalController refetch_clients={refetch_clients} selected_clients={selected_clients}/>
+                (selectedClients?.length === 1 ) ? 
+                  <PatchClientModalController selected_clients={selectedClients}/>
                   : ""
               }
               {
-                (selected_clients?.length > 0 ) ? 
-                  <DeleteClientsModalController refetch_clients={refetch_clients} selected_clients={selected_clients}/>
+                (selectedClients?.length > 0 ) ? 
+                  <DeleteClientsModalController selected_clients={selectedClients}/>
                   : ""
               }
-              <PutClientModalController refetch_clients={refetch_clients} />
+              <PutClientModalController/>
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <ClientsList clear_selection_trigger={clear_selection_trigger} clients={clients ?? null} on_selected_change={set_selected_clients} />
+        <ClientsList clear_selection_trigger={clearSelectionTrigger} on_selected_change={setSelectedClients} />
       </IonContent>
     </IonPage>
   );
 };
 
-export default Page;
+export default MetaPage;

@@ -151,6 +151,7 @@ export function patch_with_auth(
   )
 }
 
+/* Лучше использовать redux
 export function use_hook<T = any, D = any>(
   auth: DatabaseAuth,
   path: string,
@@ -165,6 +166,7 @@ export function use_hook<T = any, D = any>(
     data: json ?? {},
   })
 }
+*/
 
 const API = {
   get: get,
@@ -175,7 +177,7 @@ const API = {
   post_with_auth: post_with_auth,
   delete_with_auth: del_with_auth,
   patch_with_auth: patch_with_auth,
-  use_hook: use_hook
+  //use_hook: use_hook
 };
 
 export default API;

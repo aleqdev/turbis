@@ -6,7 +6,9 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
 import API from '../../utils/server';
 import Client from '../../interface/client';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/clients';
 
 export function DeleteClientsModal(
   {selected_clients, onDismiss}: {
@@ -45,23 +47,27 @@ export function DeleteClientsModal(
 }
 
 export interface DeleteClientsModalControllerProps {
-  refetch_clients: RefetchFunction<any, any>,
   selected_clients: Array<Client>,
 }
 
 export const DeleteClientsModalController: React.FC<DeleteClientsModalControllerProps> = (props) => {
+  const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+
   const [present, dismiss] = useIonModal(DeleteClientsModal, {
     selected_clients: props.selected_clients,
     onDismiss: (data: Array<Client> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
-  const auth = useAppSelector(state => state.auth);
-
   function openModal() {
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           Promise.allSettled(ev.detail.data.map(async (employee: Client) => {
             await API
               .delete_with_auth(auth!, `client?id=eq.${employee.id}`)
@@ -69,7 +75,7 @@ export const DeleteClientsModalController: React.FC<DeleteClientsModalController
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_clients();
+                dispatch(fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -79,7 +85,7 @@ export const DeleteClientsModalController: React.FC<DeleteClientsModalController
                 return;
               }
             }
-            props.refetch_clients();
+            dispatch(fetch(auth));
             presentAlert({
               header: "Клиенты удалены",
               buttons: ["Ок"]

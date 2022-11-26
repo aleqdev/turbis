@@ -3,11 +3,11 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { RefetchFunction } from 'axios-hooks'
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Employee from '../../interface/employee';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { fetch } from '../../redux/employees';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 
 export function DeleteEmployeesModal(
   {selected_employees, onDismiss}: {
@@ -46,12 +46,13 @@ export function DeleteEmployeesModal(
 }
 
 export interface DeleteEmployeesModalControllerProps {
-  refetch_employees: RefetchFunction<any, any>,
   selected_employees: Array<Employee>,
 }
 
 export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeleteEmployeesModal, {
     selected_employees: props.selected_employees,
@@ -63,14 +64,18 @@ export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalContro
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+
           Promise.allSettled(ev.detail.data.map(async (employee: Employee) => {
             await API
-              .delete_with_auth(auth!, `employee?id=eq.${employee.id}`)
+              .delete_with_auth(auth, `employee?id=eq.${employee.id}`)
           }))
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_employees();
+                dispatch(fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -80,7 +85,7 @@ export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalContro
                 return;
               }
             }
-            props.refetch_employees();
+            dispatch(fetch(auth));
             presentAlert({
               header: "Сотрудники удалены",
               buttons: ["Ок"]

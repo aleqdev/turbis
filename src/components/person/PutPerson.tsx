@@ -6,7 +6,9 @@ import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/persons';
 
 export function PutPersonModal(
   {onDismiss}: {
@@ -77,12 +79,9 @@ export function PutPersonModal(
   )
 }
 
-export interface PutPersonModalControllerProps {
-  refetch_persons: RefetchFunction<any, any>,
-}
-
-export const PutPersonModalController: React.FC<PutPersonModalControllerProps> = (props) => {
+export const PutPersonModalController: React.FC = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PutPersonModal, {
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
@@ -92,6 +91,10 @@ export const PutPersonModalController: React.FC<PutPersonModalControllerProps> =
   function openModal() {
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (auth === null) {
+          return presentNoAuthAlert(presentAlert);
+        }
+        
         if (ev.detail.role === 'confirm') {
           API
             .post_with_auth(auth!, 'person', {
@@ -102,20 +105,21 @@ export const PutPersonModalController: React.FC<PutPersonModalControllerProps> =
               phone_number: ev.detail.data.phone_number,
             })
             .then((_) => {
-              props.refetch_persons();
               presentAlert({
                 header: "Контактное лицо добавлено",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_persons();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetch(auth));
             });
         }
       },

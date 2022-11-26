@@ -9,25 +9,38 @@ import { PatchHotelModalController } from '../components/hotel/PatchHotel';
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
 import { HotelsList } from '../components/hotel/HotelsList';
 import { PutHotelModalController } from '../components/hotel/PutHotel';
-import API from '../utils/server';
 import Hotel from '../interface/hotel';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import NoAuth from '../components/composite/no_auth';
+import { fetch } from '../redux/hotels';
+
+const MetaPage: React.FC = () => {
+  const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+
+  if (!auth) {
+    return <NoAuth/>
+  }
+
+  dispatch(fetch(auth));
+
+  return <Page/>
+}
 
 const Page: React.FC = () => {
-  const auth = useAppSelector(state => state.auth);
+  const hotels = useAppSelector(state => state.hotels);
 
-  const [selected_hotels, set_selected_hotels] = useState(Array<Hotel>);
-  const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
-
-  const [{ data: hotels }, refetch_hotels]: [{data?: Array<Hotel>}, ...any] = API.use_hook(
-    auth!,
-    'hotel?select=*,city(*,region(*,country(*))),owner:person(*)'
-  );
+  const [selectedHotels, setSelectedHotels] = useState(Array<Hotel>);
+  const [clearSelectionTrigger, setClearSelectionTrigger] = useState(false);
 
   useEffect(
     () => {
-      set_selected_hotels(s => s.map((selected_hotel) => {
-        return hotels?.find((h) => h.id === selected_hotel.id)
+      if (hotels.status !== "ok") {
+        return
+      }
+
+      setSelectedHotels(s => s.map((selected_hotel) => {
+        return hotels.data.find((h) => h.id === selected_hotel.id)
       }).filter((h) => h !== undefined).map((h) => h!));
     },
     [hotels]
@@ -35,7 +48,7 @@ const Page: React.FC = () => {
 
   useEffect(
     () => {
-      set_clear_selection_trigger(s => !s);
+      setClearSelectionTrigger(s => !s);
     },
     [hotels]
   )
@@ -51,26 +64,26 @@ const Page: React.FC = () => {
             <IonTitle>Отели</IonTitle>
             <IonList>
               {
-                (selected_hotels?.length === 1) ? 
-                  <PatchHotelModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                (selectedHotels?.length === 1) ? 
+                  <PatchHotelModalController selected_hotels={selectedHotels}/>
                   : ""
               }
               {
-                (selected_hotels?.length > 0) ? 
-                  <DeleteHotelsModalController refetch_hotels={refetch_hotels} selected_hotels={selected_hotels}/>
+                (selectedHotels?.length > 0) ? 
+                  <DeleteHotelsModalController selected_hotels={selectedHotels}/>
                   : ""
               }
-              <PutHotelModalController refetch_hotels={refetch_hotels} />
+              <PutHotelModalController/>
             </IonList>
           </IonItem>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <HotelsList clear_selection_trigger={clear_selection_trigger} hotels={hotels ?? null} on_selected_change={set_selected_hotels} />
+        <HotelsList clear_selection_trigger={clearSelectionTrigger} on_selected_change={setSelectedHotels} />
       </IonContent>
     </IonPage>
   );
 };
 
-export default Page;
+export default MetaPage;

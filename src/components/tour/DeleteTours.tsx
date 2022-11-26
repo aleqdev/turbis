@@ -1,13 +1,15 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
 import React from 'react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
-import { AuthProps } from '../../interface/props/auth';
 import Tour from '../../interface/tour';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import API from '../../utils/server';
-import { useAppSelector } from '../../redux/store';
+import { fetch } from '../../redux/tours';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { formatDate } from '../../utils/fmt';
 
 
 export function DeleteToursModal(
@@ -35,10 +37,10 @@ export function DeleteToursModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить сотрудников? (${selected_tours.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить туры? (${selected_tours.length})`}</IonText>
         <IonList>
           {selected_tours.map((tour) => {
-            return <IonItem key={tour.id}>{`- ID: ${tour.id} (с ${tour.arrival_date} по ${tour.departure_date})`}</IonItem>
+            return <IonItem key={tour.id}>{`- ID: ${tour.id} (с ${formatDate(tour.arrival_date)} по ${formatDate(tour.departure_date)})`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -47,12 +49,12 @@ export function DeleteToursModal(
 }
 
 export interface DeleteToursModalControllerProps {
-  refetch_tours: RefetchFunction<any, any>,
   selected_tours: Array<Tour>,
 }
 
 export const DeleteToursModalController: React.FC<DeleteToursModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeleteToursModal, {
     selected_tours: props.selected_tours,
@@ -63,6 +65,10 @@ export const DeleteToursModalController: React.FC<DeleteToursModalControllerProp
   function openModal() {
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (auth === null) {
+          return presentNoAuthAlert(presentAlert);
+        }
+
         if (ev.detail.role === 'confirm') {
           Promise.allSettled(ev.detail.data.map(async (worker: Tour) => {
             await API
@@ -71,7 +77,7 @@ export const DeleteToursModalController: React.FC<DeleteToursModalControllerProp
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                props.refetch_tours();
+                dispatch(fetch(auth))
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -81,7 +87,7 @@ export const DeleteToursModalController: React.FC<DeleteToursModalControllerProp
                 return;
               }
             }
-            props.refetch_tours();
+            dispatch(fetch(auth));
             presentAlert({
               header: "Туры удалены",
               buttons: ["Ок"]

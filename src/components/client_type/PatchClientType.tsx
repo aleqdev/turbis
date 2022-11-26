@@ -1,12 +1,12 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import ClientType from '../../interface/client_type';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import presentNoAuthAlert from '../../utils/present_no_auth_alert';
+import { fetch } from '../../redux/client_types';
 
 export function PatchEmployeeRoleModal(
   {selected_client_types, onDismiss}: {
@@ -63,12 +63,12 @@ export function PatchEmployeeRoleModal(
 }
 
 export interface PatchClientTypeModalControllerProps {
-  refetch_client_types: RefetchFunction<any, any>,
   selected_client_types: Array<ClientType>,
 }
 
 export const PatchClientTypeModalController: React.FC<PatchClientTypeModalControllerProps> = (props) => {
   const auth = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
     selected_client_types: props.selected_client_types,
@@ -80,25 +80,30 @@ export const PatchClientTypeModalController: React.FC<PatchClientTypeModalContro
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          if (auth === null) {
+            return presentNoAuthAlert(presentAlert);
+          }
+          
           API
             .patch_with_auth(auth!, `client_type?id=eq.${ev.detail.data.id}`, {
               name: ev.detail.data.name,
             })
             .then((_) => {
-              props.refetch_client_types();
               presentAlert({
                 header: "Данные типа клиента изменены",
                 buttons: ["Ок"]
               });
             })
             .catch((error) => {
-              props.refetch_client_types();
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
                 message: process_error_hint(error.response!),
                 buttons: ["Ок"]
               });
+            })
+            .finally(() => {
+              dispatch(fetch(auth));
             });
         }
       },
