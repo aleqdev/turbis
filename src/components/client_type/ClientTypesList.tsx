@@ -36,9 +36,11 @@ export const ClientTypesList: React.FC<EmployeeRolesListProps> = (props) => {
           <DataTableExtensions
             columns={listColumns}
             data={clientTypes.data}
-            print={false}
-            export={false}
+            print={true}
+            export={true}
+            exportHeaders={true}
             filterPlaceholder="Поиск"
+            fileName='Типы клиентов'
           >
             <DataTable
             title="Список типов клиентов:"

@@ -117,8 +117,9 @@ export const ToursList: React.FC<ToursListProps> = (props) => {
           <DataTableExtensions
             columns={listColumns}
             data={tours.data}
-            print={false}
-            export={false}
+            print={true}
+            export={true}
+            exportHeaders={true}
             filterPlaceholder="Поиск"
           >
             <DataTable

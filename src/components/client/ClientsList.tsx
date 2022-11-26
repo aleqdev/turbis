@@ -62,8 +62,9 @@ export const ClientsList: React.FC<ClientsListProps> = (props) => {
           <DataTableExtensions
             columns={listColumns}
             data={clients.data}
-            print={false}
-            export={false}
+            print={true}
+            export={true}
+            exportHeaders={true}
             filterPlaceholder="Поиск"
           >
             <DataTable

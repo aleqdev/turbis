@@ -1,6 +1,9 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import React, { useEffect, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
+import CurrencyInput from 'react-currency-input-field';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { AuthProps } from '../../interface/props/auth';
 import Hotel from '../../interface/hotel';
 import TourFeedingType from '../../interface/tour_feeding_type';
@@ -33,6 +36,9 @@ export function PutTourModal(
   const [diff, setDiff] = React.useState(null as string | null);
 
   const [errorMessage, setErrorMessage] = useState(null as string | null);
+  const [fromDate, setFromDate] = useState(0);
+  const [endDate, setEndDate] = useState(0);
+  const diffInputDate = useRef<HTMLIonInputElement>(null);
 
   const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectWithSearchModal, {
     acquirer: () => {
@@ -119,7 +125,33 @@ export function PutTourModal(
         setDiff(formatDateDiff(inputArrival, inputDeparture));
       }
     }
+}
+
+function onChangeEndDate(e:any) {
+  console.log('change_end_date', endDate)
+  if (fromDate != 0) {
+    diffDate()
   }
+}
+function onChangeFromDate(e:any) {
+  // const date = Date.parse(e.detail.value as string)/1000
+  // setFromDate(date);
+  console.log('change_from_date', fromDate)
+  if (endDate !== 0) {
+    diffDate()
+  }
+}
+
+function diffDate() {
+  let timestamp1 = fromDate
+  let timestamp2 = endDate
+  var difference = (timestamp2 - timestamp1) * 1000;
+  console.log(timestamp1, timestamp2)
+  var daysDifference = Math.floor(difference / (1000 * 60 * 60 * 24));
+  console.log('change', daysDifference)
+  diffInputDate.current!.value = daysDifference
+  console.log('change', diffInputDate.current!.value) 
+}
 
   useEffect(() => {
     dispatch(fetchHotels(auth));
@@ -148,6 +180,37 @@ export function PutTourModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked" >Отель</IonLabel>
+          {/* <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}> */}
+            {/* <IonSelectOption key={'Gold'} value={'Gold'}>{'Gold'}</IonSelectOption>
+            {
+              hotels ? 
+                hotels.map((element) => {
+                  return <IonSelectOption key={element.name} value={element}>{element.name}</IonSelectOption>
+                }) :
+                <IonText>Загрузка...</IonText>
+            }
+          </IonSelect> */}
+          {/* <IonLabel position="stacked" >Вид питания</IonLabel>
+          <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>
+            <IonSelectOption key={'Без питания'} value={'Без питания'}>{'Без питания'}</IonSelectOption>
+            <IonSelectOption key={'С завтраком'} value={'С завтраком'}>{'С завтраком'}</IonSelectOption>
+            <IonSelectOption key={'3-х разовое'} value={'3-х разовое'}>{'3-х разовое'}</IonSelectOption>
+          </IonSelect>
+          <IonDatetime onIonChange={(e) =>{setFromDate(Date.parse(e.detail.value as string)/1000); onChangeFromDate(e)}} presentation="date"><span slot="title">Дата заезда</span></IonDatetime>
+          <IonDatetime onIonChange={(e) => onChangeEndDate(e)} presentation="date" ><span slot="title">Дата выезда</span></IonDatetime>
+          <IonInput ref={diffInputDate} value=''>
+            {diffInputDate.current?.value}
+          </IonInput>
+          <IonLabel position="stacked">Стоимость тура</IonLabel><br />
+          <CurrencyInput
+            id="currencyinput"
+            placeholder="Введите стоимость тура"
+            decimalsLimit={2}
+            decimalSeparator='.'
+            suffix=' ₽'
+            // onValueChange={(value:any, name:any) => console.log(value, name)}
+          />
+          <IonLabel position="stacked">Описание тура</IonLabel> */}
           <IonButton disabled={hotels === null} onClick={() => openHotelSelectModal()}>
             {hotels === null ? "Загрузка..." : (inputHotel === null ? "Выбрать" : `${inputHotel.name}`)}
           </IonButton>
