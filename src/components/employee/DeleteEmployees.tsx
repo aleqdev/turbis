@@ -74,7 +74,7 @@ export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalContro
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
-                  message: process_error_hint(result.reason.response?.data),
+                  message: process_error_hint(result.reason.response!),
                   buttons: ["Ок"]
                 });
                 return;

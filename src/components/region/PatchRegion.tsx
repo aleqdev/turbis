@@ -113,7 +113,7 @@ export const PatchRegionModalController: React.FC<PatchRegionModalControllerProp
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
-                message: error.response.data,
+                message: error.response,
                 buttons: ["Ок"]
               });
             });

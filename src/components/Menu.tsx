@@ -109,7 +109,6 @@ const Menu: React.FC = () => {
 
   const accordionGroupChange = (ev: AccordionGroupCustomEvent) => {
     history.push(ev.detail.value);
-    console.log(history);
   };
 
   return (

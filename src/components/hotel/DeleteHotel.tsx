@@ -3,7 +3,6 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { RefetchFunction } from 'axios-hooks'
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Hotel from '../../interface/hotel';
 import { useAppSelector } from '../../redux/store';
@@ -72,7 +71,7 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
-                  message: process_error_hint(result.reason.response?.data),
+                  message: process_error_hint(result.reason.response!),
                   buttons: ["Ок"]
                 });
                 return;
