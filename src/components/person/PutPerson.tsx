@@ -1,14 +1,11 @@
 import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
 import React, { useRef, useState } from 'react'
-import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/persons';
+import { personsR } from '../../redux/store';
 
 export function PutPersonModal(
   {onDismiss}: {
@@ -119,7 +116,7 @@ export const PutPersonModalController: React.FC = (props) => {
               });
             })
             .finally(() => {
-              dispatch(fetch(auth));
+              dispatch(personsR.fetch(auth));
             });
         }
       },

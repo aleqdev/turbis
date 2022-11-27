@@ -1,10 +1,8 @@
-import { IonList, IonTitle } from "@ionic/react";
-import React, { Dispatch } from "react";
-import DataTable from "react-data-table-component";
-import DataTableExtensions from "react-data-table-component-extensions";
+import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import { EmployeeRole } from "../../interface/employee_role";
-import { useAppSelector } from "../../redux/store";
+import { employeeRolesR, useAppDispatch } from "../../redux/store";
+import { Table } from "../table_management/Table";
 
 const listColumns = [
   {
@@ -21,41 +19,15 @@ const listColumns = [
   }
 ];
 
-export interface EmployeeRolesListProps {
-  on_selected_change: Dispatch<React.SetStateAction<Array<EmployeeRole>>>
-}
-
-export const EmployeeRolesList: React.FC<EmployeeRolesListProps> = (props) => {
-  const employeeRoles = useAppSelector(state => state.employeeRoles);
+export const EmployeeRolesList: React.FC = () => {
+  const dispatch = useAppDispatch();
 
   return (
-    <IonList id="employee-roles-list">
-      {
-        (employeeRoles.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
-        (employeeRoles.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
-          <DataTableExtensions
-            columns={listColumns}
-            data={employeeRoles.data}
-            print={true}
-            export={true}
-            exportHeaders={true}
-            filterPlaceholder="Поиск"
-          >
-            <DataTable
-            title="Список ролей:"
-            columns={listColumns as any}
-            data={employeeRoles.data}
-            defaultSortFieldId="name"
-            onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
-            pagination
-            selectableRows
-            highlightOnHover
-            noDataComponent="Пусто"
-            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
-          />
-         </DataTableExtensions>
-  
-      }
-    </IonList>
+    <Table 
+      title="Список ролей сотрудников:"
+      selector={state => state.employeeRoles}
+      columns={listColumns as any}
+      selectRowsCallback={selected => dispatch(employeeRolesR.select(selected.selectedRows as EmployeeRole[]))}
+    />
   );
 }

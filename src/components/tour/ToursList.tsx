@@ -1,12 +1,10 @@
-import { IonCol, IonGrid, IonList, IonRow, IonTitle } from "@ionic/react";
-import React, { Dispatch } from "react";
-import DataTable from "react-data-table-component";
-import DataTableExtensions from "react-data-table-component-extensions";
+import { IonCol, IonGrid, IonRow } from "@ionic/react";
+import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
-import { AuthProps } from "../../interface/props/auth";
 import Tour from "../../interface/tour";
-import { useAppSelector } from "../../redux/store";
-import { formatPerson, formatCity, formatDate, formatDateDiff } from "../../utils/fmt";
+import { toursR, useAppDispatch } from "../../redux/store";
+import { formatDate, formatDateDiff } from "../../utils/fmt";
+import { Table } from "../table_management/Table";
 
 const listColumns = [
   {
@@ -102,42 +100,17 @@ const ExpandedTour = ({ data }: { data: any}) => {
   );
 }
 
-export interface ToursListProps {
-  on_selected_change: Dispatch<React.SetStateAction<Array<Tour>>>
-}
-
-export const ToursList: React.FC<ToursListProps> = (props) => {
-  const tours = useAppSelector(state => state.tours);
+export const ToursList: React.FC = () => {
+  const dispatch = useAppDispatch();
 
   return (
-    <IonList id="tours-list">
-      {
-        (tours.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
-        (tours.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
-          <DataTableExtensions
-            columns={listColumns}
-            data={tours.data}
-            print={true}
-            export={true}
-            exportHeaders={true}
-            filterPlaceholder="Поиск"
-          >
-            <DataTable
-            title="Список туров:"
-            columns={listColumns as any}
-            data={tours.data}
-            defaultSortFieldId="name"
-            onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
-            pagination
-            selectableRows
-            expandableRows={true}
-            expandableRowsComponent={ExpandedTour}
-            highlightOnHover
-            noDataComponent="Пусто"
-            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
-          />
-         </DataTableExtensions>
-      }
-    </IonList>
+    <Table 
+      title="Список туров:"
+      selector={state => state.tours}
+      columns={listColumns as any}
+      selectRowsCallback={selected => dispatch(toursR.select(selected.selectedRows as Tour[]))}
+      expandableRows
+      expandableRowsComponent={ExpandedTour}
+    />
   );
 }

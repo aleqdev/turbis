@@ -3,19 +3,20 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { RefetchFunction } from 'axios-hooks'
 import API from '../../utils/server';
 import Client from '../../interface/client';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/clients';
+import { clientsR } from '../../redux/store';
 
 export function DeleteClientsModal(
-  {selected_clients, onDismiss}: {
-    selected_clients: Array<Client>
+  {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const clients = useAppSelector(state => state.clients);
+  const selectedClients = clients.status === "ok" ? clients.selected : [];
+
   return (
     <>
       <IonHeader>
@@ -27,7 +28,7 @@ export function DeleteClientsModal(
           </IonButtons>
           <IonTitle>Удаление клиентов</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_clients, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selectedClients, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -35,10 +36,10 @@ export function DeleteClientsModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить клиентов? (${selected_clients.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить клиентов? (${selectedClients.length})`}</IonText>
         <IonList>
-          {selected_clients.map((employee) => {
-            return <IonItem key={employee.id}>{`- ${employee.person!.surname} ${employee.person!.name} ${employee.person!.last_name}`}</IonItem>
+          {selectedClients.map((clients) => {
+            return <IonItem key={clients.id}>{`- ${clients.person!.surname} ${clients.person!.name} ${clients.person!.last_name}`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -46,16 +47,11 @@ export function DeleteClientsModal(
   )
 }
 
-export interface DeleteClientsModalControllerProps {
-  selected_clients: Array<Client>,
-}
-
-export const DeleteClientsModalController: React.FC<DeleteClientsModalControllerProps> = (props) => {
+export const DeleteClientsModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
 
   const [present, dismiss] = useIonModal(DeleteClientsModal, {
-    selected_clients: props.selected_clients,
     onDismiss: (data: Array<Client> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -75,7 +71,7 @@ export const DeleteClientsModalController: React.FC<DeleteClientsModalController
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(fetch(auth));
+                dispatch(clientsR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -85,7 +81,7 @@ export const DeleteClientsModalController: React.FC<DeleteClientsModalController
                 return;
               }
             }
-            dispatch(fetch(auth));
+            dispatch(clientsR.fetch(auth));
             presentAlert({
               header: "Клиенты удалены",
               buttons: ["Ок"]

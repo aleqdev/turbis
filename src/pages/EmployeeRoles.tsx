@@ -4,15 +4,13 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
-import { EmployeeRole } from '../interface/employee_role';
+import React from 'react';
 import { PutEmployeeRoleModalController } from '../components/employee_role/PutEmployeeRole';
 import { PatchWorkerRoleModalController } from '../components/employee_role/PatchEmployeeRole';
 import { EmployeeRolesList } from '../components/employee_role/EmployeeRolesList';
 import { DeleteWorkerRolesModalController } from '../components/employee_role/DeleteEmployeeRoles';
-import { useAppDispatch, useAppSelector } from '../redux/store';
+import { employeeRolesR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
-import { fetch } from '../redux/employee_roles';
 
 const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
@@ -22,28 +20,13 @@ const MetaPage: React.FC = () => {
     return <NoAuth/>
   }
 
-  dispatch(fetch(auth));
+  dispatch(employeeRolesR.fetch(auth));
 
   return <Page/>
 }
 
 const Page: React.FC = () => {
   const employeeRoles = useAppSelector(state => state.employeeRoles);
-
-  const [selectedEmployeeRoles, setSelectedEmployeeRoles] = useState(Array<EmployeeRole>);
-
-  useEffect(
-    () => {
-      if (employeeRoles.status !== "ok") {
-        return
-      }
-
-      setSelectedEmployeeRoles(s => s.map((selected_employee_role) => {
-        return employeeRoles.data.find((w) => w.id === selected_employee_role.id)
-      }).filter((w) => w !== undefined).map((w) => w!));
-    },
-    [employeeRoles]
-  );
   
   return (
     <IonPage>
@@ -56,13 +39,13 @@ const Page: React.FC = () => {
             <IonTitle>Роли</IonTitle>
             <IonList>
               {
-                (selectedEmployeeRoles?.length === 1 ) ? 
-                  <PatchWorkerRoleModalController selected_employee_roles={selectedEmployeeRoles}/>
+                (employeeRoles.status === "ok" && employeeRoles.selected.length === 1) ? 
+                  <PatchWorkerRoleModalController/>
                   : ""
               }
               {
-                (selectedEmployeeRoles?.length > 0 ) ? 
-                  <DeleteWorkerRolesModalController selected_employee_roles={selectedEmployeeRoles}/>
+                (employeeRoles.status === "ok" && employeeRoles.selected.length >= 1) ? 
+                  <DeleteWorkerRolesModalController/>
                   : ""
               }
               <PutEmployeeRoleModalController/>
@@ -72,7 +55,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <EmployeeRolesList on_selected_change={setSelectedEmployeeRoles} />
+        <EmployeeRolesList/>
       </IonContent>
     </IonPage>
   );

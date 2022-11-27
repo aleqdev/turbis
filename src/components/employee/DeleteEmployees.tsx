@@ -6,15 +6,17 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
 import Employee from '../../interface/employee';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { fetch } from '../../redux/employees';
+import { employeesR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 
 export function DeleteEmployeesModal(
-  {selected_employees, onDismiss}: {
-    selected_employees: Array<Employee>
+  {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const employees = useAppSelector(state => state.employees);
+  const selectedEmployees = employees.status === "ok" ? employees.selected : [];
+
   return (
     <>
       <IonHeader>
@@ -26,7 +28,7 @@ export function DeleteEmployeesModal(
           </IonButtons>
           <IonTitle>Удаление Сотрудников</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_employees, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selectedEmployees, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -34,9 +36,9 @@ export function DeleteEmployeesModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить сотрудников? (${selected_employees.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить сотрудников? (${selectedEmployees.length})`}</IonText>
         <IonList>
-          {selected_employees.map((employee) => {
+          {selectedEmployees.map((employee) => {
             return <IonItem key={employee.id}>{`- ${employee.person!.surname} ${employee.person!.name} ${employee.person!.last_name}`}</IonItem>
           })}
         </IonList>
@@ -45,17 +47,12 @@ export function DeleteEmployeesModal(
   )
 }
 
-export interface DeleteEmployeesModalControllerProps {
-  selected_employees: Array<Employee>,
-}
-
-export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalControllerProps> = (props) => {
+export const DeleteEmployeesModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
 
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeleteEmployeesModal, {
-    selected_employees: props.selected_employees,
     onDismiss: (data: Array<Employee> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -75,7 +72,7 @@ export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalContro
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(fetch(auth));
+                dispatch(employeesR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -85,7 +82,7 @@ export const DeleteEmployeesModalController: React.FC<DeleteEmployeesModalContro
                 return;
               }
             }
-            dispatch(fetch(auth));
+            dispatch(employeesR.fetch(auth));
             presentAlert({
               header: "Сотрудники удалены",
               buttons: ["Ок"]

@@ -10,26 +10,23 @@ import Hotel from '../../interface/hotel';
 import City from '../../interface/city';
 import Person from '../../interface/person';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { fetch as fetchHotels } from '../../redux/hotels';
-import { fetch as fetchPersons } from '../../redux/persons';
-import { fetch as fetchCities } from '../../redux/cities';
+import { hotelsR, personsR, citiesR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 
 export function PatchHotelModal(
-  {auth, selected_hotels, onDismiss}: AuthProps & {
-    selected_hotels: Array<Hotel>,
+  {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [persons, cities] = useAppSelector(state => [state.persons, state.cities]);
+  const [hotels, persons, cities] = useAppSelector(state => [state.hotels, state.persons, state.cities]);
   const dispatch = useAppDispatch();
 
-  const hotel = selected_hotels[0];
+  const hotel = hotels.status === "ok" ? hotels.selected[0] : null;
 
   const inputName = useRef<HTMLIonInputElement>(null);
   const inputDescription = useRef<HTMLIonTextareaElement>(null);
-  const [cityInput, setCityInput] = useState(hotel.city as City | null);
-  const [ownerInput, setOwnerInput] = useState(hotel.owner as Person | null);
+  const [cityInput, setCityInput] = useState(hotel!.city as City | null);
+  const [ownerInput, setOwnerInput] = useState(hotel!.owner as Person | null);
 
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
@@ -95,8 +92,8 @@ export function PatchHotelModal(
   }
 
   useEffect(() => {
-    dispatch(fetchPersons(auth));
-    dispatch(fetchCities(auth));
+    dispatch(personsR.fetch(auth));
+    dispatch(citiesR.fetch(auth));
   }, []);
 
   function confirm() {
@@ -110,7 +107,7 @@ export function PatchHotelModal(
         setErrorMessage("Название отеля должно быть меньше 200 символов.")
       } else {
         onDismiss({
-          id: hotel.id,
+          id: hotel!.id,
           name,
           description,
           city_id: cityInput.id,
@@ -144,7 +141,7 @@ export function PatchHotelModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" value={hotel.name} required/>
+          <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" value={hotel!.name} required/>
           <IonLabel position="stacked">Местоположение</IonLabel>
           <IonButton disabled={cities === null} onClick={() => openCitySelectModal()}>
             {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : formatCity(cityInput))}
@@ -154,24 +151,19 @@ export function PatchHotelModal(
             {persons === null ? "Загрузка..." : (ownerInput === null ? "Выбрать" : formatPerson(ownerInput))}
           </IonButton>
           <IonLabel position="stacked">Описание</IonLabel>
-          <IonTextarea ref={inputDescription} auto-grow={true} value={hotel.description} placeholder="Введите описание" required/>
+          <IonTextarea ref={inputDescription} auto-grow={true} value={hotel!.description} placeholder="Введите описание" required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export type PatchHotelModalControllerProps = {
-  selected_hotels: Array<Hotel>,
-}
-
-export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps> = (props) => {
+export const PatchHotelModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchHotelModal, {
     auth: auth!,
-    selected_hotels: props.selected_hotels,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -206,7 +198,7 @@ export const PatchHotelModalController: React.FC<PatchHotelModalControllerProps>
               });
             })
             .finally(() => {
-              dispatch(fetchHotels(auth));
+              dispatch(hotelsR.fetch(auth));
             });
         }
       },

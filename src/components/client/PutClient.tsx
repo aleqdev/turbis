@@ -10,9 +10,7 @@ import Person from '../../interface/person';
 import { formatPerson } from '../../utils/fmt';
 import ClientType from '../../interface/client_type';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { fetch as fetchClients } from '../../redux/clients';
-import { fetch as fetchClientTypes } from '../../redux/client_types';
-import { fetch as fetchPersons } from '../../redux/persons';
+import { clientsR, clientTypesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 //import { createPutComponent } from '../TableManagement';
 
@@ -59,8 +57,8 @@ export function PutClientModal(
   }
 
   useEffect(() => {
-    dispatch(fetchClientTypes(auth));
-    dispatch(fetchPersons(auth));
+    dispatch(clientTypesR.fetch(auth));
+    dispatch(personsR.fetch(auth));
   }, []);
 
   function confirm() {
@@ -153,7 +151,7 @@ export const PutClientModalController: React.FC = () => {
               });
             })
             .finally(() => {
-              dispatch(fetchClients(auth));
+              dispatch(clientsR.fetch(auth));
             });
         }
       },

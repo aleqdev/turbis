@@ -4,14 +4,12 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { PutEmployeeModalController } from '../components/employee/PutEmployee';
 import { PatchEmployeesModalController } from '../components/employee/PatchEmployee';
 import { DeleteEmployeesModalController } from '../components/employee/DeleteEmployees';
-import { EmployeesList } from '../components/employee/EmployeesList';
-import Employee from '../interface/employee';
-import { useAppDispatch, useAppSelector } from '../redux/store';
-import { fetch } from '../redux/employees';
+import { EmployeesList } from '../components/employee/EmployeesList';;
+import { employeesR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
 
 const MetaPage: React.FC = () => {
@@ -22,36 +20,13 @@ const MetaPage: React.FC = () => {
     return <NoAuth/>
   }
 
-  dispatch(fetch(auth));
+  dispatch(employeesR.fetch(auth));
 
   return <Page/>
 }
 
 const Page: React.FC = () => {
   const employees = useAppSelector(state => state.employees);
-
-  const [selected_employees, set_selected_employees] = useState(Array<Employee>);
-  const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
-
-  useEffect(
-    () => {
-      if (employees.status !== "ok") {
-        return;
-      }
-
-      set_selected_employees(s => s.map((selected_employee) => {
-        return employees.data.find((w) => w.id === selected_employee.id)
-      }).filter((w) => w !== undefined).map((w) => w!));
-    },
-    [employees]
-  );
-
-  useEffect(
-    () => {
-      set_clear_selection_trigger(s => !s);
-    },
-    [employees]
-  )
   
   return (
     <IonPage>
@@ -64,13 +39,13 @@ const Page: React.FC = () => {
             <IonTitle>Сотрудники</IonTitle>
             <IonList>
               {
-                (selected_employees?.length === 1 ) ? 
-                  <PatchEmployeesModalController selected_employees={selected_employees}/>
+                (employees.status === "ok" && employees.selected.length === 1) ? 
+                  <PatchEmployeesModalController/>
                   : ""
               }
               {
-                (selected_employees?.length > 0 ) ? 
-                  <DeleteEmployeesModalController selected_employees={selected_employees}/>
+                (employees.status === "ok" && employees.selected.length >= 1) ? 
+                  <DeleteEmployeesModalController/>
                   : ""
               }
               <PutEmployeeModalController/>
@@ -80,7 +55,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <EmployeesList clear_selection_trigger={clear_selection_trigger} on_selected_change={set_selected_employees} />
+        <EmployeesList/>
       </IonContent>
     </IonPage>
   );

@@ -9,9 +9,7 @@ import { SelectWithSearchModal } from '../SelectWithSearch';
 import Person from '../../interface/person';
 import { formatPerson } from '../../utils/fmt';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { fetch as fetchEmployees } from '../../redux/employees';
-import { fetch as fetchEmployeeRoles } from '../../redux/employee_roles';
-import { fetch as fetchPersons } from '../../redux/persons';
+import { employeesR, employeeRolesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 //import { createPutComponent } from '../TableManagement';
 
@@ -58,8 +56,8 @@ export function PutEmployeeModal(
   }
 
   useEffect(() => {
-    dispatch(fetchEmployeeRoles(auth));
-    dispatch(fetchPersons(auth));
+    dispatch(employeeRolesR.fetch(auth));
+    dispatch(personsR.fetch(auth));
   }, []);
 
   function confirm() {
@@ -152,7 +150,7 @@ export const PutEmployeeModalController: React.FC = (props) => {
               });
             })
             .finally(() => {
-              dispatch(fetchEmployees(auth));
+              dispatch(employeesR.fetch(auth));
             });
         }
       },

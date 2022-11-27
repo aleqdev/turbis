@@ -10,9 +10,8 @@ import { DeletePersonsModalController } from '../components/person/DeletePersons
 import { PersonsList } from '../components/person/PersonsList';
 import { PutPersonModalController } from '../components/person/PutPerson';
 import { PatchPersonModalController } from '../components/person/PatchPerson';
-import { useAppDispatch, useAppSelector } from '../redux/store';
+import { personsR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
-import { fetch } from '../redux/persons';
 
 const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
@@ -22,36 +21,13 @@ const MetaPage: React.FC = () => {
     return <NoAuth/>
   }
 
-  dispatch(fetch(auth));
+  dispatch(personsR.fetch(auth));
 
   return <Page/>
 }
 
 const Page: React.FC = () => {
   const persons = useAppSelector(state => state.persons);
-  
-  const [selected_persons, set_selected_persons] = useState(Array<Person>);
-  const [clear_selection_trigger, set_clear_selection_trigger] = useState(false);
-
-  useEffect(
-    () => {
-      if (persons.status !== "ok") {
-        return
-      }
-
-      set_selected_persons(s => s.map((selected_person) => {
-        return persons.data.find((w) => w.id === selected_person.id)
-      }).filter((w) => w !== undefined).map((w) => w!));
-    },
-    [persons]
-  );
-
-  useEffect(
-    () => {
-      set_clear_selection_trigger(s => !s);
-    },
-    [persons]
-  )
   
   return (
     <IonPage>
@@ -64,13 +40,13 @@ const Page: React.FC = () => {
             <IonTitle>Контактные лица</IonTitle>
             <IonList>
               {
-                (selected_persons?.length === 1 ) ? 
-                  <PatchPersonModalController selected_persons={selected_persons}/>
+                (persons.status === "ok" && persons.selected.length === 1) ? 
+                  <PatchPersonModalController/>
                   : ""
               }
               {
-                (selected_persons?.length > 0 ) ? 
-                  <DeletePersonsModalController selected_persons={selected_persons}/>
+                (persons.status === "ok" && persons.selected.length >= 1) ? 
+                  <DeletePersonsModalController/>
                   : ""
               }
               <PutPersonModalController/>
@@ -80,7 +56,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <PersonsList clear_selection_trigger={clear_selection_trigger} on_selected_change={set_selected_persons} />
+        <PersonsList/>
       </IonContent>
     </IonPage>
   );

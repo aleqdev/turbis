@@ -1,10 +1,8 @@
-import { IonList, IonTitle } from "@ionic/react";
-import React, { Dispatch } from "react";
-import DataTable from "react-data-table-component";
-import DataTableExtensions from "react-data-table-component-extensions";
+import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import Employee from "../../interface/employee";
-import { useAppSelector } from "../../redux/store";
+import { employeesR, useAppDispatch } from "../../redux/store";
+import { Table } from "../table_management/Table";
 
 const listColumns = [
   {
@@ -46,43 +44,15 @@ const listColumns = [
   }
 ];
 
-export interface EmployeesListProps {
-  on_selected_change: Dispatch<React.SetStateAction<Array<Employee>>>,
-  clear_selection_trigger: boolean
-}
+export const EmployeesList: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-export const EmployeesList: React.FC<EmployeesListProps> = (props) => {
-  const employees = useAppSelector(state => state.employees);
-  
   return (
-    <IonList id="employees-list">
-      {
-        (employees.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
-        (employees.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
-          <DataTableExtensions
-            columns={listColumns}
-            data={employees.data}
-            print={true}
-            export={true}
-            exportHeaders={true}
-            filterPlaceholder="Поиск"
-          >
-            <DataTable
-            title="Список сотрудников:"
-            columns={listColumns as any}
-            data={employees.data}
-            defaultSortFieldId="name"
-            onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
-            pagination
-            selectableRows
-            highlightOnHover
-            clearSelectedRows={props.clear_selection_trigger}
-            noDataComponent="Пусто"
-            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
-          />
-         </DataTableExtensions>
-  
-      }
-    </IonList>
+    <Table 
+      title="Список сотрудников:"
+      selector={state => state.employees}
+      columns={listColumns as any}
+      selectRowsCallback={selected => dispatch(employeesR.select(selected.selectedRows as Employee[]))}
+    />
   );
 }

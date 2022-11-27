@@ -1,8 +1,6 @@
-import { IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import React, { useEffect, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import CurrencyInput from 'react-currency-input-field';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { AuthProps } from '../../interface/props/auth';
 import Hotel from '../../interface/hotel';
@@ -14,9 +12,7 @@ import { formatDateDiff } from '../../utils/fmt';
 import moment from 'moment';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch as fetchTours } from '../../redux/tours';
-import { fetch as fetchHotels } from '../../redux/hotels';
-import { fetch as fetchTourFeedingTypes } from '../../redux/tour_feeding_types';
+import { toursR, tourFeedingTypesR, hotelsR } from '../../redux/store';
 
 export function PutTourModal(
   {auth, onDismiss}: AuthProps & {
@@ -139,8 +135,8 @@ export function PutTourModal(
   }
 
   useEffect(() => {
-    dispatch(fetchHotels(auth));
-    dispatch(fetchTourFeedingTypes(auth));
+    dispatch(hotelsR.fetch(auth));
+    dispatch(tourFeedingTypesR.fetch(auth));
   }, []);
 
   return (
@@ -229,7 +225,7 @@ export const PutTourModalController: React.FC = () => {
               });
             })
             .finally(() => {
-              dispatch(fetchTours(auth));
+              dispatch(toursR.fetch(auth));
             });
         }
       },

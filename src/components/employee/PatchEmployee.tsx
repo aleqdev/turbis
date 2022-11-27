@@ -9,25 +9,22 @@ import { Person } from '../../interface/person';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatPerson } from '../../utils/fmt';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { fetch as fetchEmployees } from '../../redux/employees';
-import { fetch as fetchEmployeeRoles } from '../../redux/employee_roles';
-import { fetch as fetchPersons } from '../../redux/persons';
+import { employeesR, employeeRolesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import { AuthProps } from '../../interface/props/auth';
 
 export function PatchEmployeeModal(
-  {auth, selected_employees, onDismiss}: AuthProps & {
-    selected_employees: Array<Employee>,
+  {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [employeeRoles, persons] = useAppSelector(state => [state.employeeRoles, state.persons]);
+  const [employees, employeeRoles, persons] = useAppSelector(state => [state.employees, state.employeeRoles, state.persons]);
   const dispatch = useAppDispatch();
 
-  const employee = selected_employees[0];
+  const employee = employees.status === "ok" ? employees.selected[0] : null;
 
-  const [inputRole, setInputRole] = useState(employee.role as EmployeeRole | null);
-  const [inputPerson, setInputPerson] = useState(employee.person as Person | null);
+  const [inputRole, setInputRole] = useState(employee!.role as EmployeeRole | null);
+  const [inputPerson, setInputPerson] = useState(employee!.person as Person | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentPersonChoice, dismissPersonChoice] = useIonModal(SelectWithSearchModal, {
@@ -63,7 +60,7 @@ export function PatchEmployeeModal(
   function confirm() {
     if (inputRole && inputPerson) {
       onDismiss({
-        id: employee.id,
+        id: employee!.id,
         role: inputRole,
         person: inputPerson
       }, 'confirm');
@@ -73,8 +70,8 @@ export function PatchEmployeeModal(
   }
 
   useEffect(() => {
-    dispatch(fetchEmployeeRoles(auth));
-    dispatch(fetchPersons(auth));
+    dispatch(employeeRolesR.fetch(auth));
+    dispatch(personsR.fetch(auth));
   }, []);
 
   return (
@@ -118,18 +115,13 @@ export function PatchEmployeeModal(
   )
 }
 
-export interface PatchEmployeeModalControllerProps {
-  selected_employees: Array<Employee>,
-}
-
-export const PatchEmployeesModalController: React.FC<PatchEmployeeModalControllerProps> = (props) => {
+export const PatchEmployeesModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
 
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchEmployeeModal, {
     auth: auth!,
-    selected_employees: props.selected_employees,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -162,7 +154,7 @@ export const PatchEmployeesModalController: React.FC<PatchEmployeeModalControlle
               });
             })
             .finally(() => {
-              dispatch(fetchEmployees(auth));
+              dispatch(employeesR.fetch(auth));
             });
         }
       },

@@ -5,7 +5,7 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/employee_roles';
+import { employeeRolesR } from '../../redux/store';
 
 export function PutEmployeeRoleModal(
   {onDismiss}: {
@@ -92,7 +92,7 @@ export const PutEmployeeRoleModalController: React.FC = () => {
                 buttons: ["Ок"]
               });
             }).finally(() => {
-              dispatch(fetch(auth));
+              dispatch(employeeRolesR.fetch(auth));
             });
         }
       },

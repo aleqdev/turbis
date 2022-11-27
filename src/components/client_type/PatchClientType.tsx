@@ -6,15 +6,16 @@ import API from '../../utils/server';
 import ClientType from '../../interface/client_type';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/client_types';
+import { clientTypesR } from '../../redux/store';
 
 export function PatchEmployeeRoleModal(
-  {selected_client_types, onDismiss}: {
-    selected_client_types: Array<ClientType>,
+  {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const client_type = selected_client_types[0];
+  const clientTypes = useAppSelector(state => state.clientTypes);
+
+  const client_type = clientTypes.status === "ok" ? clientTypes.selected[0] : null;
 
   const inputName = useRef<HTMLIonInputElement>(null);
 
@@ -25,7 +26,7 @@ export function PatchEmployeeRoleModal(
 
     if (name) {
       onDismiss({
-        id: client_type.id,
+        id: client_type!.id,
         name,
       }, 'confirm');
     } else {
@@ -55,23 +56,18 @@ export function PatchEmployeeRoleModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите название" value={client_type.name} required/>
+          <IonInput ref={inputName} type="text" placeholder="Введите название" value={client_type!.name} required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PatchClientTypeModalControllerProps {
-  selected_client_types: Array<ClientType>,
-}
-
-export const PatchClientTypeModalController: React.FC<PatchClientTypeModalControllerProps> = (props) => {
+export const PatchClientTypeModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
-    selected_client_types: props.selected_client_types,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -103,7 +99,7 @@ export const PatchClientTypeModalController: React.FC<PatchClientTypeModalContro
               });
             })
             .finally(() => {
-              dispatch(fetch(auth));
+              dispatch(clientTypesR.fetch(auth));
             });
         }
       },

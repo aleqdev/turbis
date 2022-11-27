@@ -3,20 +3,20 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { RefetchFunction } from 'axios-hooks'
-import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import Person from '../../interface/person';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/persons';
+import { personsR } from '../../redux/store';
 
 export function DeletePersonsModal(
-  {selected_persons, onDismiss}: {
-    selected_persons: Array<Person>
+  {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const persons = useAppSelector(state => state.persons);
+  const selectedPersons = persons.status === "ok" ? persons.selected : [];
+
   return (
     <>
       <IonHeader>
@@ -28,7 +28,7 @@ export function DeletePersonsModal(
           </IonButtons>
           <IonTitle>Удаление контактного лица</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_persons, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selectedPersons, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -36,9 +36,9 @@ export function DeletePersonsModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить контактные лица? (${selected_persons.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить контактные лица? (${selectedPersons.length})`}</IonText>
         <IonList>
-          {selected_persons.map((person) => {
+          {selectedPersons.map((person) => {
             return <IonItem key={person.id}>{`- ${person.surname} ${person.name} ${person.last_name}`}</IonItem>
           })}
         </IonList>
@@ -47,16 +47,11 @@ export function DeletePersonsModal(
   )
 }
 
-export interface DeletePersonsModalControllerProps {
-  selected_persons: Array<Person>,
-}
-
-export const DeletePersonsModalController: React.FC<DeletePersonsModalControllerProps> = (props) => {
+export const DeletePersonsModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeletePersonsModal, {
-    selected_persons: props.selected_persons,
     onDismiss: (data: Array<Person> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -76,7 +71,7 @@ export const DeletePersonsModalController: React.FC<DeletePersonsModalController
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(fetch(auth));
+                dispatch(personsR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -86,7 +81,7 @@ export const DeletePersonsModalController: React.FC<DeletePersonsModalController
                 return;
               }
             }
-            dispatch(fetch(auth));
+            dispatch(personsR.fetch(auth));
             presentAlert({
               header: "Контактные лица удалены",
               buttons: ["Ок"]

@@ -1,8 +1,6 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
-import axios from 'axios';
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
+import React, { useEffect, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { AuthProps } from '../../interface/props/auth';
 import Tour from '../../interface/tour';
 import Hotel from '../../interface/hotel';
@@ -14,28 +12,25 @@ import { useAppDispatch, useAppSelector } from '../../redux/store';
 import moment from 'moment';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch as fetchHotels } from '../../redux/hotels';
-import { fetch as fetchTours } from '../../redux/tours';
-import { fetch as fetchTourFeedingTypes } from '../../redux/tour_feeding_types';
+import { toursR, tourFeedingTypesR, hotelsR } from '../../redux/store';
 
 export function PatchTourModal(
-  {auth, selected_tours, onDismiss}: AuthProps & {
-    selected_tours: Array<Tour>,
+  {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [hotels, tourFeedingTypes] = useAppSelector(state => [state.hotels, state.tourFeedingTypes]);
+  const [tours, hotels, tourFeedingTypes] = useAppSelector(state => [state.tours, state.hotels, state.tourFeedingTypes]);
   const dispatch = useAppDispatch();
 
-  const tour = selected_tours[0];
+  const tour =tours.status === "ok" ? tours.selected[0] : null;
 
   const inputArrivalDate = useRef<HTMLIonInputElement>(null);
   const inputDepartureDate = useRef<HTMLIonInputElement>(null);
   const inputCost = useRef<HTMLIonInputElement>(null);
   const inputDescription = useRef<HTMLIonTextareaElement>(null);
 
-  const [inputHotel, setInputHotel] = React.useState(tour.hotel as Hotel | null);
-  const [inputFeedingType, setInputFeedingType] = React.useState(tour.feeding_type as TourFeedingType | null);
+  const [inputHotel, setInputHotel] = React.useState(tour!.hotel as Hotel | null);
+  const [inputFeedingType, setInputFeedingType] = React.useState(tour!.feeding_type as TourFeedingType | null);
   const [diff, setDiff] = React.useState(null as string | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
@@ -97,14 +92,14 @@ export function PatchTourModal(
   }
 
   useEffect(() => {
-    dispatch(fetchHotels(auth));
-    dispatch(fetchTourFeedingTypes(auth));
+    dispatch(hotelsR.fetch(auth));
+    dispatch(tourFeedingTypesR.fetch(auth));
 
     if (inputArrivalDate.current) {
-      inputArrivalDate.current.value = formatDate(tour.arrival_date);
+      inputArrivalDate.current.value = formatDate(tour!.arrival_date);
     }
     if (inputDepartureDate.current) {
-      inputDepartureDate.current.value = formatDate(tour.departure_date);
+      inputDepartureDate.current.value = formatDate(tour!.departure_date);
     }
     calcDiff();
   }, []);
@@ -117,7 +112,7 @@ export function PatchTourModal(
 
     if (inputHotel && inputFeedingType && arrivalDate && departureDate && cost && description) {
       onDismiss({
-        id: tour.id,
+        id: tour!.id,
         arrivalDate: moment(arrivalDate, "DD-MM-YYYY"),
         departureDate: moment(departureDate, "DD-MM-YYYY"),
         description,
@@ -175,26 +170,21 @@ export function PatchTourModal(
             {tourFeedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
           </IonButton>
           <IonLabel position="stacked">{"Стоимость тура (руб.)"}</IonLabel>
-          <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" value={tour.cost} required/>
+          <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" value={tour!.cost} required/>
           <IonLabel position="stacked">Описание</IonLabel>
-          <IonTextarea ref={inputDescription} auto-grow={true} value={tour.description} placeholder="Введите описание" required/>
+          <IonTextarea ref={inputDescription} auto-grow={true} value={tour!.description} placeholder="Введите описание" required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PatchTourModalControllerProps {
-  selected_tours: Array<Tour>,
-}
-
-export const PatchTourModalController: React.FC<PatchTourModalControllerProps> = (props) => {
+export const PatchTourModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchTourModal, {
     auth: auth!,
-    selected_tours: props.selected_tours,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -231,7 +221,7 @@ export const PatchTourModalController: React.FC<PatchTourModalControllerProps> =
               });
             })
             .finally(() => {
-              dispatch(fetchTours(auth));
+              dispatch(toursR.fetch(auth));
             });
         }
       },

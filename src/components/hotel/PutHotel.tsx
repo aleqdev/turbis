@@ -11,9 +11,7 @@ import Person from '../../interface/person';
 import City from '../../interface/city';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch as fetchHotels } from '../../redux/hotels';
-import { fetch as fetchPersons } from '../../redux/persons';
-import { fetch as fetchCities } from '../../redux/cities';
+import { hotelsR, personsR, citiesR } from '../../redux/store';
 
 export function PutHotelModal(
   {auth, onDismiss}: AuthProps & {
@@ -92,8 +90,8 @@ export function PutHotelModal(
   }
 
   useEffect(() => {
-    dispatch(fetchPersons(auth));
-    dispatch(fetchCities(auth));
+    dispatch(personsR.fetch(auth));
+    dispatch(citiesR.fetch(auth));
   }, []);
 
   function confirm() {
@@ -197,7 +195,7 @@ export const PutHotelModalController: React.FC = () => {
               });
             })
             .finally(() => {
-              dispatch(fetchHotels(auth))
+              dispatch(hotelsR.fetch(auth))
             });
         }
       },

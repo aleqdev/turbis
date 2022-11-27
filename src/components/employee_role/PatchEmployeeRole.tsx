@@ -6,15 +6,15 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/employee_roles';
+import { employeeRolesR } from '../../redux/store';
 
 export function PatchEmployeeRoleModal(
-  {selected_employee_roles, onDismiss}: {
-    selected_employee_roles: Array<EmployeeRole>,
+  {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const employee_role = selected_employee_roles[0];
+  const employeeRoles = useAppSelector(state => state.employeeRoles);
+  const employeeRole = employeeRoles.status === "ok" ? employeeRoles.selected[0] : null;
 
   const inputName = useRef<HTMLIonInputElement>(null);
 
@@ -25,7 +25,7 @@ export function PatchEmployeeRoleModal(
 
     if (name) {
       onDismiss({
-        id: employee_role.id,
+        id: employeeRole!.id,
         name,
       }, 'confirm');
     } else {
@@ -55,23 +55,18 @@ export function PatchEmployeeRoleModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Название</IonLabel>
-          <IonInput ref={inputName} type="text" placeholder="Введите название" value={employee_role.name} required/>
+          <IonInput ref={inputName} type="text" placeholder="Введите название" value={employeeRole!.name} required/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export interface PatchWorkerRoleModalControllerProps {
-  selected_employee_roles: Array<EmployeeRole>,
-}
-
-export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalControllerProps> = (props) => {
+export const PatchWorkerRoleModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchEmployeeRoleModal, {
-    selected_employee_roles: props.selected_employee_roles,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -103,7 +98,7 @@ export const PatchWorkerRoleModalController: React.FC<PatchWorkerRoleModalContro
               });
             })
             .finally(() => {
-              dispatch(fetch(auth));
+              dispatch(employeeRolesR.fetch(auth));
             });
         }
       },

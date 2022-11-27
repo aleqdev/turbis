@@ -11,23 +11,20 @@ import Client from '../../interface/client';
 import ClientType from '../../interface/client_type';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch as fetchClients } from '../../redux/clients';
-import { fetch as fetchClientTypes } from '../../redux/client_types';
-import { fetch as fetchPersons } from '../../redux/persons';
+import { clientsR, clientTypesR, personsR } from '../../redux/store';
 
 export function PatchClientModal(
-  {auth, selected_clients, onDismiss}: AuthProps & {
-    selected_clients: Array<Client>,
+  {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [clientTypes, persons] = useAppSelector(state => [state.clientTypes, state.persons]);
+  const [clients, clientTypes, persons] = useAppSelector(state => [state.clients, state.clientTypes, state.persons]);
   const dispatch = useAppDispatch();
 
-  const client = selected_clients[0];
+  const client = clients.status === "ok" ? clients.selected[0] : null;
 
-  const [inputType, setInputType] = useState(client.type as ClientType | null);
-  const [inputPerson, setInputPerson] = useState(client.person as Person | null);
+  const [inputType, setInputType] = useState(client!.type as ClientType | null);
+  const [inputPerson, setInputPerson] = useState(client!.person as Person | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
 
   const [presentPersonChoice, dismissPersonChoice] = useIonModal(SelectWithSearchModal, {
@@ -61,14 +58,14 @@ export function PatchClientModal(
   }
 
   useEffect(() => {
-    dispatch(fetchClientTypes(auth));
-    dispatch(fetchPersons(auth));
+    dispatch(clientTypesR.fetch(auth));
+    dispatch(personsR.fetch(auth));
   }, []);
 
   function confirm() {
     if (inputType && inputPerson) {
       onDismiss({
-        id: client.id,
+        id: client!.id,
         type: inputType,
         person: inputPerson
       }, 'confirm');
@@ -118,17 +115,12 @@ export function PatchClientModal(
   )
 }
 
-export interface PatchClientModalControllerProps {
-  selected_clients: Array<Client>,
-}
-
-export const PatchClientModalController: React.FC<PatchClientModalControllerProps> = (props) => {
+export const PatchClientModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchClientModal, {
     auth: auth!,
-    selected_clients: props.selected_clients,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -161,7 +153,7 @@ export const PatchClientModalController: React.FC<PatchClientModalControllerProp
               });
             })
             .finally(() => {
-              dispatch(fetchClients(auth))
+              dispatch(clientsR.fetch(auth))
             });
         }
       },

@@ -1,11 +1,10 @@
-import { IonCol, IonGrid, IonList, IonRow, IonTitle } from "@ionic/react";
-import React, { Dispatch } from "react";
-import DataTable from "react-data-table-component";
-import DataTableExtensions from "react-data-table-component-extensions";
+import { IonCol, IonGrid, IonRow } from "@ionic/react";
+import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import Hotel from "../../interface/hotel";
-import { useAppSelector } from "../../redux/store";
+import { hotelsR, useAppDispatch } from "../../redux/store";
 import { formatCity, formatPerson } from "../../utils/fmt";
+import { Table } from "../table_management/Table";
 
 const listColumns = [
   {
@@ -56,43 +55,17 @@ const ExpandedHotel = ({ data }: { data: any}) => {
   );
 }
 
-export type HotelsListProps = {
-  on_selected_change: Dispatch<React.SetStateAction<Array<Hotel>>>,
-  clear_selection_trigger: boolean
-}
+export const HotelsList: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-export const HotelsList: React.FC<HotelsListProps> = (props) => {
-  const hotels = useAppSelector(state => state.hotels);
-  
   return (
-    <IonList id="hotels-list">
-      {
-        (hotels.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
-        (hotels.status === "err") ? <IonTitle>Ошибка загрузки</IonTitle> :
-          <DataTableExtensions
-            columns={listColumns}
-            data={hotels.data}
-            print={true}
-            export={true}
-            exportHeaders={true}
-            filterPlaceholder="Поиск"
-          >
-            <DataTable
-              title="Список отелей:"
-              columns={listColumns as any}
-              data={hotels.data}
-              defaultSortFieldId="name"
-              onSelectedRowsChange={({selectedRows}) => props.on_selected_change(selectedRows)}
-              pagination
-              selectableRows
-              expandableRows={true}
-              expandableRowsComponent={ExpandedHotel}
-              clearSelectedRows={props.clear_selection_trigger}
-              noDataComponent="Пусто"
-              paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
-            />
-          </DataTableExtensions>
-      }
-    </IonList>
+    <Table 
+      title="Список отелей:"
+      selector={state => state.hotels}
+      columns={listColumns as any}
+      selectRowsCallback={selected => dispatch(hotelsR.select(selected.selectedRows as Hotel[]))}
+      expandableRows
+      expandableRowsComponent={ExpandedHotel}
+    />
   );
 }

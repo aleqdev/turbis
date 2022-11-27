@@ -1,12 +1,11 @@
 import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from '@ionic/react';
 import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/client_types';
+import { clientTypesR } from '../../redux/store';
 
 export function PutClientTypeModal(
   {onDismiss}: {
@@ -94,7 +93,7 @@ export const PutClientTypeModalController: React.FC = () => {
               });
             })
             .finally(() => {
-              dispatch(fetch(auth));
+              dispatch(clientTypesR.fetch(auth));
             });
         }
       },

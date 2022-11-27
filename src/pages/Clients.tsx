@@ -4,15 +4,13 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
-import Client from '../interface/client';
+import React from 'react';
 import { PutClientModalController } from '../components/client/PutClient';
 import { DeleteClientsModalController } from '../components/client/DeleteClients';
 import { PatchClientModalController } from '../components/client/PatchClient';
 import { ClientsList } from '../components/client/ClientsList';
-import { useAppDispatch, useAppSelector } from '../redux/store';
+import { clientsR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
-import { fetch } from '../redux/clients';
 
 const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
@@ -22,36 +20,13 @@ const MetaPage: React.FC = () => {
     return <NoAuth/>
   }
 
-  dispatch(fetch(auth));
+  dispatch(clientsR.fetch(auth));
 
   return <Page/>
 }
 
 const Page: React.FC = () => {
   const clients = useAppSelector(state => state.clients);
-  
-  const [selectedClients, setSelectedClients] = useState(Array<Client>);
-  const [clearSelectionTrigger, setClearSelectionTrigger] = useState(false);
-
-  useEffect(
-    () => {
-      if (clients.status !== "ok") {
-        return
-      }
-
-      setSelectedClients(s => s.map((selected_employee) => {
-        return clients.data.find((w) => w.id === selected_employee.id)
-      }).filter((w) => w !== undefined).map((w) => w!));
-    },
-    [clients]
-  );
-
-  useEffect(
-    () => {
-      setClearSelectionTrigger(s => !s);
-    },
-    [clients]
-  )
   
   return (
     <IonPage>
@@ -64,13 +39,13 @@ const Page: React.FC = () => {
             <IonTitle>Клиенты</IonTitle>
             <IonList>
               {
-                (selectedClients?.length === 1 ) ? 
-                  <PatchClientModalController selected_clients={selectedClients}/>
+                (clients.status === "ok" && clients.selected.length === 1) ? 
+                  <PatchClientModalController/>
                   : ""
               }
               {
-                (selectedClients?.length > 0 ) ? 
-                  <DeleteClientsModalController selected_clients={selectedClients}/>
+                (clients.status === "ok" && clients.selected.length >= 1) ? 
+                  <DeleteClientsModalController/>
                   : ""
               }
               <PutClientModalController/>
@@ -80,7 +55,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <ClientsList clear_selection_trigger={clearSelectionTrigger} on_selected_change={setSelectedClients} />
+        <ClientsList/>
       </IonContent>
     </IonPage>
   );

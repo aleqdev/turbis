@@ -7,14 +7,16 @@ import API from '../../utils/server';
 import ClientType from '../../interface/client_type';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/client_types';
+import { clientTypesR } from '../../redux/store';
 
 export function DeleteClientTypesModal(
-  {selected_client_types, onDismiss}: {
-    selected_client_types: Array<ClientType>
+  {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const clients = useAppSelector(state => state.clients);
+  const selectedClients = clients.status === "ok" ? clients.selected : [];
+
   return (
     <>
       <IonHeader>
@@ -26,7 +28,7 @@ export function DeleteClientTypesModal(
           </IonButtons>
           <IonTitle>Удаление типов клиентов</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_client_types, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selectedClients, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -34,10 +36,10 @@ export function DeleteClientTypesModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить типы клиентов? (${selected_client_types.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить типы клиентов? (${selectedClients.length})`}</IonText>
         <IonList>
-          {selected_client_types.map((role) => {
-            return <IonItem key={role.id}>{`- ${role.name}`}</IonItem>
+          {selectedClients.map((client) => {
+            return <IonItem key={client.id}>{`- ${client.person!.name}`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -45,16 +47,11 @@ export function DeleteClientTypesModal(
   )
 }
 
-export interface DeleteClientTypesModalControllerProps {
-  selected_client_types: Array<ClientType>,
-}
-
-export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalControllerProps> = (props) => {
+export const DeleteClientTypesModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeleteClientTypesModal, {
-    selected_client_types: props.selected_client_types,
     onDismiss: (data: Array<ClientType> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -74,7 +71,7 @@ export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalCo
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(fetch(auth));
+                dispatch(clientTypesR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -84,7 +81,7 @@ export const DeleteClientTypesModalController: React.FC<DeleteClientTypesModalCo
                 return;
               }
             }
-            dispatch(fetch(auth));
+            dispatch(clientTypesR.fetch(auth));
             presentAlert({
               header: "Типы клиентов удалены",
               buttons: ["Ок"]

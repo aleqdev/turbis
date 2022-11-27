@@ -2,19 +2,20 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonLis
 import { OverlayEventDetail } from '@ionic/core/components';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
-import { RefetchFunction } from 'axios-hooks'
 import API from '../../utils/server';
 import Hotel from '../../interface/hotel';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { fetch } from '../../redux/hotels';
+import { hotelsR } from '../../redux/store';
 
 export function DeleteHotelsModal(
-  {selected_hotels, onDismiss}: {
-    selected_hotels: Array<Hotel>
+  {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const hotels = useAppSelector(state => state.hotels);
+  const selectedHotels = hotels.status === "ok" ? hotels.selected : [];
+
   return (
     <>
       <IonHeader>
@@ -26,7 +27,7 @@ export function DeleteHotelsModal(
           </IonButtons>
           <IonTitle>Удаление Отелей</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selected_hotels, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selectedHotels, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -34,9 +35,9 @@ export function DeleteHotelsModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить отели? (${selected_hotels.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить отели? (${selectedHotels.length})`}</IonText>
         <IonList>
-          {selected_hotels.map((hotel) => {
+          {selectedHotels.map((hotel) => {
             return <IonItem key={hotel.id}>{`- ${hotel.name} в городе ${hotel.city?.name} (${hotel.city?.region?.name})`}</IonItem>
           })}
         </IonList>
@@ -45,16 +46,11 @@ export function DeleteHotelsModal(
   )
 }
 
-export type DeleteHotelsModalControllerProps = {
-  selected_hotels: Array<Hotel>
-}
-
-export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerProps> = (props) => {
+export const DeleteHotelsModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(DeleteHotelsModal, {
-    selected_hotels: props.selected_hotels,
     onDismiss: (data: Array<Hotel> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
@@ -73,7 +69,7 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(fetch(auth));
+                dispatch(hotelsR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -83,7 +79,7 @@ export const DeleteHotelsModalController: React.FC<DeleteHotelsModalControllerPr
                 return;
               }
             }
-            dispatch(fetch(auth));
+            dispatch(hotelsR.fetch(auth));
             presentAlert({
               header: "Отели удалены",
               buttons: ["Ок"]
