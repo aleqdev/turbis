@@ -8,14 +8,15 @@ import Client from '../../interface/client';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import { clientsR } from '../../redux/store';
+import TourOrder from '../../interface/tour_order';
 
-export function DeleteClientsModal(
+export function DeleteTourOrdersModal(
   {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const clients = useAppSelector(state => state.clients);
-  const selectedClients = clients.status === "ok" ? clients.selected : [];
+  const tourOrders = useAppSelector(state => state.tourOrders);
+  const selectedTourOrders = tourOrders.status === "ok" ? tourOrders.selected : [];
 
   return (
     <>
@@ -26,9 +27,9 @@ export function DeleteClientsModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление клиентов</IonTitle>
+          <IonTitle>Удаление заказов туров</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selectedClients, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selectedTourOrders, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -36,10 +37,10 @@ export function DeleteClientsModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить заказы? (${selectedClients.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить заказы? (${selectedTourOrders.length})`}</IonText>
         <IonList>
-          {selectedClients.map((clients) => {
-            return <IonItem key={clients.id}>{`- ${clients.person!.surname} ${clients.person!.name} ${clients.person!.last_name}`}</IonItem>
+          {selectedTourOrders.map((tourOrder) => {
+            return <IonItem key={tourOrder.id}>{`- ${tourOrder.client!.person!.surname} ${tourOrder.client!.person!.name} ${tourOrder.client!.person!.last_name} : ${tourOrder.tour?.hotel?.name}`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -47,12 +48,12 @@ export function DeleteClientsModal(
   )
 }
 
-export const DeleteOrdersModalController: React.FC = () => {
+export const DeleteTourOrdersModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
 
-  const [present, dismiss] = useIonModal(DeleteClientsModal, {
-    onDismiss: (data: Array<Client> | null, role: string) => dismiss(data, role),
+  const [present, dismiss] = useIonModal(DeleteTourOrdersModal, {
+    onDismiss: (data: Array<TourOrder> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -64,9 +65,9 @@ export const DeleteOrdersModalController: React.FC = () => {
             return presentNoAuthAlert(presentAlert);
           }
           
-          Promise.allSettled(ev.detail.data.map(async (employee: Client) => {
+          Promise.allSettled(ev.detail.data.map(async (tour_order: TourOrder) => {
             await API
-              .delete_with_auth(auth!, `client?id=eq.${employee.id}`)
+              .delete_with_auth(auth!, `tour_order?id=eq.${tour_order.id}`)
           }))
           .then((results) => {
             for (const result of results) {

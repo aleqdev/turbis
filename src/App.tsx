@@ -6,7 +6,7 @@ import Hotels from './pages/Hotels';
 import Regions from './pages/Regions'
 import Employees from './pages/Employees'
 import EmployeeRoles from './pages/EmployeeRoles'
-import Order from './pages/Order'
+import Order from './pages/Orders'
 import Clients from './pages/Clients'
 import ClientTypes from './pages/ClientTypes'
 import { Provider } from 'react-redux'

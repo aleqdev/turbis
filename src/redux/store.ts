@@ -12,6 +12,8 @@ import Hotel from '../interface/hotel'
 import Tour from '../interface/tour'
 import TourFeedingType from '../interface/tour_feeding_type'
 import Person from '../interface/person'
+import TourOrder from '../interface/tour_order'
+import TourOrderPaymentType from '../interface/tour_order_payment_type'
 
 export const employeesR = makeReducer<Employee, string, string>("employees", "employee?select=*,person(*),role:employee_role(*)");
 export const employeeRolesR = makeReducer<EmployeeRole, string, string>("employee_roles", "employee_role");
@@ -22,6 +24,8 @@ export const hotelsR = makeReducer<Hotel, string, string>("hotels", "hotel?selec
 export const toursR = makeReducer<Tour, string, string>("tours", "tour?select=*,hotel(*,city(*,region(*,country(*)))),feeding_type:tour_feeding_type(*)");
 export const tourFeedingTypesR = makeReducer<TourFeedingType, string, string>("tour_feeding_types", "tour_feeding_type");
 export const personsR = makeReducer<Person, string, string>("persons", "person");
+export const tourOrdersR = makeReducer<TourOrder, string, string>("tour_orders", "tour_order_view?select=*,payment_type:tour_order_payment_type(*),client(*,person(*),type:client_type(*)),tour(*,hotel(*,city(*,region(*,country(*))),owner:person(*)))");
+export const tourOrderPaymentTypesR = makeReducer<TourOrderPaymentType, string, string>("tour_order_payment_types", "tour_order_payment_type");
 
 export const store = configureStore({
   reducer: {
@@ -35,6 +39,8 @@ export const store = configureStore({
     tours: toursR.reducer,
     tourFeedingTypes: tourFeedingTypesR.reducer,
     persons: personsR.reducer,
+    tourOrders: tourOrdersR.reducer,
+    tourOrderPaymentTypes: tourOrderPaymentTypesR.reducer
   },
   middleware: [thunk]
 })

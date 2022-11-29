@@ -134,7 +134,7 @@ export const PatchOrderModalController: React.FC = () => {
           }
           
           API
-            .patch_with_auth(auth!, `client?id=eq.${ev.detail.data.id}`, {
+            .patch_with_auth(auth!, `tour_order?id=eq.${ev.detail.data.id}`, {
               type_id: ev.detail.data.type.id,
               person_id: ev.detail.data.person.id,
             })
