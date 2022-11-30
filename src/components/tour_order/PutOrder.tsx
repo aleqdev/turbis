@@ -4,12 +4,12 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
-import API from '../../utils/server';
+import API, { get_with_auth } from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import Client from '../../interface/client';
 import { formatClient, formatPerson } from '../../utils/fmt';
 import ClientType from '../../interface/client_type';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { toursR, useAppDispatch, useAppSelector } from '../../redux/store';
 import { clientsR, clientTypesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import Person from '../../interface/person';
@@ -18,6 +18,8 @@ import CurrencyInput from 'react-currency-input-field';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css'
+import Hotel from '../../interface/hotel';
+import { SelectModal } from './SelectModal';
 
 export function PutOrderModal(
   {auth, onDismiss}: AuthProps & {
@@ -31,6 +33,7 @@ export function PutOrderModal(
   const [inputPerson, setInputPerson] = useState(null as Person | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [inputAllSum, setInputAllSum] = useState(0)
+  const [toursAll, setToursAll] = useState([])
   const [selectedRows, setSelectedRows] = useState([]);
   const [presentPersonChoice, dismissPersonChoice] = useIonModal(SelectWithSearchModal, {
     acquirer: () => {
@@ -65,6 +68,7 @@ export function PutOrderModal(
   useEffect(() => {
     dispatch(clientTypesR.fetch(auth));
     dispatch(personsR.fetch(auth));
+    dispatch(toursR.fetch(auth))
   }, []);
 
   function confirm() {
@@ -146,6 +150,34 @@ export function PutOrderModal(
   const data:any = [
     {id:1, hotel: 'Palazzo 4*', description: 'Путешествовать экономно — легко. Отель «Гостиница Ковров» расположен в Коврове. Этот отель находится в самом центре города. Перед сном есть возможность прогуляться вдоль главных достопримечательностей. Рядом с отелем — Борисоглебский собор, Церковь Бориса и Глеба и Свято-Васильевский Монастырь.В отеле Время вспомнить о хлебе насущном! Для гостей работает ресторан. Кафе отеля — удобное место для перекуса.', price: 10000, people_count: 2}
   ]
+
+  const [inputTourOrder, setInputTourOrder] = React.useState(null);
+  const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectModal, {
+    acquirer: () => {
+      const tours = useAppSelector(state => state.tours)
+      return tours.status === "ok" ? tours.data : null
+    },
+    title: "Добавить тур для заказа",
+    formatter: (e: Tour) => `Тур от отеля ${e.hotel?.name} Стоимость: ${e.cost} руб.`,
+    keyer: (e: Tour) => e.id,
+    onDismiss: (data: object | null, role: string) => dismissHotelChoice(data, role),
+  });
+
+
+  function openTourOrderSelectModal() {
+
+    presentHotelChoice({
+      onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (ev.detail.role === 'confirm') {
+          // setInputTourOrder(ev.detail.data);
+        }
+      },
+    });
+  }
+
+
+
+
   return (
     <>
       <IonHeader>
@@ -181,7 +213,7 @@ export function PutOrderModal(
                 <IonSelectOption key={"Кредит"} value={"Кредит"}>{"Кредит"}</IonSelectOption>
           </IonSelect>
           <IonList>
-              <IonButton routerDirection="none" >
+              <IonButton routerDirection="none" onClick={() => openTourOrderSelectModal()}>
                 Добавить тур для заказа
               </IonButton>
               {
@@ -200,7 +232,6 @@ export function PutOrderModal(
             pagination
             selectableRows
             highlightOnHover
-            // clearSelectedRows={clearSelectedRowsTrigger}
             noDataComponent="Пусто"
             paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
             expandableRows
@@ -209,7 +240,7 @@ export function PutOrderModal(
       
         </IonItem>
         <IonItem>
-          <IonLabel position="stacked" >Общая стоимость заказа</IonLabel>
+          <IonLabel position="stacked" >Общая стоимость заказа.</IonLabel>
           <CurrencyInput suffix="₽" disabled value={inputAllSum}></CurrencyInput>
         </IonItem>
       </IonContent>
