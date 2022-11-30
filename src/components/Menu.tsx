@@ -36,7 +36,7 @@ const appPages: AppPage[] = [
     mdIcon: homeOutline
   },
   {
-    title: 'Заказ тура',
+    title: 'Заказы',
     url: '/page/Order',
     iosIcon: cartOutline,
     mdIcon: cartOutline

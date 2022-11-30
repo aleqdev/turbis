@@ -1,8 +1,14 @@
 import City from "../interface/city";
 import Person from "../interface/person";
+import Client from "../interface/client";
 
 export function formatPerson(w: Person): string {
   return `${w.surname} ${w.name[0]}. ${w.last_name[0]}. (+${w.phone_number})`;
+}
+
+export function formatClient(w: Client): string {
+  console.log(w)
+  return `${w.person?.surname} ${w.person?.name[0]}. ${w.person?.last_name[0]}. (+${w.person?.phone_number})`;
 }
 
 export function formatCity(c: City): string {
