@@ -1,4 +1,4 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal, IonGrid, IonRow, IonCol } from '@ionic/react';
+import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal, IonGrid, IonRow, IonCol, IonList } from '@ionic/react';
 import React, { useEffect, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RefetchFunction } from 'axios-hooks'
@@ -14,6 +14,7 @@ import { clientsR, clientTypesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import Person from '../../interface/person';
 import Tour from '../../interface/tour';
+import CurrencyInput from 'react-currency-input-field';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css'
@@ -30,6 +31,8 @@ export function PutOrderModal(
   const [inputType, setInputType] = useState(null as ClientType | null);
   const [inputPerson, setInputPerson] = useState(null as Person | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
+  const [inputAllSum, setInputAllSum] = useState(0)
+  const [selectedRows, setSelectedRows] = useState([]);
   const [presentPersonChoice, dismissPersonChoice] = useIonModal(SelectWithSearchModal, {
     acquirer: () => {
       const persons = useAppSelector(state => state.persons)
@@ -114,7 +117,7 @@ export function PutOrderModal(
   ];
 
   function selectRowsCallback(ev:any){
-    console.log(ev)
+    setSelectedRows(ev.selectedRows)
   }
   
   const ExpandedTour = ({ data }: { data: any}) => {
@@ -178,10 +181,17 @@ export function PutOrderModal(
                 <IonSelectOption key={"Предоплата"} value={"Предоплата"}>{"Предоплата"}</IonSelectOption>
                 <IonSelectOption key={"Кредит"} value={"Кредит"}>{"Кредит"}</IonSelectOption>
           </IonSelect>
-          
-          <IonButton routerDirection="none" >
-            Добавить тур для заказа
-          </IonButton>
+          <IonList>
+              <IonButton routerDirection="none" >
+                Добавить тур для заказа
+              </IonButton>
+              {
+                (selectedRows.length !== 0) ? 
+                <IonButton color='danger' routerDirection="none" >
+                    Удалить
+                </IonButton> : ""
+              }
+          </IonList>
           <DataTable
             title={'Список туров для заказа'}
             columns={listColumns}
@@ -198,6 +208,10 @@ export function PutOrderModal(
             expandableRowsComponent={ExpandedTour}
           />
       
+        </IonItem>
+        <IonItem>
+          <IonLabel position="stacked" >Общая стоимость заказа</IonLabel>
+          <CurrencyInput suffix="₽" disabled value={inputAllSum}></CurrencyInput>
         </IonItem>
       </IonContent>
     </>
