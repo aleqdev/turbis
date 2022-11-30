@@ -59,7 +59,7 @@ export const OrdersList: React.FC = () => {
   return (
     <Table 
       title="Список заказов тура:"
-      selector={state => state.clients}
+      selector={state => state.tourOrders}
       columns={listColumns as any}
       selectRowsCallback={selected => dispatch(tourOrdersR.select(selected.selectedRows as TourOrder[]))}
     />

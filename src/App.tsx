@@ -6,7 +6,8 @@ import Hotels from './pages/Hotels';
 import Regions from './pages/Regions'
 import Employees from './pages/Employees'
 import EmployeeRoles from './pages/EmployeeRoles'
-import Order from './pages/Orders'
+import TourOrders from './pages/TourOrders'
+import TourOrdersPaymentTypes from './pages/TourOrderPaymentTypes'
 import Clients from './pages/Clients'
 import ClientTypes from './pages/ClientTypes'
 import { Provider } from 'react-redux'
@@ -68,8 +69,11 @@ const App: React.FC = () => {
               <Route path="/page/EmployeeRoles" exact={true}>
                 <EmployeeRoles/>
               </Route>
-              <Route path="/page/Order" exact={true}>
-                <Order/>
+              <Route path="/page/TourOrders" exact={true}>
+                <TourOrders/>
+              </Route>
+              <Route path="/page/TourOrderPaymentTypes" exact={true}>
+                <TourOrdersPaymentTypes/>
               </Route>
               <Route path="/page/Persons" exact={true}>
                 <Persons/>

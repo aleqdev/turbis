@@ -36,10 +36,24 @@ const appPages: AppPage[] = [
     mdIcon: homeOutline
   },
   {
-    title: 'Заказ тура',
-    url: '/page/Order',
+    title: 'Заказы туров',
+    url: '/page/TourOrders',
     iosIcon: cartOutline,
-    mdIcon: cartOutline
+    mdIcon: cartOutline,
+    children: [
+      {
+        title: 'Заказы туров',
+        url: '/page/TourOrders',
+        iosIcon: cartOutline,
+        mdIcon: cartOutline,
+      },
+      {
+        title: 'Типы оплаты',
+        url: '/page/TourOrderPaymentTypes',
+        iosIcon: settingsOutline,
+        mdIcon: settingsOutline,
+      },
+    ]
   },
   {
     title: 'Туры',

@@ -4,19 +4,18 @@ import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
-import Client from '../../interface/client';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { clientsR } from '../../redux/store';
-import TourOrder from '../../interface/tour_order';
+import { tourOrderPaymentTypesR } from '../../redux/store';
+import TourOrderPaymentType from '../../interface/tour_order_payment_type';
 
-export function DeleteTourOrdersModal(
+export function DeleteTourOrderPaymentTypeModal(
   {onDismiss}: {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const tourOrders = useAppSelector(state => state.tourOrders);
-  const selectedTourOrders = tourOrders.status === "ok" ? tourOrders.selected : [];
+  const tourOrderPaymentTypes = useAppSelector(state => state.tourOrderPaymentTypes);
+  const selectedTourOrderPaymentTypes = tourOrderPaymentTypes.status === "ok" ? tourOrderPaymentTypes.selected : [];
 
   return (
     <>
@@ -27,9 +26,9 @@ export function DeleteTourOrdersModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление заказов туров</IonTitle>
+          <IonTitle>Удаление типов оплаты заказов туров</IonTitle>
           <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => {onDismiss(selectedTourOrders, "confirm")}}>
+            <IonButton strong={true} onClick={() => {onDismiss(selectedTourOrderPaymentTypes, "confirm")}}>
               Удалить
             </IonButton>
           </IonButtons>
@@ -37,10 +36,10 @@ export function DeleteTourOrdersModal(
       </IonHeader>
 
       <IonContent className="ion-padding" >
-        <IonText color="danger">{`Точно удалить заказы? (${selectedTourOrders.length})`}</IonText>
+        <IonText color="danger">{`Точно удалить типы оплаты заказов? (${selectedTourOrderPaymentTypes.length})`}</IonText>
         <IonList>
-          {selectedTourOrders.map((tourOrder) => {
-            return <IonItem key={tourOrder.id}>{`- ${tourOrder.client!.person!.surname} ${tourOrder.client!.person!.name} ${tourOrder.client!.person!.last_name} : ${tourOrder.tour?.hotel?.name}`}</IonItem>
+          {selectedTourOrderPaymentTypes.map((t) => {
+            return <IonItem key={t.id}>{`- ID: ${t.id}, ${t.name}`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -48,12 +47,12 @@ export function DeleteTourOrdersModal(
   )
 }
 
-export const DeleteTourOrdersModalController: React.FC = () => {
+export const DeleteTourOrderPaymentTypeModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
 
-  const [present, dismiss] = useIonModal(DeleteTourOrdersModal, {
-    onDismiss: (data: Array<TourOrder> | null, role: string) => dismiss(data, role),
+  const [present, dismiss] = useIonModal(DeleteTourOrderPaymentTypeModal, {
+    onDismiss: (data: Array<TourOrderPaymentType> | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();
 
@@ -65,14 +64,14 @@ export const DeleteTourOrdersModalController: React.FC = () => {
             return presentNoAuthAlert(presentAlert);
           }
           
-          Promise.allSettled(ev.detail.data.map(async (tour_order: TourOrder) => {
+          Promise.allSettled(ev.detail.data.map(async (tour_order_payment_type: TourOrderPaymentType) => {
             await API
-              .delete_with_auth(auth!, `tour_order?id=eq.${tour_order.id}`)
+              .delete_with_auth(auth!, `tour_order_payment_type?id=eq.${tour_order_payment_type.id}`)
           }))
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(clientsR.fetch(auth));
+                dispatch(tourOrderPaymentTypesR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -82,9 +81,9 @@ export const DeleteTourOrdersModalController: React.FC = () => {
                 return;
               }
             }
-            dispatch(clientsR.fetch(auth));
+            dispatch(tourOrderPaymentTypesR.fetch(auth));
             presentAlert({
-              header: "Заказы удалены",
+              header: "Типы оплатов заказов удалены",
               buttons: ["Ок"]
             });
           })

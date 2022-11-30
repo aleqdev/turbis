@@ -5,10 +5,10 @@ import {
   IonList,
 } from '@ionic/react';
 import React from 'react';
-import { PatchOrderModalController } from '../components/order/PatchOrder';
-import { DeleteTourOrdersModalController } from '../components/order/DeleteOrders';
-import { OrdersList } from '../components/order/OrdersList';
-import { PutOrderModalController } from '../components/order/PutOrder';
+import { PatchOrderModalController } from '../components/tour_order/PatchOrder';
+import { DeleteTourOrdersModalController } from '../components/tour_order/DeleteOrders';
+import { OrdersList } from '../components/tour_order/OrdersList';
+import { PutOrderModalController } from '../components/tour_order/PutOrder';
 import { tourOrdersR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
 

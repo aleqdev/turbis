@@ -12,7 +12,6 @@ import ClientType from '../../interface/client_type';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { clientsR, clientTypesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-//import { createPutComponent } from '../TableManagement';
 
 export function PutOrderModal(
   {auth, onDismiss}: AuthProps & {
@@ -164,56 +163,3 @@ export const PutOrderModalController: React.FC = () => {
     </IonButton>
   )
 }
-
-/*
-const PutE = createPutComponent<AuthProps, unknown, unknown>(
-  {
-    title: "Добавить сотрудника",
-    successTitle: "Сотрудник добавлен",
-    buttonTitle: "Добавить сотрудника",
-    requestPath: "employee",
-    modalInit: (params) => {
-      const [roles, setRoles] = React.useState(null as Array<EmployeeRole> | null);
-      const inputName = useRef<HTMLIonInputElement>(null);
-      const inputSurname = useRef<HTMLIonInputElement>(null);
-      const inputLastName = useRef<HTMLIonInputElement>(null);
-      const inputEmail = useRef<HTMLIonInputElement>(null);
-      const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
-      const [inputRole, setInputRole] = useState(null as EmployeeRole | null);
-      const [errorMessage, setErrorMessage] = useState(null as string | null);
-
-      React.useEffect(() => {
-        API
-          .get_with_auth(params.props.auth, 'employee_role')
-          .then((response: any) => setRoles(response.data));
-      }, []);
-
-      return 
-    },
-    modalPage: () => {},
-    modalOnDismiss: (results: any, response: string | undefined) => undefined,
-    modalConfirm: (params: any, state: void) => {
-      const name = inputName.current?.value;
-      const surname = inputSurname.current?.value
-      const last_name = inputLastName.current?.value
-      const email = inputEmail.current?.value;
-      const phone_number = inputPhoneNumber.current?.value;
-
-      if (name && surname && last_name && email && phone_number && inputRole) {
-        params.onDismiss({
-          name,
-          surname,
-          last_name,
-          email,
-          phone_number,
-          role: inputRole
-        }, 'confirm');
-      } else {
-        setErrorMessage("Не все поля заполнены!")
-      }
-    },
-    modalPrepareResults: (params) => {
-
-    }
-  }
-)*/
