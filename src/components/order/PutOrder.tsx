@@ -9,7 +9,7 @@ import { SelectWithSearchModal } from '../SelectWithSearch';
 import Client from '../../interface/client';
 import { formatClient, formatPerson } from '../../utils/fmt';
 import ClientType from '../../interface/client_type';
-import { toursR, useAppDispatch, useAppSelector } from '../../redux/store';
+import { citiesR, toursR, useAppDispatch, useAppSelector } from '../../redux/store';
 import { clientsR, clientTypesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import Person from '../../interface/person';
@@ -70,6 +70,7 @@ export function PutOrderModal(
     dispatch(clientTypesR.fetch(auth));
     dispatch(personsR.fetch(auth));
     dispatch(toursR.fetch(auth))
+    dispatch(citiesR.fetch(auth));
   }, []);
 
   function confirm() {
@@ -84,73 +85,66 @@ export function PutOrderModal(
   }
 
   
-  const listColumns:any = [
-    {
-      name: "ID",
-      selector: "id",
-      sortable: true,
-      wrap: true
-    },
-    {
-      name: "Описание тура",
-      selector: "tour",
-      sortable: true,
-      wrap: true,
-      cell: (e: Tour) => <h6 className='desc_tour'>{e.description.slice(0, 50)}...</h6>
-    },
-    {
-      name: "Цена",
-      selector: "price",
-      sortable: true,
-      wrap: true,
-      // cell: (e: Tour) => `${e.cost}`
-    },
-    {
-      name: "Кол-во человек",
-      selector: "people_count",
-      sortable: true,
-      wrap: true
-    },
-    {
-      name: "Стоимость",
-      selector: "cost",
-      sortable: true,
-      wrap: true,
-      cell: (e: any) => `${e.price * e.people_count} руб.`
-    },
-  ];
-
-  function selectRowsCallback(ev:any){
-    setSelectedRows(ev.selectedRows)
-  }
+  // const listColumns:any = [
+  //   {
+  //     name: "ID",
+  //     selector: "id",
+  //     sortable: true,
+  //     wrap: true
+  //   },
+  //   {
+  //     name: "Описание тура",
+  //     selector: "tour",
+  //     sortable: true,
+  //     wrap: true,
+  //     cell: (e: Tour) => <h6 className='desc_tour'>{e.description.slice(0, 50)}...</h6>
+  //   },
+  //   {
+  //     name: "Цена",
+  //     selector: "price",
+  //     sortable: true,
+  //     wrap: true,
+  //     // cell: (e: Tour) => `${e.cost}`
+  //   },
+  //   {
+  //     name: "Кол-во человек",
+  //     selector: "people_count",
+  //     sortable: true,
+  //     wrap: true
+  //   },
+  //   {
+  //     name: "Стоимость",
+  //     selector: "cost",
+  //     sortable: true,
+  //     wrap: true,
+  //     cell: (e: any) => `${e.price * e.people_count} руб.`
+  //   },
+  // ];
   
-  const ExpandedTour = ({ data }: { data: any}) => {
-    return (
-      <IonGrid>
-        <IonGrid>
-          <IonRow>
-            <IonCol>{'ID:'}</IonCol>
-            <IonCol size='10'>{data.id}</IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol>{'Отель тура:'}</IonCol>
-            <IonCol size='10'>{data.hotel}</IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol>{'Описание тура:'}</IonCol>
-            <IonCol size='10'>{data.description}</IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol>{'Общая стоимость:'}</IonCol>
-            <IonCol size='10'>{`${data.price * data.people_count} руб.`}</IonCol>
-          </IonRow>
-        </IonGrid>
-      </IonGrid>
-    );
-  }
-  const data:any = [
-    {id:1, hotel: 'Palazzo 4*', description: 'Путешествовать экономно — легко. Отель «Гостиница Ковров» расположен в Коврове. Этот отель находится в самом центре города. Перед сном есть возможность прогуляться вдоль главных достопримечательностей. Рядом с отелем — Борисоглебский собор, Церковь Бориса и Глеба и Свято-Васильевский Монастырь.В отеле Время вспомнить о хлебе насущном! Для гостей работает ресторан. Кафе отеля — удобное место для перекуса.', price: 10000, people_count: 2}
-  ]
+  // const ExpandedTour = ({ data }: { data: any}) => {
+  //   return (
+  //     <IonGrid>
+  //       <IonGrid>
+  //         <IonRow>
+  //           <IonCol>{'ID:'}</IonCol>
+  //           <IonCol size='10'>{data.id}</IonCol>
+  //         </IonRow>
+  //         <IonRow>
+  //           <IonCol>{'Отель тура:'}</IonCol>
+  //           <IonCol size='10'>{data.hotel}</IonCol>
+  //         </IonRow>
+  //         <IonRow>
+  //           <IonCol>{'Описание тура:'}</IonCol>
+  //           <IonCol size='10'>{data.description}</IonCol>
+  //         </IonRow>
+  //         <IonRow>
+  //           <IonCol>{'Общая стоимость:'}</IonCol>
+  //           <IonCol size='10'>{`${data.price * data.people_count} руб.`}</IonCol>
+  //         </IonRow>
+  //       </IonGrid>
+  //     </IonGrid>
+  //   );
+  // }
 
   const [inputTourOrder, setInputTourOrder] = React.useState(null);
   const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectModal, {
@@ -166,10 +160,11 @@ export function PutOrderModal(
 
 
   function openTourOrderSelectModal() {
-
     presentHotelChoice({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
+          console.log(ev.detail)
+          setInputAllSum(inputAllSum + Number(ev.detail.data.totalCost2))
           // setInputTourOrder(ev.detail.data);
         }
       },
@@ -224,20 +219,6 @@ export function PutOrderModal(
                 </IonButton> : ""
               }
           </IonList>
-          <DataTable
-            title={'Список туров для заказа'}
-            columns={listColumns}
-            data={data}
-            defaultSortFieldId="name"
-            onSelectedRowsChange={(ev) => selectRowsCallback(ev)}
-            pagination
-            selectableRows
-            highlightOnHover
-            noDataComponent="Пусто"
-            paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
-            expandableRows
-            expandableRowsComponent={ExpandedTour}
-          />
       
         </IonItem>
         <IonItem>
@@ -302,56 +283,3 @@ export const PutOrderModalController: React.FC = () => {
     </IonButton>
   )
 }
-
-/*
-const PutE = createPutComponent<AuthProps, unknown, unknown>(
-  {
-    title: "Добавить сотрудника",
-    successTitle: "Сотрудник добавлен",
-    buttonTitle: "Добавить сотрудника",
-    requestPath: "employee",
-    modalInit: (params) => {
-      const [roles, setRoles] = React.useState(null as Array<EmployeeRole> | null);
-      const inputName = useRef<HTMLIonInputElement>(null);
-      const inputSurname = useRef<HTMLIonInputElement>(null);
-      const inputLastName = useRef<HTMLIonInputElement>(null);
-      const inputEmail = useRef<HTMLIonInputElement>(null);
-      const inputPhoneNumber = useRef<HTMLIonInputElement>(null);
-      const [inputRole, setInputRole] = useState(null as EmployeeRole | null);
-      const [errorMessage, setErrorMessage] = useState(null as string | null);
-
-      React.useEffect(() => {
-        API
-          .get_with_auth(params.props.auth, 'employee_role')
-          .then((response: any) => setRoles(response.data));
-      }, []);
-
-      return 
-    },
-    modalPage: () => {},
-    modalOnDismiss: (results: any, response: string | undefined) => undefined,
-    modalConfirm: (params: any, state: void) => {
-      const name = inputName.current?.value;
-      const surname = inputSurname.current?.value
-      const last_name = inputLastName.current?.value
-      const email = inputEmail.current?.value;
-      const phone_number = inputPhoneNumber.current?.value;
-
-      if (name && surname && last_name && email && phone_number && inputRole) {
-        params.onDismiss({
-          name,
-          surname,
-          last_name,
-          email,
-          phone_number,
-          role: inputRole
-        }, 'confirm');
-      } else {
-        setErrorMessage("Не все поля заполнены!")
-      }
-    },
-    modalPrepareResults: (params) => {
-
-    }
-  }
-)*/
