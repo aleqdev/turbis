@@ -22,7 +22,7 @@ export function PatchTourModal(
   const [tours, hotels, tourFeedingTypes] = useAppSelector(state => [state.tours, state.hotels, state.tourFeedingTypes]);
   const dispatch = useAppDispatch();
 
-  const tour =tours.status === "ok" ? tours.selected[0] : null;
+  const tour = tours.status === "ok" ? tours.selected[0] : null;
 
   const inputArrivalDate = useRef<HTMLIonInputElement>(null);
   const inputDepartureDate = useRef<HTMLIonInputElement>(null);
