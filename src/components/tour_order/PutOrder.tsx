@@ -1,177 +1,136 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonSelect, IonSelectOption, IonText, IonTitle, IonToolbar, useIonModal, IonGrid, IonRow, IonCol, IonList } from '@ionic/react';
+import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal, IonGrid, IonRow, IonCol, IonList } from '@ionic/react';
 import React, { useEffect, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
-import API, { get_with_auth } from '../../utils/server';
+import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import Client from '../../interface/client';
-import { formatClient, formatPerson } from '../../utils/fmt';
-import ClientType from '../../interface/client_type';
-import { citiesR, toursR, useAppDispatch, useAppSelector } from '../../redux/store';
-import { clientsR, clientTypesR, personsR } from '../../redux/store';
+import { citiesR, toursR, tourOrderPaymentTypesR, useAppDispatch, useAppSelector, tourOrdersR } from '../../redux/store';
+import { clientsR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import Person from '../../interface/person';
-import Tour from '../../interface/tour';
 import CurrencyInput from 'react-currency-input-field';
-import DataTable from 'react-data-table-component';
-import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css'
-import Hotel from '../../interface/hotel';
-import { SelectModal } from './SelectModal';
+import { SelectTourModal } from './SelectTourModal';
+import { formatClient, formatTourOrderPaymentType, formatTourOrderTourEntryFirst, formatTourOrderTourEntrySecond } from '../../utils/fmt';
+import TourOrderPaymentType from '../../interface/tour_order_payment_type';
+import TourOrderTourEntry from '../../interface/tour_order_entry';
+import { AxiosError } from 'axios';
 
 export function PutOrderModal(
   {auth, onDismiss}: AuthProps & {
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
-  const [clientTypes, persons] = useAppSelector(state => [state.clientTypes, state.persons]);
+  const [tourOrderPaymentTypes, persons] = useAppSelector(state => [state.tourOrderPaymentTypes, state.persons]);
   const dispatch = useAppDispatch();
 
-  const [inputType, setInputType] = useState(null as ClientType | null);
-  const [inputPerson, setInputPerson] = useState(null as Person | null);
+  const [inputPaymentType, setInputPaymentType] = useState(null as TourOrderPaymentType | null);
+  const [inputClient, setInputClient] = useState(null as Client | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
-  const [inputAllSum, setInputAllSum] = useState(0)
-  const [toursAll, setToursAll] = useState([])
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [presentPersonChoice, dismissPersonChoice] = useIonModal(SelectWithSearchModal, {
+  const [inputEntries, setInputEntries] = useState([] as TourOrderTourEntry[]);
+  const [presentClientChoice, dismissClientChoice] = useIonModal(SelectWithSearchModal, {
     acquirer: () => {
-      const persons = useAppSelector(state => state.persons)
-      return persons.status === "ok" ? persons.data : null
+      const clients = useAppSelector(state => state.clients)
+      return clients.status === "ok" ? clients.data : null
     },
-    title: "Выберите контактное лицо",
-    formatter: formatPerson,
-    sorter: (e: Person, query: string) => {
+    title: "Выберите клиента",
+    formatter: formatClient,
+    sorter: (e: Client, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
         return value + 
-          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() === element) + 
-          +e.surname.toLowerCase().includes(element) + 10 * +(e.surname.toLowerCase() === element) +
-          +e.last_name.toLowerCase().includes(element) + 10 * +(e.last_name.toLowerCase() === element);
+          +e.person!.name.toLowerCase().includes(element) + 10 * +(e.person!.name.toLowerCase() === element) + 
+          +e.person!.surname.toLowerCase().includes(element) + 10 * +(e.person!.surname.toLowerCase() === element) +
+          +e.person!.last_name.toLowerCase().includes(element) + 10 * +(e.person!.last_name.toLowerCase() === element);
       }, 0);
     },
-    keyer: (e: Person) => e.id,
-    onDismiss: (data: object | null, role: string) => dismissPersonChoice(data, role),
+    keyer: (e: Client) => e.id,
+    onDismiss: (data: object | null, role: string) => dismissClientChoice(data, role),
   });
 
-  function openPersonSelectModal() {
-    presentPersonChoice({
+  const [presentPaymentTypeChoice, dismissPaymentTypeChoice] = useIonModal(SelectWithSearchModal, {
+    acquirer: () => {
+      const tourOrderPaymentTypes = useAppSelector(state => state.tourOrderPaymentTypes)
+      return tourOrderPaymentTypes.status === "ok" ? tourOrderPaymentTypes.data : null
+    },
+    title: "Выберите тип оплаты",
+    formatter: formatTourOrderPaymentType,
+    sorter: (e: TourOrderPaymentType, query: string) => {
+      return query.split(' ').reduce((value, element) => {
+        element = element.toLowerCase();
+        return value + 
+          +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() === element)
+      }, 0);
+    },
+    keyer: (e: TourOrderPaymentType) => e.id,
+    onDismiss: (data: object | null, role: string) => dismissPaymentTypeChoice(data, role),
+  });
+
+  function openPaymentTypeSelectModal() {
+    presentPaymentTypeChoice({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          setInputPerson(ev.detail.data.value);
+          setInputPaymentType(ev.detail.data.value);
+        }
+      },
+    });
+  }
+
+  function openPersonSelectModal() {
+    presentClientChoice({
+      onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+        if (ev.detail.role === 'confirm') {
+          setInputClient(ev.detail.data.value);
         }
       },
     });
   }
 
   useEffect(() => {
-    dispatch(clientTypesR.fetch(auth));
+    dispatch(clientsR.fetch(auth));
     dispatch(personsR.fetch(auth));
-    dispatch(toursR.fetch(auth))
+    dispatch(toursR.fetch(auth));
     dispatch(citiesR.fetch(auth));
+    dispatch(tourOrderPaymentTypesR.fetch(auth));
   }, []);
 
   function confirm() {
-    if (inputType && inputPerson) {
+    if (inputEntries.length === 0) {
+      return setErrorMessage("Должен быть заказан хотя бы 1 тур!");
+    }
+
+    if (inputPaymentType && inputClient) {
       onDismiss({
-        person: inputPerson,
-        type: inputType
+        client: inputClient,
+        paymentType: inputPaymentType,
+        entries: inputEntries
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
     }
   }
 
-  
-  // const listColumns:any = [
-  //   {
-  //     name: "ID",
-  //     selector: "id",
-  //     sortable: true,
-  //     wrap: true
-  //   },
-  //   {
-  //     name: "Описание тура",
-  //     selector: "tour",
-  //     sortable: true,
-  //     wrap: true,
-  //     cell: (e: Tour) => <h6 className='desc_tour'>{e.description.slice(0, 50)}...</h6>
-  //   },
-  //   {
-  //     name: "Цена",
-  //     selector: "price",
-  //     sortable: true,
-  //     wrap: true,
-  //     // cell: (e: Tour) => `${e.cost}`
-  //   },
-  //   {
-  //     name: "Кол-во человек",
-  //     selector: "people_count",
-  //     sortable: true,
-  //     wrap: true
-  //   },
-  //   {
-  //     name: "Стоимость",
-  //     selector: "cost",
-  //     sortable: true,
-  //     wrap: true,
-  //     cell: (e: any) => `${e.price * e.people_count} руб.`
-  //   },
-  // ];
-  
-  // const ExpandedTour = ({ data }: { data: any}) => {
-  //   return (
-  //     <IonGrid>
-  //       <IonGrid>
-  //         <IonRow>
-  //           <IonCol>{'ID:'}</IonCol>
-  //           <IonCol size='10'>{data.id}</IonCol>
-  //         </IonRow>
-  //         <IonRow>
-  //           <IonCol>{'Отель тура:'}</IonCol>
-  //           <IonCol size='10'>{data.hotel}</IonCol>
-  //         </IonRow>
-  //         <IonRow>
-  //           <IonCol>{'Описание тура:'}</IonCol>
-  //           <IonCol size='10'>{data.description}</IonCol>
-  //         </IonRow>
-  //         <IonRow>
-  //           <IonCol>{'Общая стоимость:'}</IonCol>
-  //           <IonCol size='10'>{`${data.price * data.people_count} руб.`}</IonCol>
-  //         </IonRow>
-  //       </IonGrid>
-  //     </IonGrid>
-  //   );
-  // }
-
-  const [inputTourOrder, setInputTourOrder] = React.useState(null);
-  const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectModal, {
-    acquirer: () => {
-      const tours = useAppSelector(state => state.tours)
-      return tours.status === "ok" ? tours.data : null
-    },
-    title: "Добавить тур для заказа",
-    formatter: (e: Tour) => `Тур от отеля ${e.hotel?.name} Стоимость: ${e.cost} руб.`,
-    keyer: (e: Tour) => e.id,
-    onDismiss: (data: object | null, role: string) => dismissHotelChoice(data, role),
+  const [presentTourChoice, dismissTourChoice] = useIonModal(SelectTourModal, {
+    onDismiss: (data: object | null, role: string) => dismissTourChoice(data, role),
   });
 
-
   function openTourOrderSelectModal() {
-    presentHotelChoice({
+    presentTourChoice({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          console.log(ev.detail)
-          setInputAllSum(inputAllSum + Number(ev.detail.data.totalCost2))
-          // setInputTourOrder(ev.detail.data);
+          if (inputEntries.map(e => e.tour).includes(ev.detail.data.value)) {
+            return setErrorMessage("Тур уже присутствует среди заказов!");
+          }
+          setInputEntries(tours => [...tours, ev.detail.data.value]);
         }
       },
     });
   }
 
-
-
+  function handleTourRemoval(entry: TourOrderTourEntry) {
+    setInputEntries(e => e.filter(l => l !== entry));
+  }
 
   return (
     <>
@@ -194,35 +153,45 @@ export function PutOrderModal(
       <IonContent className="ion-padding">
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
-          <IonLabel position="stacked" >Клиент</IonLabel>
+          <IonLabel position="stacked">Клиент</IonLabel>
           <IonButton disabled={persons === null} onClick={() => openPersonSelectModal()}>
-            {persons === null ? "Загрузка..." : (inputPerson === null ? "Выбрать" : formatPerson(inputPerson))}
+            {persons === null ? "Загрузка..." : (inputClient === null ? "Выбрать" : formatClient(inputClient))}
           </IonButton>
-          <IonLabel position="stacked" >Вид оплаты</IonLabel>
-          <IonSelect interfaceOptions={{
-            header: 'Вид оплаты',
-            message: 'Выберите предпочтительный вид оплаты',
-            translucent: true,
-          }} placeholder="Выбрать" onIonChange={(ev) => setInputType(ev.target.value)}>
-                <IonSelectOption key={"Предоплата"} value={"Предоплата"}>{"Предоплата"}</IonSelectOption>
-                <IonSelectOption key={"Кредит"} value={"Кредит"}>{"Кредит"}</IonSelectOption>
-          </IonSelect>
-          <IonList>
-              <IonButton routerDirection="none" onClick={() => openTourOrderSelectModal()}>
-                Добавить тур для заказа
-              </IonButton>
-              {
-                (selectedRows.length !== 0) ? 
-                <IonButton color='danger' routerDirection="none" >
-                    Удалить
-                </IonButton> : ""
-              }
-          </IonList>
-      
+          <IonLabel position="stacked">Вид оплаты</IonLabel>
+          <IonButton disabled={tourOrderPaymentTypes === null} onClick={() => openPaymentTypeSelectModal()}>
+            {tourOrderPaymentTypes === null ? "Загрузка..." : (inputPaymentType === null ? "Выбрать" : formatTourOrderPaymentType(inputPaymentType))}
+          </IonButton>
+          <IonLabel position="stacked">Заказанные туры</IonLabel>
+          {inputEntries.length === 0 ? "" :
+            <>
+              <br/>
+              <IonList lines='none'>
+                {
+                  inputEntries.map((e) => {
+                    return (
+                      <IonItem key={e.tour.id}>
+                        <IonLabel>
+                          <h2>{formatTourOrderTourEntryFirst(e)}</h2>
+                          <p>{formatTourOrderTourEntrySecond(e)}</p>
+                        </IonLabel>
+                        <IonButton slot="end" color="danger" onClick={() => handleTourRemoval(e)}>
+                          <IonLabel>Удалить</IonLabel>
+                        </IonButton>
+                      </IonItem>
+                    )
+                  })
+                }
+              </IonList>
+            </>
+          }
+          <IonButton routerDirection="none" onClick={() => openTourOrderSelectModal()}>
+            Добавить тур для заказа
+          </IonButton>
         </IonItem>
+
         <IonItem>
           <IonLabel position="stacked" >Общая стоимость заказа.</IonLabel>
-          <CurrencyInput suffix="₽" disabled value={inputAllSum}></CurrencyInput>
+          <CurrencyInput suffix="₽" disabled value={inputEntries.reduce((value, el) => value + el.price * el.peopleCount, 0)}></CurrencyInput>
         </IonItem>
       </IonContent>
     </>
@@ -240,38 +209,47 @@ export const PutOrderModalController: React.FC = () => {
   const [presentAlert] = useIonAlert();
 
   function openModal() {
-    console.log('good');
     present({
-      onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+      onWillDismiss: async (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
           if (auth === null) {
             return presentNoAuthAlert(presentAlert);
           }
           
-          API
-            .post_with_auth(auth!, 'client', {
-              person_id: ev.detail.data.person.id,
-              type_id: ev.detail.data.type.id
-            })
-            .then((_) => {
-              presentAlert({
-                header: "Заказ добавлен",
-                buttons: ["Ок"]
-              });
-            })
-            .catch((error) => {
-              presentAlert({
-                header: "Ошибка",
-                subHeader: error.response.statusText,
-                message: process_error_hint(error.response),
-                buttons: ["Ок"]
-              });
-            })
-            .finally(() => {
-              dispatch(clientsR.fetch(auth));
+          const group = (await API
+            .post_with_auth(auth!, `tour_order_group?select=*`) as any).data[0];
+
+          Promise.allSettled(ev.detail.data.entries.map(async (e: TourOrderTourEntry) => {
+            await API
+              .post_with_auth(auth!, `tour_order`, {
+                client_id: ev.detail.data.client.id,
+                payment_type_id: ev.detail.data.paymentType.id,
+                tour_id: e.tour.id,
+                price: e.price,
+                people_count: e.peopleCount,
+                group_id: group.id
+              })
+          }))
+          .then((results) => {
+            for (const result of results) {
+              if (result.status === "rejected" && result.reason instanceof AxiosError) {
+                dispatch(clientsR.fetch(auth));
+                presentAlert({
+                  header: "Ошибка",
+                  subHeader: result.reason.response?.statusText,
+                  message: process_error_hint(result.reason.response!),
+                  buttons: ["Ок"]
+                });
+                return;
+              }
+            }
+            dispatch(tourOrdersR.fetch(auth));
+            presentAlert({
+              header: "Заказы добавлены",
+              buttons: ["Ок"]
             });
-        } 
-        
+          })
+        }
       },
     });
   }

@@ -39,9 +39,9 @@ const Page: React.FC = () => {
             <IonTitle>Заказы туров</IonTitle>
             <IonList>
               {
-                (tourOrders.status === "ok" && tourOrders.selected.length === 1) ? 
-                  <PatchOrderModalController/>
-                  : ""
+                //(tourOrders.status === "ok" && tourOrders.selected.length === 1) ? 
+                //  <PatchOrderModalController/>
+                //  : ""
               }
               {
                 (tourOrders.status === "ok" && tourOrders.selected.length >= 1)? 

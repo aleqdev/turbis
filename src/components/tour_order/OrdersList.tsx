@@ -4,7 +4,7 @@ import { useAppDispatch } from "../../redux/store";
 import { Table } from "../table_management/Table";
 import { tourOrdersR } from "../../redux/store";
 import TourOrder from "../../interface/tour_order";
-import { formatPerson } from "../../utils/fmt";
+import { formatDate, formatPerson } from "../../utils/fmt";
 
 const listColumns = [
   {
@@ -14,11 +14,17 @@ const listColumns = [
     wrap: true
   },
   {
+    name: "Заказная группа",
+    selector: "group_id",
+    sortable: true,
+    wrap: true
+  },
+  {
     name: "Клиент",
     selector: "person",
     sortable: true,
     wrap: true,
-    cell: (e: TourOrder) => `${formatPerson(e.client?.person!)} <${e.client?.type?.name}, +${e.client?.person?.phone_number}>`
+    cell: (e: TourOrder) => `${formatPerson(e.client?.person!)} <${e.client?.type?.name}>`
   },
   {
     name: "Вид оплаты",
@@ -31,7 +37,7 @@ const listColumns = [
     selector: "tour",
     sortable: true,
     wrap: true,
-    cell: (e: TourOrder) => `${e.tour?.hotel?.name} (с ${e.tour?.arrival_date} по ${e.tour?.departure_date})`
+    cell: (e: TourOrder) => `${e.tour?.hotel?.name} (с ${formatDate(e.tour?.arrival_date!)} по ${formatDate(e.tour?.departure_date!)})`
   },
   {
     name: "Цена",

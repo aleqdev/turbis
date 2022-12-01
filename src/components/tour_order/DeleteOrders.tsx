@@ -4,9 +4,8 @@ import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { tourOrdersR, useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { clientsR } from '../../redux/store';
 import TourOrder from '../../interface/tour_order';
 
 export function DeleteTourOrdersModal(
@@ -71,7 +70,7 @@ export const DeleteTourOrdersModalController: React.FC = () => {
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(clientsR.fetch(auth));
+                dispatch(tourOrdersR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -81,7 +80,7 @@ export const DeleteTourOrdersModalController: React.FC = () => {
                 return;
               }
             }
-            dispatch(clientsR.fetch(auth));
+            dispatch(tourOrdersR.fetch(auth));
             presentAlert({
               header: "Заказы удалены",
               buttons: ["Ок"]

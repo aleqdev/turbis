@@ -115,7 +115,8 @@ export function post_with_auth(
     {
       headers: {
         "DB-User-Email": auth.email,
-        "DB-User-Password": auth.password
+        "DB-User-Password": auth.password,
+        "Prefer": "return=representation"
       }
     }
   )
@@ -130,7 +131,8 @@ export function del_with_auth(
     data: json ?? {},
     headers: {
       "DB-User-Email": auth.email,
-      "DB-User-Password": auth.password
+      "DB-User-Password": auth.password,
+      "Prefer": "return=representation"
     }
   })
 }

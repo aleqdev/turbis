@@ -9,6 +9,7 @@ export type TourOrder = {
   tour_id: number,
   price: number,
   people_count: number,
+  group_id: number,
   cost?: number,
   client?: Client,
   payment_type?: TourOrderPaymentType,
