@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'IonicAnotherTest',
+  appName: 'Turbis',
   webDir: 'build',
   bundledWebRuntime: false
 };

@@ -1,4 +1,4 @@
-import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal, IonGrid, IonRow, IonCol, IonList } from '@ionic/react';
+import { useIonAlert, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal, IonGrid, IonRow, IonCol, IonList, IonInput } from '@ionic/react';
 import React, { useEffect, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { process_error_hint } from '../../utils/process_erros_hints';
@@ -9,7 +9,6 @@ import Client from '../../interface/client';
 import { citiesR, toursR, tourOrderPaymentTypesR, useAppDispatch, useAppSelector, tourOrdersR } from '../../redux/store';
 import { clientsR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import CurrencyInput from 'react-currency-input-field';
 import 'react-data-table-component-extensions/dist/index.css'
 import { SelectTourModal } from './SelectTourModal';
 import { formatClient, formatTourOrderPaymentType, formatTourOrderTourEntryFirst, formatTourOrderTourEntrySecond } from '../../utils/fmt';
@@ -191,7 +190,7 @@ export function PutOrderModal(
 
         <IonItem>
           <IonLabel position="stacked" >Общая стоимость заказа.</IonLabel>
-          <CurrencyInput suffix="₽" disabled value={inputEntries.reduce((value, el) => value + el.price * el.peopleCount, 0)}></CurrencyInput>
+          <IonInput disabled value={`= ${inputEntries.reduce((value, el) => value + el.price * el.peopleCount, 0)}₽`}/>
         </IonItem>
       </IonContent>
     </>

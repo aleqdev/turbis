@@ -1,11 +1,17 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from "@ionic/react";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import { useEffect, useState } from "react";
-import CurrencyInput from "react-currency-input-field";
 import { SelectWithSearchModal } from "../SelectWithSearch";
 import Tour from "../../interface/tour";
 import { useAppSelector } from "../../redux/store";
 import { formatTour } from "../../utils/fmt";
+
+function isNaturalNumber(n: any): boolean {
+  let ns = n.toString();
+  var n1 = Math.abs(n),
+      n2 = parseInt(ns, 10);
+  return !ns.includes(',') && !ns.includes('-') && !isNaN(n1) && n2 === n1 && n1.toString() === n.toString();
+}
 
 export function SelectTourModal(
   {
@@ -66,8 +72,7 @@ export function SelectTourModal(
   }, [inputTour]);
 
   useEffect(() => {
-    if (inputTourPrice !== null) {
-      // console.log(Number(inputTourPrice), Number(inputPeopleCount))
+    if (inputTourPrice !== null && isNaturalNumber(inputPeopleCount)) {
       setTotalCost(Number((inputTourPrice * inputPeopleCount).toFixed(2)));
     }
   }, [inputTourPrice, inputPeopleCount]);
@@ -82,8 +87,15 @@ export function SelectTourModal(
     });
   }
 
-  // function onChangePriceTour(value:any) {
-  // }
+
+  function handlePeopleCountChange(text: string) {
+    if (isNaturalNumber(text)) {
+      setInputPeopleCount(Number(text))
+    } else {
+      setInputPeopleCount(Math.floor(Number(text)))
+      setErrorMessage("Кол-во человек должно быть натуральным значением!");
+    }
+  }
 
   return (
     <>
@@ -111,12 +123,11 @@ export function SelectTourModal(
                 {tours === null ? "Загрузка..." : (inputTour === null ? "Выбрать" : formatTour(inputTour))}
               </IonButton>
             <IonLabel position="stacked" >Цена (в рублях)</IonLabel><br/>
-            <CurrencyInput suffix="" value={inputTourPrice} onValueChange={((value:any, name:any) =>{setInputTourPrice(value)})} decimalsLimit={2} decimalScale={2} decimalSeparator="." disableGroupSeparators={true} allowNegativeValue={false} step={1}></CurrencyInput>
+            <IonInput type="number" value={inputTourPrice} onIonChange={((event) =>{setInputTourPrice(Number(event.detail.value))})}/>
             <IonLabel position="stacked" >Кол-во человек</IonLabel><br/>
-            <CurrencyInput disableGroupSeparators={true} value={inputPeopleCount} allowDecimals={false} allowNegativeValue={false} step={1} onChange={(ev:any) =>{setInputPeopleCount(Number(ev.target.value))}}></CurrencyInput>
-            {/* <IonInput value={inputPeopleCount} type={'number'} step={'1'} onIonChange={(ev:any) =>{setInputPeopleCount(Number(ev.target.value))}}></IonInput> */}
+            <IonInput type="number" inputmode="numeric" value={inputPeopleCount} onIonChange={(event) =>{handlePeopleCountChange(event.detail.value!)}}/>
             <IonLabel position="stacked" >Общая стоимость</IonLabel><br/>
-            <CurrencyInput suffix=" ₽" value={totalCost} decimalsLimit={2} disabled allowNegativeValue={false} step={1}></CurrencyInput>
+            <IonInput value={totalCost === null ? "" : `= ${totalCost}₽`} disabled/>
         </IonItem>
       </IonContent>
     </>

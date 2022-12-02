@@ -33,7 +33,6 @@
     "npm": "^9.1.2",
     "postcss-normalize": "^10.0.1",
     "react": "^18.2.0",
-    "react-currency-input-field": "^3.6.9",
     "react-data-table-component": "^7.5.3",
     "react-data-table-component-extensions": "^1.6.0",
     "react-datepicker": "^4.8.0",
@@ -45,11 +44,11 @@
     "readdirp": "^3.6.0",
     "redux": "^4.2.0",
     "redux-store": "^0.0.0",
+    "redux-thunk": "^2.4.2",
     "regenerator-transform": "^0.15.1",
     "regexpu-core": "^5.2.2",
     "renderkid": "^3.0.0",
     "reusify": "^1.0.4",
-    "redux-thunk": "^2.4.2",
     "rsuite": "^5.22.2",
     "run-parallel": "^1.2.0",
     "safe-regex-test": "^1.0.0",
@@ -130,6 +129,6 @@
   },
   "resolutions": {
     "sanitize.css": "12.0.1"
- },
+  },
   "description": "An Ionic project"
 }
