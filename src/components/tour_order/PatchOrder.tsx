@@ -31,7 +31,8 @@ export function PatchOrderModal(
     .map(e => {return {
       tour: e.tour,
       price: e.price, 
-      peopleCount: e.people_count
+      peopleCount: e.people_count,
+      id: e?.id
     }}) : [];
 
   const [tourOrderPaymentTypes, persons] = useAppSelector(state => [state.tourOrderPaymentTypes, state.persons]);
@@ -116,7 +117,9 @@ export function PatchOrderModal(
       onDismiss({
         client: inputClient,
         paymentType: inputPaymentType,
-        entries: inputEntries
+        entries: inputEntries,
+        originalEntries: entries,
+        group_id: tourOrder?.group_id
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -156,7 +159,7 @@ export function PatchOrderModal(
           <IonTitle>Изменить заказ</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
-              Создать
+              Подвердить
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -228,16 +231,40 @@ export const PatchOrderModalController: React.FC = () => {
             return presentNoAuthAlert(presentAlert);
           }
           
-          Promise.allSettled(ev.detail.data.entries.map(async (e: TourOrderTourEntry) => {
+          const toBeAdded = ev.detail.data.entries.filter((e: any) => !ev.detail.data.originalEntries.includes(e));
+          const toBePatched = ev.detail.data.entries.filter((e: any) => ev.detail.data.originalEntries.includes(e));
+          const toBeRemoved = ev.detail.data.originalEntries.filter((e: any) => !ev.detail.data.entries.includes(e));
+
+          const toBeAddedPromises = toBeAdded.map(async (e: TourOrderTourEntry) => {
             await API
-              .patch_with_auth(auth!, `tour_order?id=eq.${ev.detail.data.id}`, {
+              .post_with_auth(auth!, `tour_order`, {
                 client_id: ev.detail.data.client.id,
                 payment_type_id: ev.detail.data.paymentType.id,
                 tour_id: e.tour.id,
                 price: e.price,
-                people_count: e.peopleCount
+                people_count: e.peopleCount,
+                group_id: ev.detail.data.group_id
               })
-          }))
+          });
+
+          const toBePatchedPromises = toBePatched.map(async (e: TourOrderTourEntry) => {
+            await API
+              .patch_with_auth(auth!, `tour_order?id=eq.${e.id}`, {
+                client_id: ev.detail.data.client.id,
+                payment_type_id: ev.detail.data.paymentType.id,
+                tour_id: e.tour.id,
+                price: e.price,
+                people_count: e.peopleCount,
+                group_id: ev.detail.data.group_id
+              })
+          });
+
+          const toBeRemovedPromises = toBeRemoved.map(async (e: TourOrderTourEntry) => {
+            await API
+              .delete_with_auth(auth!, `tour_order?id=eq.${e.id}`)
+          });
+
+          Promise.allSettled([...toBeAddedPromises, ...toBePatchedPromises, ...toBeRemovedPromises])
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
@@ -253,7 +280,7 @@ export const PatchOrderModalController: React.FC = () => {
             }
             dispatch(tourOrdersR.fetch(auth));
             presentAlert({
-              header: "Заказы добавлены",
+              header: "Заказы изменены",
               buttons: ["Ок"]
             });
           })
