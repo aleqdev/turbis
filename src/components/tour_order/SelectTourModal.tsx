@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from "@ionic/react";
+import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from "@ionic/react";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import { useEffect, useRef, useState } from "react";
 import CurrencyInput from "react-currency-input-field";
@@ -67,7 +67,8 @@ export function SelectTourModal(
 
   useEffect(() => {
     if (inputTourPrice !== null) {
-      setTotalCost(inputTourPrice * inputPeopleCount);
+      // console.log(Number(inputTourPrice), Number(inputPeopleCount))
+      setTotalCost(Number((inputTourPrice * inputPeopleCount).toFixed(2)));
     }
   }, [inputTourPrice, inputPeopleCount]);
 
@@ -80,6 +81,9 @@ export function SelectTourModal(
       },
     });
   }
+
+  // function onChangePriceTour(value:any) {
+  // }
 
   return (
     <>
@@ -107,9 +111,10 @@ export function SelectTourModal(
                 {tours === null ? "Загрузка..." : (inputTour === null ? "Выбрать" : formatTour(inputTour))}
               </IonButton>
             <IonLabel position="stacked" >Цена (в рублях)</IonLabel><br/>
-            <CurrencyInput suffix="" value={inputTourPrice} decimalScale={2} fixedDecimalLength={2} decimalSeparator={','} disableGroupSeparators={true} decimalsLimit={2} allowNegativeValue={false} step={1} onChange={(ev:any) => {setInputTourPrice(Number(ev.target.value))}}></CurrencyInput>
+            <CurrencyInput suffix="" value={inputTourPrice} onValueChange={((value:any, name:any) =>{setInputTourPrice(value)})} decimalsLimit={2} decimalScale={2} decimalSeparator="." disableGroupSeparators={true} allowNegativeValue={false} step={1}></CurrencyInput>
             <IonLabel position="stacked" >Кол-во человек</IonLabel><br/>
             <CurrencyInput disableGroupSeparators={true} value={inputPeopleCount} allowDecimals={false} allowNegativeValue={false} step={1} onChange={(ev:any) =>{setInputPeopleCount(Number(ev.target.value))}}></CurrencyInput>
+            {/* <IonInput value={inputPeopleCount} type={'number'} step={'1'} onIonChange={(ev:any) =>{setInputPeopleCount(Number(ev.target.value))}}></IonInput> */}
             <IonLabel position="stacked" >Общая стоимость</IonLabel><br/>
             <CurrencyInput suffix=" ₽" value={totalCost} decimalsLimit={2} disabled allowNegativeValue={false} step={1}></CurrencyInput>
         </IonItem>
