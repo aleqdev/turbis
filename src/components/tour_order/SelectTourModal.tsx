@@ -1,6 +1,6 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonText, IonTitle, IonToolbar, useIonModal } from "@ionic/react";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import CurrencyInput from "react-currency-input-field";
 import { SelectWithSearchModal } from "../SelectWithSearch";
 import Tour from "../../interface/tour";
