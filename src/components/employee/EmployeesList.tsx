@@ -1,6 +1,7 @@
 import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import Employee from "../../interface/employee";
+import Person from "../../interface/person";
 import { employeesR, useAppDispatch } from "../../redux/store";
 import { Table } from "../table_management/Table";
 
@@ -25,10 +26,10 @@ const listColumns = [
   },
   {
     name: "Телефон",
-    selector: "person.phone_number",
+    selector: "person",
     sortable: true,
     wrap: true,
-    cell: (e: Employee) => `+${e.person!.phone_number}`
+    cell: Person.makePersonPhoneNumberFormatter("person")
   },
   {
     name: "Почта",

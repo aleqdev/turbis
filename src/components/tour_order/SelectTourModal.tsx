@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { SelectWithSearchModal } from "../SelectWithSearch";
 import Tour from "../../interface/tour";
 import { useAppSelector } from "../../redux/store";
-import { formatTour } from "../../utils/fmt";
 
 function isNaturalNumber(n: any): boolean {
   let ns = n.toString();
@@ -51,7 +50,7 @@ export function SelectTourModal(
       return tour.status === "ok" ? tour.data : null
     },
     title: "Выберите тур",
-    formatter: (e: Tour) => formatTour(e),
+    formatter: Tour.format,
     sorter: (e: Tour, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -120,7 +119,7 @@ export function SelectTourModal(
             {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
             <IonLabel position="stacked">Тур: </IonLabel>
               <IonButton disabled={tours === null} onClick={() => openTourSelectModal()}>
-                {tours === null ? "Загрузка..." : (inputTour === null ? "Выбрать" : formatTour(inputTour))}
+                {tours === null ? "Загрузка..." : (inputTour === null ? "Выбрать" : Tour.format(inputTour))}
               </IonButton>
             <IonLabel position="stacked" >Цена (в рублях)</IonLabel><br/>
             <IonInput type="number" value={inputTourPrice} onIonChange={((event) =>{setInputTourPrice(Number(event.detail.value))})}/>

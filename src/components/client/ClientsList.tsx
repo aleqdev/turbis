@@ -4,6 +4,7 @@ import Client from "../../interface/client";
 import { useAppDispatch } from "../../redux/store";
 import { Table } from "../table_management/Table";
 import { clientsR } from "../../redux/store";
+import Person from "../../interface/person";
 
 const listColumns = [
   {
@@ -29,7 +30,7 @@ const listColumns = [
     selector: "person.phone_number",
     sortable: true,
     wrap: true,
-    cell: (e: Client) => `+${e.person!.phone_number}`
+    cell: Person.makePersonPhoneNumberFormatter("person")
   },
   {
     name: "Почта",

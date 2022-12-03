@@ -11,7 +11,6 @@ import { clientsR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import 'react-data-table-component-extensions/dist/index.css'
 import { SelectTourModal } from './SelectTourModal';
-import { formatClient, formatTourOrderPaymentType, formatTourOrderTourEntryFirst, formatTourOrderTourEntrySecond } from '../../utils/fmt';
 import TourOrderPaymentType from '../../interface/tour_order_payment_type';
 import TourOrderTourEntry from '../../interface/tour_order_entry';
 import { AxiosError } from 'axios';
@@ -47,7 +46,7 @@ export function PatchOrderModal(
       return clients.status === "ok" ? clients.data : null
     },
     title: "Выберите клиента",
-    formatter: formatClient,
+    formatter: Client.format,
     sorter: (e: Client, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -67,7 +66,7 @@ export function PatchOrderModal(
       return tourOrderPaymentTypes.status === "ok" ? tourOrderPaymentTypes.data : null
     },
     title: "Выберите тип оплаты",
-    formatter: formatTourOrderPaymentType,
+    formatter: TourOrderPaymentType.format,
     sorter: (e: TourOrderPaymentType, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -169,11 +168,11 @@ export function PatchOrderModal(
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Клиент</IonLabel>
           <IonButton disabled={persons === null} onClick={() => openPersonSelectModal()}>
-            {persons === null ? "Загрузка..." : (inputClient === null ? "Выбрать" : formatClient(inputClient))}
+            {persons === null ? "Загрузка..." : (inputClient === null ? "Выбрать" : Client.format(inputClient))}
           </IonButton>
           <IonLabel position="stacked">Вид оплаты</IonLabel>
           <IonButton disabled={tourOrderPaymentTypes === null} onClick={() => openPaymentTypeSelectModal()}>
-            {tourOrderPaymentTypes === null ? "Загрузка..." : (inputPaymentType === null ? "Выбрать" : formatTourOrderPaymentType(inputPaymentType))}
+            {tourOrderPaymentTypes === null ? "Загрузка..." : (inputPaymentType === null ? "Выбрать" : TourOrderPaymentType.format(inputPaymentType))}
           </IonButton>
           <IonLabel position="stacked">Заказанные туры</IonLabel>
           {inputEntries.length === 0 ? "" :
@@ -185,8 +184,8 @@ export function PatchOrderModal(
                     return (
                       <IonItem key={e.tour.id}>
                         <IonLabel>
-                          <h2>{formatTourOrderTourEntryFirst(e)}</h2>
-                          <p>{formatTourOrderTourEntrySecond(e)}</p>
+                          <h2>{TourOrderTourEntry.formatHeader(e)}</h2>
+                          <p>{TourOrderTourEntry.formatDetails(e)}</p>
                         </IonLabel>
                         <IonButton slot="end" color="danger" onClick={() => handleTourRemoval(e)}>
                           <IonLabel>Удалить</IonLabel>

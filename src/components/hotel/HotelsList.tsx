@@ -1,9 +1,10 @@
 import { IonCol, IonGrid, IonRow } from "@ionic/react";
 import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
+import City from "../../interface/city";
 import Hotel from "../../interface/hotel";
+import Person from "../../interface/person";
 import { hotelsR, useAppDispatch } from "../../redux/store";
-import { formatCity, formatPerson } from "../../utils/fmt";
 import { Table } from "../table_management/Table";
 
 const listColumns = [
@@ -14,15 +15,15 @@ const listColumns = [
   },
   {
     name: "Местоположение",
-    selector: "city.name",
+    selector: "city",
     sortable: true,
-    cell: (row: Hotel) => formatCity(row.city!)
+    cell: City.makeFormatter("city")
   },
   {
     name: "Владелец",
-    selector: "owner.phone_number",
+    selector: "owner",
     sortable: true,
-    cell: (row: Hotel) => formatPerson(row.owner!)
+    cell: Person.makeFormatter("owner")
   },
 ];
 
@@ -40,11 +41,11 @@ const ExpandedHotel = ({ data }: { data: any}) => {
         </IonRow>
         <IonRow>
           <IonCol>{'Владелец:'}</IonCol>
-          <IonCol size='10'>{formatPerson(data.owner)}</IonCol>
+          <IonCol size='10'>{Person.format(data.owner)}</IonCol>
         </IonRow>
         <IonRow>
           <IonCol>{'Местоположение:'}</IonCol>
-          <IonCol size='10'>{formatCity(data.city)}</IonCol>
+          <IonCol size='10'>{City.format(data.city)}</IonCol>
         </IonRow>
         <IonRow>
           <IonCol>{'Описание:'}</IonCol>

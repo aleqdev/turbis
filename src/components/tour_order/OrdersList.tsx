@@ -4,7 +4,8 @@ import { useAppDispatch } from "../../redux/store";
 import { Table } from "../table_management/Table";
 import { tourOrdersR } from "../../redux/store";
 import TourOrder from "../../interface/tour_order";
-import { formatDate, formatPerson } from "../../utils/fmt";
+import { formatDate } from "../../utils/fmt";
+import Person from "../../interface/person";
 
 const listColumns = [
   {
@@ -24,7 +25,7 @@ const listColumns = [
     selector: "person",
     sortable: true,
     wrap: true,
-    cell: (e: TourOrder) => `${formatPerson(e.client?.person!)} <${e.client?.type?.name}>`
+    cell: (e: TourOrder) => `${Person.format(e.client?.person!)} <${e.client?.type?.name}>`
   },
   {
     name: "Вид оплаты",

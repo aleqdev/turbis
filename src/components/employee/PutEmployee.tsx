@@ -7,11 +7,9 @@ import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import Person from '../../interface/person';
-import { formatPerson } from '../../utils/fmt';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { employeesR, employeeRolesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-//import { createPutComponent } from '../TableManagement';
 
 export function PutEmployeeModal(
   {auth, onDismiss}: AuthProps & {
@@ -31,7 +29,7 @@ export function PutEmployeeModal(
       return persons.status === "ok" ? persons.data : null
     },
     title: "Выберите контактное лицо",
-    formatter: formatPerson,
+    formatter: Person.format,
     sorter: (e: Person, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -94,7 +92,7 @@ export function PutEmployeeModal(
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked" >Контактное лицо</IonLabel>
           <IonButton disabled={persons === null} onClick={() => openPersonSelectModal()}>
-            {persons === null ? "Загрузка..." : (inputPerson === null ? "Выбрать" : formatPerson(inputPerson))}
+            {persons === null ? "Загрузка..." : (inputPerson === null ? "Выбрать" : Person.format(inputPerson))}
           </IonButton>
           <IonLabel position="stacked" >Роль</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>

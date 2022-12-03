@@ -4,10 +4,8 @@ import { EmployeeRole } from '../../interface/employee_role';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
-import Employee from '../../interface/employee';
 import { Person } from '../../interface/person';
 import { SelectWithSearchModal } from '../SelectWithSearch';
-import { formatPerson } from '../../utils/fmt';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { employeesR, employeeRolesR, personsR } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
@@ -33,7 +31,7 @@ export function PatchEmployeeModal(
       return persons.status === "ok" ? persons.data : null
     },
     title: "Выберите контактное лицо",
-    formatter: formatPerson,
+    formatter: Person.format,
     sorter: (e: Person, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -97,7 +95,7 @@ export function PatchEmployeeModal(
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked" >Контактное лицо</IonLabel>
           <IonButton disabled={persons === null} onClick={() => openPersonSelectModal()}>
-            {persons === null ? "Загрузка..." : (inputPerson === null ? "Выбрать" : formatPerson(inputPerson))}
+            {persons === null ? "Загрузка..." : (inputPerson === null ? "Выбрать" : Person.format(inputPerson))}
           </IonButton>
           <IonLabel position="stacked" >Роль</IonLabel>
           <IonSelect placeholder="Выбрать" onIonChange={(ev) => setInputRole(ev.target.value)}>

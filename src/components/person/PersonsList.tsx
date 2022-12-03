@@ -29,7 +29,7 @@ const listColumns = [
     selector: "phone_number",
     sortable: true,
     wrap: true,
-    cell: (e: Person) => `+${e.phone_number}`
+    cell: Person.makePersonPhoneNumberFormatter()
   },
   {
     name: "Почта",

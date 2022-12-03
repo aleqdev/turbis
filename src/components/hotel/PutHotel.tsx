@@ -1,9 +1,7 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonModal } from '@ionic/react';
 import React, { useEffect, useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
-import { RefetchFunction } from 'axios-hooks'
 import { SelectWithSearchModal } from '../SelectWithSearch';
-import { formatCity, formatPerson } from '../../utils/fmt';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
@@ -34,7 +32,7 @@ export function PutHotelModal(
       return cities.status === "ok" ? cities.data : null
     },
     title: "Выберите город",
-    formatter: (e: City) => formatCity(e),
+    formatter: City.format,
     sorter: (e: City, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -54,7 +52,7 @@ export function PutHotelModal(
       return persons.status === "ok" ? persons.data : null
     },
     title: "Выберите контактное лицо",
-    formatter: (e: Person) => formatPerson(e),
+    formatter: Person.format,
     sorter: (e: Person, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -141,11 +139,11 @@ export function PutHotelModal(
           <IonInput ref={inputName} clearInput={true} type="text" placeholder="Введите имя" required/>
           <IonLabel position="stacked">Местоположение</IonLabel>
           <IonButton disabled={cities === null} onClick={() => openCitySelectModal()}>
-            {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : formatCity(cityInput))}
+            {cities === null ? "Загрузка..." : (cityInput === null ? "Выбрать" : City.format(cityInput))}
           </IonButton>
           <IonLabel position="stacked" >Владелец</IonLabel>
           <IonButton disabled={persons === null} onClick={() => openOwnerSelectModal()}>
-            {persons === null ? "Загрузка..." : (ownerInput === null ? "Выбрать" : formatPerson(ownerInput))}
+            {persons === null ? "Загрузка..." : (ownerInput === null ? "Выбрать" : Person.format(ownerInput))}
           </IonButton>
           <IonLabel position="stacked">Описание</IonLabel>
           <IonTextarea ref={inputDescription} auto-grow={true} placeholder="Введите описание" required/>
