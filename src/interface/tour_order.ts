@@ -14,6 +14,7 @@ export class TourOrder {
   client?: Client;
   payment_type?: TourOrderPaymentType;
   tour?: Tour;
+  status: "active" | "canceled" | "completed";
 
   constructor(args: {[Property in keyof TourOrder]: TourOrder[Property]}) {
     this.id = args.id;
@@ -27,6 +28,7 @@ export class TourOrder {
     this.client = args.client;
     this.payment_type = args.payment_type;
     this.tour = args.tour;
+    this.status = args.status;
   }
 }
 

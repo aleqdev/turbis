@@ -7,7 +7,9 @@ import Regions from './pages/Regions'
 import Employees from './pages/Employees'
 import EmployeeRoles from './pages/EmployeeRoles'
 import TourOrders from './pages/TourOrders'
-import TourOrdersPaymentTypes from './pages/TourOrderPaymentTypes'
+import TourOrderPayments from './pages/TourOrderPayments'
+import TourOrderPurchases from './pages/TourOrderPurchases'
+import TourOrderPaymentTypes from './pages/TourOrderPaymentTypes'
 import Clients from './pages/Clients'
 import ClientTypes from './pages/ClientTypes'
 import { Provider } from 'react-redux'
@@ -73,7 +75,13 @@ const App: React.FC = () => {
                 <TourOrders/>
               </Route>
               <Route path="/page/TourOrderPaymentTypes" exact={true}>
-                <TourOrdersPaymentTypes/>
+                <TourOrderPaymentTypes/>
+              </Route>
+              <Route path="/page/TourOrderPayments" exact={true}>
+                <TourOrderPayments/>
+              </Route>
+              <Route path="/page/TourOrderPurchases" exact={true}>
+                <TourOrderPurchases/>
               </Route>
               <Route path="/page/Persons" exact={true}>
                 <Persons/>

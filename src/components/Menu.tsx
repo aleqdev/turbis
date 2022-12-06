@@ -15,10 +15,11 @@ import {
 } from '@ionic/react';
 
 import { useLocation } from 'react-router-dom';
-import { cardOutline, cartOutline, personOutline, homeOutline, earthOutline, settingsOutline, callOutline, airplaneOutline, accessibilityOutline } from 'ionicons/icons';
+import { cartOutline, personOutline, homeOutline, earthOutline, settingsOutline, callOutline, airplaneOutline, accessibilityOutline } from 'ionicons/icons';
 import './Menu.css';
 import { useRef } from 'react';
 import { useHistory } from 'react-router'
+import { readerOutline } from 'ionicons/icons';
 
 interface AppPage {
   url: string;
@@ -36,23 +37,17 @@ const appPages: AppPage[] = [
     mdIcon: homeOutline
   },
   {
-    title: 'Оплаты туров',
-    url: '/page/PayTours',
-    iosIcon: cartOutline,
-    mdIcon: cartOutline
-  },
-  {
-    title: 'Продажи туров',
-    url: '/page/SellTours',
-    iosIcon: cardOutline,
-    mdIcon: cardOutline
-  },
-  {
-    title: 'Заказы туров',
-    url: '/page/TourOrders',
-    iosIcon: cartOutline,
-    mdIcon: cartOutline,
+    title: 'Туры',
+    url: '/page/Tours',
+    iosIcon: airplaneOutline,
+    mdIcon: airplaneOutline,
     children: [
+      {
+        title: 'Туры',
+        url: '/page/Tours',
+        iosIcon: airplaneOutline,
+        mdIcon: airplaneOutline,
+      },
       {
         title: 'Заказы туров',
         url: '/page/TourOrders',
@@ -60,18 +55,24 @@ const appPages: AppPage[] = [
         mdIcon: cartOutline,
       },
       {
-        title: 'Типы оплаты',
+        title: 'Оплаты туров',
+        url: '/page/TourOrderPayments',
+        iosIcon: readerOutline,
+        mdIcon: readerOutline
+      },
+      {
+        title: 'Продажи туров',
+        url: '/page/TourOrderPurchases',
+        iosIcon: readerOutline,
+        mdIcon: readerOutline
+      },
+      {
+        title: 'Типы оплаты туров',
         url: '/page/TourOrderPaymentTypes',
         iosIcon: settingsOutline,
         mdIcon: settingsOutline,
       },
     ]
-  },
-  {
-    title: 'Туры',
-    url: '/page/Tours',
-    iosIcon: airplaneOutline,
-    mdIcon: airplaneOutline
   },
   {
     title: 'Контактные лица',

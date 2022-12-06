@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react'
 import { OverlayEventDetail } from '@ionic/core/components';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
-import Person from '../../interface/person';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import { personsR } from '../../redux/store';
