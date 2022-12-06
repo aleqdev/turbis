@@ -15,7 +15,7 @@ import {
 } from '@ionic/react';
 
 import { useLocation } from 'react-router-dom';
-import { cartOutline, personOutline, homeOutline, earthOutline, settingsOutline, callOutline, airplaneOutline, accessibilityOutline } from 'ionicons/icons';
+import { cardOutline, cartOutline, personOutline, homeOutline, earthOutline, settingsOutline, callOutline, airplaneOutline, accessibilityOutline } from 'ionicons/icons';
 import './Menu.css';
 import { useRef } from 'react';
 import { useHistory } from 'react-router'
@@ -34,6 +34,18 @@ const appPages: AppPage[] = [
     url: '/page/Hotels',
     iosIcon: homeOutline,
     mdIcon: homeOutline
+  },
+  {
+    title: 'Оплаты туров',
+    url: '/page/PayTours',
+    iosIcon: cartOutline,
+    mdIcon: cartOutline
+  },
+  {
+    title: 'Продажи туров',
+    url: '/page/SellTours',
+    iosIcon: cardOutline,
+    mdIcon: cardOutline
   },
   {
     title: 'Заказы туров',
