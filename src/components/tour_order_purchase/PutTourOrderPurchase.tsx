@@ -38,7 +38,7 @@ export function PutTourOrderPurchaseModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Добавить тип оплаты заказа тура</IonTitle>
+          <IonTitle>Зарегистрировать продажу тура</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
               Добавить
