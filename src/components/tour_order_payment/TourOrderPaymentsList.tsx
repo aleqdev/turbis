@@ -7,12 +7,12 @@ import TourOrder from "../../interface/tour_order";
 import Person from "../../interface/person";
 
 const listColumns = [
-  // {
-  //   name: "ID",
-  //   selector: "ord",
-  //   sortable: true,
-  //   wrap: true
-  // },
+  {
+    name: "ID",
+    selector: "id",
+    sortable: true,
+    wrap: true
+  },
   {
     name: "Название тура",
     selector: "order.tour.hotel.name",
@@ -24,15 +24,14 @@ const listColumns = [
     selector: "order.client.person",
     sortable: true,
     wrap: true,
-    // cell: (e: any) => `${e.order.client.person.name}`,
     cell: (e: any) => `${Person.format(e.order.client.person)} <${e.order.client.type?.name}>`
   },
   {
     name: "Оплачено",
-    selector: "order.price",
+    selector: "money_received",
     sortable: true,
     wrap: true,
-    cell: (e: any) => `${e.order.price} руб.`
+    cell: (e: any) => `${e.money_received} руб.`
   }
 ];
 

@@ -4,10 +4,11 @@ import React from 'react';
 import { AxiosError } from 'axios';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { tourOrderPaymentsR, useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import { tourOrderPaymentTypesR } from '../../redux/store';
 import TourOrderPayment from '../../interface/tour_order_payment';
+import Person from '../../interface/person';
 
 export function DeleteTourOrderPaymentModal(
   {onDismiss}: {
@@ -16,7 +17,7 @@ export function DeleteTourOrderPaymentModal(
 ) {
   const tourOrderPayments = useAppSelector(state => state.tourOrderPayments);
   const selectedTourOrderPayments = tourOrderPayments.status === "ok" ? tourOrderPayments.selected : [];
-
+  console.log(selectedTourOrderPayments)
   return (
     <>
       <IonHeader>
@@ -38,8 +39,8 @@ export function DeleteTourOrderPaymentModal(
       <IonContent className="ion-padding" >
         <IonText color="danger">{`Точно удалить записи об оплате заказов? (${selectedTourOrderPayments.length})`}</IonText>
         <IonList>
-          {selectedTourOrderPayments.map((t) => {
-            return <IonItem key={t.id}>{`- ID: ${t.id}, ${t.order?.hotel?.name} - оплачено: ${t.money_received}`}</IonItem>
+          {selectedTourOrderPayments.map((t:any) => {
+            return <IonItem key={t.id}>{`- ID: ${t?.id}, ${t.order?.tour.hotel?.name} - оплачено: ${t.id} ${Person.format(t.order.client.person)} <${t.order.client.type?.name}>`}</IonItem>
           })}
         </IonList>
       </IonContent>
@@ -63,7 +64,7 @@ export const DeleteTourOrderPaymentModalController: React.FC = () => {
           if (auth === null) {
             return presentNoAuthAlert(presentAlert);
           }
-          
+          console.log(ev.detail.data)
           Promise.allSettled(ev.detail.data.map(async (tour_order_payment: TourOrderPayment) => {
             await API
               .delete_with_auth(auth!, `tour_order_payment?id=eq.${tour_order_payment.id}`)
@@ -81,7 +82,7 @@ export const DeleteTourOrderPaymentModalController: React.FC = () => {
                 return;
               }
             }
-            dispatch(tourOrderPaymentTypesR.fetch(auth));
+            dispatch(tourOrderPaymentsR.fetch(auth));
             presentAlert({
               header: "записи об оплате заказов удалены",
               buttons: ["Ок"]

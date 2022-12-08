@@ -66,9 +66,9 @@ export function PutTourOrderPaymentModal(
     });
   }
 
-  // useEffect(() => {
-  //   dispatch(tourOrdersR.fetch(auth));
-  // }, []);
+  useEffect(() => {
+    dispatch(tourOrdersR.fetch(auth));
+  }, []);
 
   return (
     <>
@@ -151,7 +151,7 @@ export const PutTourOrderPaymentModalController: React.FC = () => {
 
   return (
     <IonButton routerDirection="none" onClick={openModal}>
-      <IonLabel>Добавить тип оплаты</IonLabel>
+      <IonLabel>Зарегистрировать оплату заказа тура</IonLabel>
     </IonButton>
   )
 }

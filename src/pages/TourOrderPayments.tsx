@@ -38,11 +38,11 @@ const Page: React.FC = () => {
           <IonItem lines="none">
             <IonTitle>Записи оплаты заказов туров</IonTitle>
             <IonList>
-              {
+              {/* {
                 (tourOrderPayments.status === "ok" && tourOrderPayments.selected.length === 1) ? 
                   <PatchTourOrderPaymentModalController/>
                   : ""
-              }
+              } */}
               {
                 (tourOrderPayments.status === "ok" && tourOrderPayments.selected.length >= 1) ? 
                   <DeleteTourOrderPaymentModalController/>
