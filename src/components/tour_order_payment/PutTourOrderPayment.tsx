@@ -4,7 +4,7 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import { hotelsR, useAppDispatch, useAppSelector } from '../../redux/store';
+import { hotelsR, tourOrderPaymentsR, useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import { tourOrderPaymentTypesR, tourOrdersR } from '../../redux/store';
 import Hotel from '../../interface/hotel';
@@ -23,9 +23,13 @@ export function PutTourOrderPaymentModal(
   const [hotels, tourFeedingTypes] = useAppSelector(state => [state.tourOrders, state.tourFeedingTypes]);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const dispatch = useAppDispatch();
+
+  // useEffect(() => {
+  //   const tours = dispatch(tourOrdersR.fetch(auth));
+  // }, []);
+
   function confirm() {
     const name = inputName.current?.value!;
-
     if (name) {
       onDismiss({
         name: name,
@@ -39,8 +43,8 @@ export function PutTourOrderPaymentModal(
 
   const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectWithSearchModal, {
     acquirer: () => {
-      const hotels = useAppSelector(state => state.tourOrders)
-      return hotels.status === "ok" ? hotels.data : null
+      const toursOrders = useAppSelector(state => state.tourOrders)
+      return toursOrders.status === "ok" ? toursOrders.data : null
     },
     title: "Выберите заказ",
     formatter: (e: TourOrder) => `Заказ №${e.group_id} ${e.cost} руб. <${e!.payment_type!.name}> ${Person.format(e.client?.person!)}`,
@@ -65,10 +69,7 @@ export function PutTourOrderPaymentModal(
       },
     });
   }
-
-  useEffect(() => {
-    dispatch(tourOrdersR.fetch(auth));
-  }, []);
+  
 
   return (
     <>
@@ -121,7 +122,6 @@ export const PutTourOrderPaymentModalController: React.FC = () => {
           if (auth === null) {
             return presentNoAuthAlert(presentAlert);
           }
-          console.log(ev.detail.data)
           API
             .post_with_auth(auth!, `tour_order_payment`, {
               tour_order_id: ev.detail.data.tour_order_id,
@@ -142,7 +142,7 @@ export const PutTourOrderPaymentModalController: React.FC = () => {
               });
             })
             .finally(() => {
-              dispatch(tourOrderPaymentTypesR.fetch(auth))
+              dispatch(tourOrderPaymentsR.fetch(auth))
             });
         }
       },
