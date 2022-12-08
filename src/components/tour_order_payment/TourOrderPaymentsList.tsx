@@ -14,7 +14,7 @@ const listColumns = [
     wrap: true
   },
   {
-    name: "Название тура",
+    name: "Название отеля тура",
     selector: "order.tour.hotel.name",
     sortable: true,
     wrap: true,

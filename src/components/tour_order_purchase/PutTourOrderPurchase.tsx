@@ -75,7 +75,7 @@ export function PutTourOrderPurchaseModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Зарегистрировать заказ тура</IonTitle>
+          <IonTitle>Продажа заказа тура</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={confirm}>
               Зарегистрировать
