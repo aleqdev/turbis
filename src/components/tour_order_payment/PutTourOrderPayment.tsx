@@ -4,12 +4,10 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import { AuthProps } from '../../interface/props/auth';
 import API from '../../utils/server';
-import { hotelsR, tourOrderPaymentsR, useAppDispatch, useAppSelector } from '../../redux/store';
+import { tourOrderPaymentsR, useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { tourOrderPaymentTypesR, tourOrdersR } from '../../redux/store';
-import Hotel from '../../interface/hotel';
+import { tourOrdersR } from '../../redux/store';
 import { SelectWithSearchModal } from '../SelectWithSearch';
-import Tour from '../../interface/tour';
 import TourOrder from '../../interface/tour_order';
 import Person from '../../interface/person';
 
@@ -18,30 +16,26 @@ export function PutTourOrderPaymentModal(
     onDismiss: (data?: object | null, role?: string) => void
   }
 ) {
+  const tourOrders = useAppSelector(state => state.tourOrders);
   const inputName = useRef<HTMLIonInputElement>(null);
-  const [inputHotel, setInputHotel] = React.useState(null as TourOrder | null);
-  const [hotels, tourFeedingTypes] = useAppSelector(state => [state.tourOrders, state.tourFeedingTypes]);
+  const [inputTourOrder, setInputTourOrder] = React.useState(null as TourOrder | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const dispatch = useAppDispatch();
-
-  // useEffect(() => {
-  //   const tours = dispatch(tourOrdersR.fetch(auth));
-  // }, []);
 
   function confirm() {
     const name = inputName.current?.value!;
     if (name) {
       onDismiss({
         name: name,
-        money_received: inputHotel?.cost,
-        tour_order_id: inputHotel?.id
+        money_received: inputTourOrder?.cost,
+        tour_order_id: inputTourOrder?.id
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
     }
   }
 
-  const [presentHotelChoice, dismissHotelChoice] = useIonModal(SelectWithSearchModal, {
+  const [presentTourOrderChoice, dismissTourOrderChoice] = useIonModal(SelectWithSearchModal, {
     acquirer: () => {
       const toursOrders = useAppSelector(state => state.tourOrders)
       return toursOrders.status === "ok" ? toursOrders.data : null
@@ -51,25 +45,28 @@ export function PutTourOrderPaymentModal(
     sorter: (e: TourOrder, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
-        return value + e.group_id + e!.cost!
-          // +e.name.toLowerCase().includes(element) + 10 * +(e.name.toLowerCase() === element) + 
-          // +e.city!.name.toLowerCase().includes(element) + 10 * +(e.city!.name.toLowerCase() === element)
+        return +
+          +e.tour!.hotel!.name.toLowerCase().includes(element) + 10 * +(e.tour!.hotel!.name.toLowerCase() === element) + 
+          +e.tour!.hotel!.city!.name.toLowerCase().includes(element) + 10 * +(e.tour!.hotel!.city!.name.toLowerCase() === element)
       }, 0);
     },
     keyer: (e: TourOrder) => e.id,
-    onDismiss: (data: object | null, role: string) => dismissHotelChoice(data, role),
+    onDismiss: (data: object | null, role: string) => dismissTourOrderChoice(data, role),
   });
 
-  function openHotelSelectModal() {
-    presentHotelChoice({
+  function openTourOrderSelectModal() {
+    presentTourOrderChoice({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
-          setInputHotel(ev.detail.data.value);
+          setInputTourOrder(ev.detail.data.value);
         }
       },
     });
   }
-  
+
+  useEffect(() => {
+    dispatch(tourOrdersR.fetch(auth));
+  }, []);
 
   return (
     <>
@@ -93,13 +90,13 @@ export function PutTourOrderPaymentModal(
         <IonItem>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked" >Заказ тура</IonLabel>
-          <IonButton disabled={hotels === null} onClick={() => openHotelSelectModal()}>
-            {hotels === null ? "Загрузка..." : (inputHotel === null ? "Выбрать" : `Заказ №${inputHotel.group_id} <${inputHotel.payment_type?.name}> ${Person.format(inputHotel.client?.person!)}`)}
+          <IonButton disabled={tourOrders === null} onClick={() => openTourOrderSelectModal()}>
+            {tourOrders === null ? "Загрузка..." : (inputTourOrder === null ? "Выбрать" : `Заказ №${inputTourOrder.group_id} <${inputTourOrder.payment_type?.name}> ${Person.format(inputTourOrder.client?.person!)}`)}
           </IonButton>
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">Сумма оплаты</IonLabel>
-          <IonInput ref={inputName} value={inputHotel?.cost} disabled={true} type="text" placeholder="= 0 р" required/>
+          <IonInput ref={inputName} value={inputTourOrder?.cost} disabled={true} type="text" placeholder="= 0 р" required/>
         </IonItem>
       </IonContent>
     </>
@@ -111,6 +108,7 @@ export const PutTourOrderPaymentModalController: React.FC = () => {
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PutTourOrderPaymentModal, {
+    auth,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();

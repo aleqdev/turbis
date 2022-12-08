@@ -95,6 +95,10 @@ export function makeReducer<T, name extends string, url extends string>(name: na
   });
   
   const fetch = (auth: DatabaseAuth): ThunkAction<void, RootState, unknown, AnyAction> => {
+    if (auth === undefined) {
+      throw new Error(`\`auth\` in dispatched fetch of \`${name}\` is \`undefined\``);
+    }
+
     return async (dispatch: any) => {
       function onSuccess(payload: any) {
         dispatch(set(payload.data));

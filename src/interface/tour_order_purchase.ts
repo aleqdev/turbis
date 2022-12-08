@@ -1,10 +1,10 @@
-import Tour from "./tour";
+import TourOrder from "./tour_order";
 
 export class TourOrderPurchase {
   id: number;
   tour_order_id: number;
   reservations_confirmed: boolean;
-  order?: Tour;
+  order?: TourOrder;
 
   constructor(args: {[Property in keyof TourOrderPurchase]: TourOrderPurchase[Property]}) {
     this.id = args.id;

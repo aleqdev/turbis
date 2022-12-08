@@ -68,6 +68,7 @@ export const PatchTourOrderPaymentModalController: React.FC = () => {
   const dispatch = useAppDispatch();
   
   const [present, dismiss] = useIonModal(PatchTourOrderPaymentModal, {
+    auth,
     onDismiss: (data: object | null, role: string) => dismiss(data, role),
   });
   const [presentAlert] = useIonAlert();

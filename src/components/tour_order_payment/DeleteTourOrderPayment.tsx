@@ -6,7 +6,6 @@ import { process_error_hint } from '../../utils/process_erros_hints';
 import API from '../../utils/server';
 import { tourOrderPaymentsR, useAppDispatch, useAppSelector } from '../../redux/store';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
-import { tourOrderPaymentTypesR } from '../../redux/store';
 import TourOrderPayment from '../../interface/tour_order_payment';
 import Person from '../../interface/person';
 
@@ -27,7 +26,7 @@ export function DeleteTourOrderPaymentModal(
               Отмена
             </IonButton>
           </IonButtons>
-          <IonTitle>Удаление типов оплаты заказов туров</IonTitle>
+          <IonTitle>Удаление записей об оплате заказов</IonTitle>
           <IonButtons slot="end">
             <IonButton strong={true} onClick={() => {onDismiss(selectedTourOrderPayments, "confirm")}}>
               Удалить
@@ -72,7 +71,7 @@ export const DeleteTourOrderPaymentModalController: React.FC = () => {
           .then((results) => {
             for (const result of results) {
               if (result.status === "rejected" && result.reason instanceof AxiosError) {
-                dispatch(tourOrderPaymentTypesR.fetch(auth));
+                dispatch(tourOrderPaymentsR.fetch(auth));
                 presentAlert({
                   header: "Ошибка",
                   subHeader: result.reason.response?.statusText,
@@ -84,7 +83,7 @@ export const DeleteTourOrderPaymentModalController: React.FC = () => {
             }
             dispatch(tourOrderPaymentsR.fetch(auth));
             presentAlert({
-              header: "записи об оплате заказов удалены",
+              header: "записи об оплате туров удалены",
               buttons: ["Ок"]
             });
           })
