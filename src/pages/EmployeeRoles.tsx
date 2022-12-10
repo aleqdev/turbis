@@ -4,7 +4,7 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PutEmployeeRoleModalController } from '../components/employee_role/PutEmployeeRole';
 import { PatchWorkerRoleModalController } from '../components/employee_role/PatchEmployeeRole';
 import { EmployeeRolesList } from '../components/employee_role/EmployeeRolesList';
@@ -21,6 +21,10 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(employeeRolesR.fetch(auth));
+
+  useEffect(() => {
+    dispatch(employeeRolesR.select([]));
+  }, []);
 
   return <Page/>
 }

@@ -7,7 +7,7 @@ import React from 'react';
 import { RegionsList } from '../components/region/RegionsList';;
 import Region from '../interface/region';
 
-const Page: React.FC = (props) => {
+const Page: React.FC = () => {
   const [_, set_selected_regions] = React.useState(Array<Region>);
   
   return (

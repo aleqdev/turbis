@@ -14,30 +14,32 @@ import { SelectTourModal } from './SelectTourModal';
 import TourOrderPaymentType from '../../interface/tour_order_payment_type';
 import TourOrderTourEntry from '../../interface/tour_order_entry';
 import { AxiosError } from 'axios';
+import TourOrder from '../../interface/tour_order';
 
 export function PatchOrderModal(
   {auth, onDismiss}: AuthProps & {
-    onDismiss: (data?: object | null, role?: string) => void
+    onDismiss: (data?: object | null, role?: string) => void,
   }
 ) {
   const tourOrders = useAppSelector(state => state.tourOrders);
 
   const tourOrder = tourOrders.status === "ok" ? tourOrders.selected[0] : null;
+
   const entries = tourOrders.status === "ok" ? 
     tourOrders.data
     .filter(e => e.group_id === tourOrder?.group_id)
     .map(e => {return {
       tour: e.tour,
       price: e.price, 
-      peopleCount: e.people_count,
+      people_count: e.people_count,
       id: e?.id
     }}) : [];
 
   const [tourOrderPaymentTypes, persons] = useAppSelector(state => [state.tourOrderPaymentTypes, state.persons]);
   const dispatch = useAppDispatch();
 
-  const [inputPaymentType, setInputPaymentType] = useState(tourOrder?.payment_type as TourOrderPaymentType | null);
-  const [inputClient, setInputClient] = useState(tourOrder?.client as Client | null);
+  const [inputPaymentType, setInputPaymentType] = useState(tourOrder!.payment_type as TourOrderPaymentType | null);
+  const [inputClient, setInputClient] = useState(tourOrder!.client as Client | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [inputEntries, setInputEntries] = useState(entries as TourOrderTourEntry[]);
   const [presentClientChoice, dismissClientChoice] = useIonModal(SelectWithSearchModal, {
@@ -204,14 +206,14 @@ export function PatchOrderModal(
 
         <IonItem>
           <IonLabel position="stacked" >Общая стоимость заказа.</IonLabel>
-          <IonInput disabled value={`${inputEntries.reduce((value, el) => value + el.price * el.peopleCount, 0)}₽`}/>
+          <IonInput disabled value={`${inputEntries.reduce((value, el) => value + el.price * el.people_count, 0)}₽`}/>
         </IonItem>
       </IonContent>
     </>
   )
 }
 
-export const PatchOrderModalController: React.FC = () => {
+export const PatchOrderModalFn: () => () => void = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
 
@@ -221,7 +223,7 @@ export const PatchOrderModalController: React.FC = () => {
   });
   const [presentAlert] = useIonAlert();
 
-  function openModal() {
+  return () => {
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
@@ -240,7 +242,7 @@ export const PatchOrderModalController: React.FC = () => {
                 payment_type_id: ev.detail.data.paymentType.id,
                 tour_id: e.tour.id,
                 price: e.price,
-                people_count: e.peopleCount,
+                people_count: e.people_count,
                 group_id: ev.detail.data.group_id
               })
           });
@@ -252,7 +254,7 @@ export const PatchOrderModalController: React.FC = () => {
                 payment_type_id: ev.detail.data.paymentType.id,
                 tour_id: e.tour.id,
                 price: e.price,
-                people_count: e.peopleCount,
+                people_count: e.people_count,
                 group_id: ev.detail.data.group_id
               })
           });
@@ -286,9 +288,13 @@ export const PatchOrderModalController: React.FC = () => {
       },
     });
   }
+}
+
+export const PatchOrderModalController: React.FC = () => {
+  const openModal = PatchOrderModalFn();
 
   return (
-    <IonButton routerDirection="none" color="secondary" onClick={openModal}>
+    <IonButton routerDirection="none" color="secondary" onClick={(ev) => openModal()}>
       <IonLabel>Изменить заказ</IonLabel>
     </IonButton>
   )

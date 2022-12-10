@@ -29,7 +29,7 @@ export const personsR = makeReducer<Person, string, string>("persons", "person")
 export const tourOrdersR = makeReducer<TourOrder, string, string>("tour_orders", "tour_order_view?select=*,payment_type:tour_order_payment_type(*),client(*,person(*),type:client_type(*)),tour(*,hotel(*,city(*,region(*,country(*))),owner:person(*)))");
 export const tourOrderPaymentTypesR = makeReducer<TourOrderPaymentType, string, string>("tour_order_payment_types", "tour_order_payment_type");
 export const tourOrderPaymentsR = makeReducer<TourOrderPayment, string, string>("tour_order_payments", "tour_order_payment?select=*,order:tour_order(*,payment_type:tour_order_payment_type(*),client(*,person(*),type:client_type(*)),tour(*,hotel(*,city(*,region(*,country(*))),owner:person(*))))");
-export const tourOrderPurchasesR = makeReducer<TourOrderPurchase, string, string>("tour_order_purchases", "tour_order_purchase?select=*,order:tour_order_view(*,payment_type:tour_order_payment_type(*),client(*,person(*),type:client_type(*)),tour(*,hotel(*,city(*,region(*,country(*))),owner:person(*))))");
+export const tourOrderPurchasesR = makeReducer<TourOrderPurchase, string, string>("tour_order_purchases", "tour_order_purchase_view?select=*,payment_type:tour_order_payment_type(*),client(*,person(*),type:client_type(*)),tour(*,hotel(*,city(*,region(*,country(*))),owner:person(*)))");
 
 export const store = configureStore({
   reducer: {

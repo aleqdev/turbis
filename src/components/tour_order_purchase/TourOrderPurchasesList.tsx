@@ -8,46 +8,46 @@ import { formatDate } from "../../utils/fmt";
 
 const listColumns = [
   {
-    name: "Заказная группа",
-    selector: "order.group_id",
+    name: "ID",
+    selector: "id",
     sortable: true,
     wrap: true
   },
   {
     name: "Клиент",
-    selector: "order.person",
+    selector: "client",
     sortable: true,
     wrap: true,
-    cell: (e: TourOrderPurchase) => `${Person.format(e.order!.client!.person!)} <${e.order!.client!.type!.name}>`
+    cell: (e: TourOrderPurchase) => `${Person.format(e!.client!.person!)} <${e!.client!.type!.name}>`
   },
   {
     name: "Вид оплаты",
-    selector: "order.payment_type.name",
+    selector: "payment_type.name",
     sortable: true,
     wrap: true
   },
   {
     name: "Тур",
-    selector: "order.tour",
+    selector: "tour",
     sortable: true,
     wrap: true,
-    cell: (e: TourOrderPurchase) => `${e.order!.tour!.hotel!.name} (с ${formatDate(e.order!.tour!.arrival_date!)} по ${formatDate(e.order!.tour!.departure_date!)})`
+    cell: (e: TourOrderPurchase) => `${e!.tour!.hotel!.name}`
   },
   {
     name: "Цена",
-    selector: "order.price",
+    selector: "price",
     sortable: true,
     wrap: true
   },
   {
-    name: "Кол-во",
-    selector: "order.people_count",
+    name: "Кол-во людей",
+    selector: "people_count",
     sortable: true,
     wrap: true
   },
   {
     name: "Стоимость",
-    selector: "order.cost",
+    selector: "cost",
     sortable: true,
     wrap: true
   },

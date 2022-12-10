@@ -24,6 +24,10 @@ const MetaPage: React.FC = () => {
 
   dispatch(toursR.fetch(auth));
 
+  useEffect(() => {
+    dispatch(toursR.select([]));
+  }, []);
+
   return <Page/>
 }
 

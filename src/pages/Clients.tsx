@@ -4,7 +4,7 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PutClientModalController } from '../components/client/PutClient';
 import { DeleteClientsModalController } from '../components/client/DeleteClients';
 import { PatchClientModalController } from '../components/client/PatchClient';
@@ -21,6 +21,10 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(clientsR.fetch(auth));
+
+  useEffect(() => {
+    dispatch(clientsR.select([]));
+  }, []);
 
   return <Page/>
 }

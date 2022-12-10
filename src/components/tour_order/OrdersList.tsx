@@ -58,6 +58,13 @@ const listColumns = [
     sortable: true,
     wrap: true
   },
+  {
+    name: "Статус",
+    selector: "status",
+    sortable: true,
+    wrap: true,
+    cell: TourOrder.formatStatus
+  },
 ];
 
 export const OrdersList: React.FC = () => {

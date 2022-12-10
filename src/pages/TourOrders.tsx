@@ -4,7 +4,7 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PatchOrderModalController } from '../components/tour_order/PatchOrder';
 import { DeleteTourOrdersModalController } from '../components/tour_order/DeleteOrders';
 import { OrdersList } from '../components/tour_order/OrdersList';
@@ -21,6 +21,10 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(tourOrdersR.fetch(auth));
+
+  useEffect(() => {
+    dispatch(tourOrdersR.select([]));
+  }, []);
 
   return <Page/>
 }

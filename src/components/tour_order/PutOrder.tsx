@@ -149,7 +149,7 @@ export function PutOrderModal(
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <IonItem>
+        <IonItem lines='none'>
           {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
           <IonLabel position="stacked">Клиент</IonLabel>
           <IonButton disabled={persons === null} onClick={() => openPersonSelectModal()}>
@@ -187,9 +187,9 @@ export function PutOrderModal(
           </IonButton>
         </IonItem>
 
-        <IonItem>
+        <IonItem lines='none'>
           <IonLabel position="stacked" >Общая стоимость заказа.</IonLabel>
-          <IonInput disabled value={`= ${inputEntries.reduce((value, el) => value + el.price * el.peopleCount, 0)}₽`}/>
+          <IonInput disabled value={`= ${inputEntries.reduce((value, el) => value + el.price * el.people_count, 0)}₽`}/>
         </IonItem>
       </IonContent>
     </>
@@ -224,7 +224,7 @@ export const PutOrderModalController: React.FC = () => {
                 payment_type_id: ev.detail.data.paymentType.id,
                 tour_id: e.tour.id,
                 price: e.price,
-                people_count: e.peopleCount,
+                people_count: e.people_count,
                 group_id: group.id
               })
           }))

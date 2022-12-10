@@ -4,13 +4,7 @@ import { useEffect, useState } from "react";
 import { SelectWithSearchModal } from "../SelectWithSearch";
 import Tour from "../../interface/tour";
 import { useAppSelector } from "../../redux/store";
-
-function isNaturalNumber(n: any): boolean {
-  let ns = n.toString();
-  var n1 = Math.abs(n),
-      n2 = parseInt(ns, 10);
-  return !ns.includes(',') && !ns.includes('-') && !isNaN(n1) && n2 === n1 && n1.toString() === n.toString();
-}
+import { isNaturalNumber } from "../../utils/checks";
 
 export function SelectTourModal(
   {
@@ -22,7 +16,7 @@ export function SelectTourModal(
   const tours = useAppSelector(state => state.tours);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [inputPeopleCount, setInputPeopleCount] = useState(0 as number);
-  const [inputTourPrice, setInputTourPrice] = useState(null as number | null);
+  const [inputTourPrice, setInputTourPrice] = useState(0 as number | null);
   const [inputTour, setInputTour] = useState(null as Tour | null);
   const [totalCost, setTotalCost] = useState(null as number | null);
 
@@ -36,7 +30,7 @@ export function SelectTourModal(
         value: {
           tour: inputTour,
           price: inputTourPrice,
-          peopleCount: inputPeopleCount
+          people_count: inputPeopleCount
         }
       }, 'confirm');
     } else {
@@ -115,7 +109,7 @@ export function SelectTourModal(
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <IonItem>
+        <IonItem lines='none'>
             {errorMessage ? <IonText color={'danger'}> {errorMessage}</IonText> : ""}
             <IonLabel position="stacked">Тур: </IonLabel>
               <IonButton disabled={tours === null} onClick={() => openTourSelectModal()}>

@@ -20,7 +20,7 @@ export type MakeReducer<T, SET, SELECT, PANIC> = {
   set: (payload: T[]) => SetAction<SET, T>,
   select: (payload: T[]) => SelectAction<SELECT, T>,
   panic: (error: any) => PanicAction<PANIC, T>,
-  fetch: (auth: DatabaseAuth) => ThunkAction<void, RootState, unknown, AnyAction>
+  fetch: (auth: DatabaseAuth) => ThunkAction<Promise<T[]>, RootState, unknown, AnyAction>
 }
 
 interface SetAction<SET, T> {
@@ -94,7 +94,7 @@ export function makeReducer<T, name extends string, url extends string>(name: na
     error
   });
   
-  const fetch = (auth: DatabaseAuth): ThunkAction<void, RootState, unknown, AnyAction> => {
+  const fetch = (auth: DatabaseAuth): ThunkAction<Promise<T[]>, RootState, unknown, AnyAction> => {
     if (auth === undefined) {
       throw new Error(`\`auth\` in dispatched fetch of \`${name}\` is \`undefined\``);
     }
@@ -107,8 +107,9 @@ export function makeReducer<T, name extends string, url extends string>(name: na
         dispatch(panic(error));
       }
       try {
-        const success = await API.get_with_auth(auth, url);
+        const success: any = await API.get_with_auth(auth, url);
         onSuccess(success);
+        return success.data;
       } catch (error) {
         onError(error);
       }

@@ -39,7 +39,7 @@ export function DeleteTourOrderPurchaseModal(
         <IonText color="danger">{`Точно удалить записи о заказах туров? (${selectedTourOrderPurchases.length})`}</IonText>
         <IonList>
           {selectedTourOrderPurchases.map((t) => {
-            return <IonItem key={t.id}>{`- ID: ${t.id}, ${t.order!.tour!.hotel!.name} - бронь подтверждена: ${t.reservations_confirmed ? "Да" : "Нет" }`}</IonItem>
+            return <IonItem key={t.id}>{`- ID: ${t.id}, ${t.tour!.hotel!.name} - бронь подтверждена: ${t.reservations_confirmed ? "Да" : "Нет" }`}</IonItem>
           })}
         </IonList>
       </IonContent>

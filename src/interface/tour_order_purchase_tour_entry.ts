@@ -1,17 +1,12 @@
 import { formatDate } from "../utils/fmt";
-import Tour from "./tour";
+import TourOrderTourEntry from "./tour_order_entry";
 
-export class TourOrderTourEntry {
-  tour: Tour;
-  price: number;
-  people_count: number;
-  id?: number;
+export class TourOrderPurchaseTourEntry extends TourOrderTourEntry {
+  reservations_confirmed: boolean;
 
-  constructor(args: {[Property in keyof TourOrderTourEntry]: TourOrderTourEntry[Property]}) {
-    this.tour = args.tour;
-    this.price = args.price;
-    this.people_count = args.people_count;
-    this.id = args.id;
+  constructor(args: {[Property in keyof TourOrderPurchaseTourEntry]: TourOrderPurchaseTourEntry[Property]}) {
+    super(args);
+    this.reservations_confirmed = args.reservations_confirmed;
   }
 
   static formatHeader(entry: TourOrderTourEntry): string {
@@ -29,4 +24,4 @@ export class TourOrderTourEntry {
   }
 };
 
-export default TourOrderTourEntry;
+export default TourOrderPurchaseTourEntry;

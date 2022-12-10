@@ -4,13 +4,13 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { tourOrderPurchasesR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
 import { TourOrderPurchasesList } from '../components/tour_order_purchase/TourOrderPurchasesList';
 import { PutTourOrderPurchaseModalController } from '../components/tour_order_purchase/PutTourOrderPurchase';
 import { DeleteTourOrderPurchaseModalController } from '../components/tour_order_purchase/DeleteTourOrderPurchase';
-import { PatchTourOrderPurchaseModalController } from '../components/tour_order_purchase/PatchTourOrderPurchase';
+//import { PatchTourOrderPurchaseModalController } from '../components/tour_order_purchase/PatchTourOrderPurchase';
 
 const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
@@ -21,6 +21,10 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(tourOrderPurchasesR.fetch(auth));
+
+  useEffect(() => {
+    dispatch(tourOrderPurchasesR.select([]));
+  }, []);
 
   return <Page/>
 }

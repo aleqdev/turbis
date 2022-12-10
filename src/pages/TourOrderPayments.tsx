@@ -4,7 +4,7 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { tourOrderPaymentsR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
 import { PatchTourOrderPaymentModalController } from '../components/tour_order_payment/PatchTourOrderPayment';
@@ -21,6 +21,10 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(tourOrderPaymentsR.fetch(auth));
+
+  useEffect(() => {
+    dispatch(tourOrderPaymentsR.select([]));
+  }, []);
 
   return <Page/>
 }

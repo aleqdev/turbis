@@ -4,7 +4,7 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PatchHotelModalController } from '../components/hotel/PatchHotel';
 import { DeleteHotelsModalController } from '../components/hotel/DeleteHotel';
 import { HotelsList } from '../components/hotel/HotelsList';
@@ -21,6 +21,10 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(hotelsR.fetch(auth));
+
+  useEffect(() => {
+    dispatch(hotelsR.select([]));
+  }, []);
 
   return <Page/>
 }

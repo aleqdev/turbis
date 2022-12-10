@@ -14,7 +14,7 @@ export class TourOrder {
   client?: Client;
   payment_type?: TourOrderPaymentType;
   tour?: Tour;
-  status: "active" | "canceled" | "completed";
+  status: "active" | "canceled" | "completed" | "only-purchased" | "only-selled";
 
   constructor(args: {[Property in keyof TourOrder]: TourOrder[Property]}) {
     this.id = args.id;
@@ -29,6 +29,19 @@ export class TourOrder {
     this.payment_type = args.payment_type;
     this.tour = args.tour;
     this.status = args.status;
+  }
+
+  static formatStatus(order: TourOrder): string {
+    switch (order.status) {
+      case 'active':
+      case 'only-purchased':
+      case 'only-selled':
+        return "Активен";
+      case 'canceled':
+        return "Отменён";
+      case 'completed':
+        return "Завершён";
+    }
   }
 }
 

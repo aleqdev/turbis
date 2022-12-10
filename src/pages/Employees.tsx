@@ -4,7 +4,7 @@ import {
   IonContent,
   IonList,
 } from '@ionic/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PutEmployeeModalController } from '../components/employee/PutEmployee';
 import { PatchEmployeesModalController } from '../components/employee/PatchEmployee';
 import { DeleteEmployeesModalController } from '../components/employee/DeleteEmployees';
@@ -21,6 +21,10 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(employeesR.fetch(auth));
+
+  useEffect(() => {
+    dispatch(employeesR.select([]));
+  }, []);
 
   return <Page/>
 }
