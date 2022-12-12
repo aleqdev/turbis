@@ -170,7 +170,7 @@ export function PatchTourModal(
             {tourFeedingTypes === null ? "Загрузка..." : (inputFeedingType === null ? "Выбрать" : `${inputFeedingType.name}`)}
           </IonButton>
           <IonLabel position="stacked">{"Стоимость тура (руб.)"}</IonLabel>
-          <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" value={tour!.cost} required/>
+          <IonInput ref={inputCost} clearInput={true} type="text" placeholder="Введите стоимость" value={tour!.price} required/>
           <IonLabel position="stacked">Описание</IonLabel>
           <IonTextarea ref={inputDescription} auto-grow={true} value={tour!.description} placeholder="Введите описание" required/>
         </IonItem>
@@ -179,7 +179,7 @@ export function PatchTourModal(
   )
 }
 
-export const PatchTourModalController: React.FC = () => {
+export const PatchTourModalFn: () => () => void = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   
@@ -189,7 +189,7 @@ export const PatchTourModalController: React.FC = () => {
   });
   const [presentAlert] = useIonAlert();
 
-  function openModal() {
+  return () => {
     present({
       onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
         if (ev.detail.role === 'confirm') {
@@ -227,6 +227,11 @@ export const PatchTourModalController: React.FC = () => {
       },
     });
   }
+}
+
+
+export const PatchTourModalController: React.FC = () => {
+  const openModal = PatchTourModalFn();
 
   return (
     <IonButton routerDirection="none" color="secondary" onClick={openModal}>

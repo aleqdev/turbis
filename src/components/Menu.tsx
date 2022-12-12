@@ -15,11 +15,10 @@ import {
 } from '@ionic/react';
 
 import { useLocation } from 'react-router-dom';
-import { cartOutline, personOutline, homeOutline, earthOutline, settingsOutline, callOutline, airplaneOutline, accessibilityOutline } from 'ionicons/icons';
+import { statsChartOutline, readerOutline, cartOutline, personOutline, homeOutline, earthOutline, settingsOutline, callOutline, airplaneOutline, accessibilityOutline } from 'ionicons/icons';
 import './Menu.css';
 import { useRef } from 'react';
 import { useHistory } from 'react-router'
-import { readerOutline } from 'ionicons/icons';
 
 interface AppPage {
   url: string;
@@ -65,6 +64,12 @@ const appPages: AppPage[] = [
         url: '/page/TourOrderPurchases',
         iosIcon: readerOutline,
         mdIcon: readerOutline
+      },
+      {
+        title: 'Отчёт по обороту',
+        url: '/page/TourOrderTurnover',
+        iosIcon: statsChartOutline,
+        mdIcon: statsChartOutline
       },
       {
         title: 'Типы оплаты туров',

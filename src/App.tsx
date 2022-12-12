@@ -10,6 +10,7 @@ import TourOrders from './pages/TourOrders'
 import TourOrderPayments from './pages/TourOrderPayments'
 import TourOrderPurchases from './pages/TourOrderPurchases'
 import TourOrderPaymentTypes from './pages/TourOrderPaymentTypes'
+import TourOrderTurnover from './pages/TourOrderTurnover'
 import Clients from './pages/Clients'
 import ClientTypes from './pages/ClientTypes'
 import { Provider } from 'react-redux'
@@ -71,9 +72,8 @@ const App: React.FC = () => {
               <Route path="/page/EmployeeRoles" exact={true}>
                 <EmployeeRoles/>
               </Route>
-              <Route path="/page/TourOrders" exact={true}>
-                <TourOrders/>
-              </Route>
+              <Route path="/page/TourOrders" render={(props) => <TourOrders params={props.match.params}/>}/>
+              <Route path="/page/TourOrders/:filter" render={(props) => <TourOrders params={props.match.params}/>}/>
               <Route path="/page/TourOrderPaymentTypes" exact={true}>
                 <TourOrderPaymentTypes/>
               </Route>
@@ -82,6 +82,9 @@ const App: React.FC = () => {
               </Route>
               <Route path="/page/TourOrderPurchases" exact={true}>
                 <TourOrderPurchases/>
+              </Route>
+              <Route path="/page/TourOrderTurnover" exact={true}>
+                <TourOrderTurnover/>
               </Route>
               <Route path="/page/Persons" exact={true}>
                 <Persons/>

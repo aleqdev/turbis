@@ -8,10 +8,12 @@ export class Tour {
     arrival_date: Date;
     departure_date: Date;
     feeding_type_id: number;
-    cost: number;
+    price: number;
     description: string;
     hotel?: Hotel;
     feeding_type?: TourFeedingType;
+    ordered?: number;
+    selled?: number;
 
     constructor(args: {[Property in keyof Tour]: Tour[Property]}) {
         this.id = args.id;
@@ -19,14 +21,14 @@ export class Tour {
         this.arrival_date = args.arrival_date;
         this.departure_date = args.departure_date;
         this.feeding_type_id = args.feeding_type_id;
-        this.cost = args.cost;
+        this.price = args.price;
         this.description = args.description;
         this.hotel = args.hotel;
         this.feeding_type = args.feeding_type;
     }
 
     static format(tour: Tour): string {
-        return `${Hotel.format(tour.hotel!)} (${tour.cost} руб., ${formatDateDiff(tour.arrival_date, tour.departure_date)} д/н)`;
+        return `${Hotel.format(tour.hotel!)} (${tour.price} руб., ${formatDateDiff(tour.arrival_date, tour.departure_date)} д/н)`;
     }
 }
 

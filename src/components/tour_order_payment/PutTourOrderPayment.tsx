@@ -27,7 +27,7 @@ export function PutTourOrderPaymentModal(
     if (name) {
       onDismiss({
         name: name,
-        money_received: inputTourOrder?.cost,
+        money_received: inputTourOrder?.price,
         tour_order_id: inputTourOrder?.id
       }, 'confirm');
     } else {
@@ -41,7 +41,7 @@ export function PutTourOrderPaymentModal(
       return toursOrders.status === "ok" ? toursOrders.data : null
     },
     title: "Выберите заказ",
-    formatter: (e: TourOrder) => `Заказ №${e.group_id} ${e.cost} руб. <${e!.payment_type!.name}> ${Person.format(e.client?.person!)}`,
+    formatter: (e: TourOrder) => `Заказ №${e.group_id} ${e.price} руб. <${e!.payment_type!.name}> ${Person.format(e.client?.person!)}`,
     sorter: (e: TourOrder, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -96,7 +96,7 @@ export function PutTourOrderPaymentModal(
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">Сумма оплаты</IonLabel>
-          <IonInput ref={inputName} value={inputTourOrder?.cost} disabled={true} type="text" placeholder="= 0 р" required/>
+          <IonInput ref={inputName} value={inputTourOrder?.price} disabled={true} type="text" placeholder="= 0 р" required/>
         </IonItem>
       </IonContent>
     </>
@@ -124,6 +124,12 @@ export const PutTourOrderPaymentModalController: React.FC = () => {
             .post_with_auth(auth!, `tour_order_payment`, {
               tour_order_id: ev.detail.data.tour_order_id,
               money_received: ev.detail.data.money_received
+            })
+            .then((_) => {
+              return API
+                .patch_with_auth(auth!, `tour_order?id=eq.${ev.detail.data.tour_order_id}`, {
+                  status: ev.detail.data.tour_order.status === "only-purchased" ? "completed" : "only-selled"
+                })
             })
             .then((_) => {
               presentAlert({
