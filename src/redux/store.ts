@@ -16,6 +16,8 @@ import TourOrder from '../interface/tour_order'
 import TourOrderPaymentType from '../interface/tour_order_payment_type'
 import TourOrderPayment from '../interface/tour_order_payment'
 import TourOrderPurchase from '../interface/tour_order_purchase'
+import TourOrderTurnoverR from './tour_order_turnover'
+export { TourOrderTurnoverR } from './tour_order_turnover'
 
 export const employeesR = makeReducer<Employee, string, string>("employees", "employee?select=*,person(*),role:employee_role(*)");
 export const employeeRolesR = makeReducer<EmployeeRole, string, string>("employee_roles", "employee_role");
@@ -46,7 +48,8 @@ export const store = configureStore({
     tourOrders: tourOrdersR.reducer,
     tourOrderPaymentTypes: tourOrderPaymentTypesR.reducer,
     tourOrderPayments: tourOrderPaymentsR.reducer,
-    tourOrderPurchases: tourOrderPurchasesR.reducer
+    tourOrderPurchases: tourOrderPurchasesR.reducer,
+    tourOrderTurnover: TourOrderTurnoverR.reducer
   },
   middleware: [thunk]
 })

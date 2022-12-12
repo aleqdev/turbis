@@ -14,7 +14,6 @@ import { SelectTourModal } from './SelectTourModal';
 import TourOrderPaymentType from '../../interface/tour_order_payment_type';
 import TourOrderTourEntry from '../../interface/tour_order_entry';
 import { AxiosError } from 'axios';
-import TourOrder from '../../interface/tour_order';
 
 export function PatchOrderModal(
   {auth, onDismiss}: AuthProps & {

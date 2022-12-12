@@ -51,7 +51,7 @@ export function SelectTourModal(
         return value +
           +e.hotel!.name!.toLowerCase().includes(element) + 
           +e.hotel!.city!.name!.toLowerCase().includes(element) +
-          +e.cost!.toString().toLowerCase().includes(element);
+          +e.price!.toString().toLowerCase().includes(element);
       }, 0);
     },
     keyer: (e: Tour) => e.id,
@@ -60,7 +60,7 @@ export function SelectTourModal(
 
   useEffect(() => {
     if (inputTour !== null) {
-      setInputTourPrice(inputTour.cost);
+      setInputTourPrice(inputTour.price);
     }
   }, [inputTour]);
 

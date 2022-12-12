@@ -11,8 +11,13 @@ import { OrdersList } from '../components/tour_order/OrdersList';
 import { PutOrderModalController } from '../components/tour_order/PutOrder';
 import { tourOrdersR, useAppDispatch, useAppSelector } from '../redux/store';
 import NoAuth from '../components/composite/no_auth';
+import { RouteComponentProps } from 'react-router';
 
-const MetaPage: React.FC = () => {
+const MetaPage: React.FC<{
+  params: {
+    filter?: string;
+  }
+}> = ({ params }) => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
 
@@ -26,10 +31,10 @@ const MetaPage: React.FC = () => {
     dispatch(tourOrdersR.select([]));
   }, []);
 
-  return <Page/>
+  return <Page filter={params.filter} />
 }
 
-const Page: React.FC = () => {
+const Page: React.FC<{ filter?: string}> = ({ filter }) => {
   const tourOrders = useAppSelector(state => state.tourOrders);
   
   return (
@@ -59,7 +64,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
-        <OrdersList/>
+        <OrdersList filter={filter}/>
       </IonContent>
     </IonPage>
   );

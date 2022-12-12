@@ -6,6 +6,7 @@ import TourOrderPayment from "../../interface/tour_order_payment";
 import Person from "../../interface/person";
 import { PatchOrderModalFn } from "../tour_order/PatchOrder";
 import { DatabaseAuth } from "../../interface/database_auth";
+import { IonItem } from "@ionic/react";
 
 function makeListColumns(openPatchTourOrder: () => void, dispatch: ReturnType<typeof useAppDispatch>, auth: DatabaseAuth) {
   return [
@@ -16,14 +17,11 @@ function makeListColumns(openPatchTourOrder: () => void, dispatch: ReturnType<ty
       wrap: true,
       cell: (e: TourOrderPayment) => {
         return (
-          <a style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}} onClick={(ev) => {
-            dispatch(tourOrdersR.fetch(auth)).then(() => {
-              dispatch(tourOrdersR.select([e.order!]));
-              openPatchTourOrder();
-            });
-          }}>
-            {`${e.order!.tour!.hotel!.name}, ${e.order!.tour!.hotel!.city!.name} (${Person.format(e.order!.client!.person!)} <${e.order!.client!.type!.name})>`}
-          </a>
+          <IonItem routerLink={`/page/TourOrders`}>
+            <a style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+              {`${e.order!.tour!.hotel!.name}, ${e.order!.tour!.hotel!.city!.name} (${Person.format(e.order!.client!.person!)} <${e.order!.client!.type!.name})>`}
+            </a>
+          </IonItem>
         )
       }
     },

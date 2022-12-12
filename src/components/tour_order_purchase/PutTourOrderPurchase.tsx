@@ -109,7 +109,8 @@ export function PutTourOrderPurchaseModal(
         price: inputTourPrice,
         people_count: inputPeopleCount,
         group_id: 1,
-        reservations_confirmed: inputReservationsConfirmed
+        reservations_confirmed: inputReservationsConfirmed,
+
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -150,7 +151,7 @@ export function PutTourOrderPurchaseModal(
         return value +
           +e.hotel!.name!.toLowerCase().includes(element) + 
           +e.hotel!.city!.name!.toLowerCase().includes(element) +
-          +e.cost!.toString().toLowerCase().includes(element);
+          +e.price!.toString().toLowerCase().includes(element);
       }, 0);
     },
     keyer: (e: Tour) => e.id,
@@ -185,7 +186,7 @@ export function PutTourOrderPurchaseModal(
 
   useEffect(() => {
     if (inputTour !== null) {
-      setInputTourPrice(inputTour.cost);
+      setInputTourPrice(inputTour.price);
     }
   }, [inputTour]);
 
@@ -293,6 +294,12 @@ export const PutTourOrderPurchaseModalController: React.FC = () => {
                 header: "Данные о продаже тура добавлены",
                 buttons: ["Ок"]
               });
+            })
+            .then((_) => {
+              return API
+                .patch_with_auth(auth!, `tour_order?id=eq.${ev.detail.data.tour_order_id}`, {
+                  status: ev.detail.data.tour_order.status === "only-selled" ? "completed" : "only-purchased"
+                })
             })
             .catch((error) => {
               presentAlert({
