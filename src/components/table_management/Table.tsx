@@ -31,8 +31,7 @@ export const Table = <T,>(props: TableProps<T>): JSX.Element => {
     _elements = {data: useAppSelector(props.selector), status: "ok", selected: []};
   }
   let elements: TableManageable<T> = useMemo(() => _elements!, [_elements]);
-  console.log(elements);
-
+  
   const [clearSelectedRowsTrigger, setClearSelectedRowsTrigger] = useState(false);
 
   useEffect(
