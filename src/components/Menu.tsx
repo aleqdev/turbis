@@ -38,10 +38,10 @@ const appPages: AppPage[] = [
     mdIcon: homeOutline
   },
   {
-    title: 'Отчеты',
-    url: '/page/Info',
-    iosIcon: newspaperOutline,
-    mdIcon: newspaperOutline,
+    title: 'Отчёт',
+    url: '/page/TourOrderTurnover',
+    iosIcon: statsChartOutline,
+    mdIcon: statsChartOutline
   },
   {
     title: 'Туры',
@@ -72,12 +72,6 @@ const appPages: AppPage[] = [
         url: '/page/TourOrderPurchases',
         iosIcon: readerOutline,
         mdIcon: readerOutline
-      },
-      {
-        title: 'Отчёт по обороту',
-        url: '/page/TourOrderTurnover',
-        iosIcon: statsChartOutline,
-        mdIcon: statsChartOutline
       },
       {
         title: 'Типы оплаты туров',

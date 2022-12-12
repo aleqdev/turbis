@@ -18,6 +18,7 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(TourOrderTurnoverR.fetch(auth));
+  console.log('good', dispatch(TourOrderTurnoverR.fetch(auth)))
 
   return <Page/>
 }
