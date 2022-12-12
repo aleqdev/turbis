@@ -97,8 +97,8 @@ export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): T
       const tours: Tour[] = payload.data;
       const entries = tours.map(tour => new TourOrderTurnoverEntry({
         tour_id: tour.id,
-        ordered: tour.ordered!,
-        selled: tour.selled!,
+        ordered: tour.ordered ?? 0,
+        selled: tour.selled ?? 0,
         tour: tour
       }));
 
