@@ -5,21 +5,10 @@ import City from "../../interface/city";
 import Hotel from "../../interface/hotel";
 import Person from "../../interface/person";
 import { AuthProps } from "../../interface/props/auth";
-import { citiesR, hotelsR, personsR, useAppDispatch } from "../../redux/store";
-import { Table } from "../table_management/Table";
-
-export function PutHotelModal(
-  {auth, onDismiss}: AuthProps & {
-    onDismiss: (data?: object | null, role?: string) => void
-  }
-) {
-  console.log('good')
-  useEffect(() => {
-    dispatch(personsR.fetch(auth));
-    dispatch(citiesR.fetch(auth));
-  }, []);
-}
-
+import { TableManageable } from "../../redux/ctor/table_manageable";
+import { citiesR, hotelsR, personsR, useAppDispatch, useAppSelector } from "../../redux/store";
+import API from "../../utils/server";
+import { Table } from "../table_management/Table";  
 
 const listColumns = [
   {
@@ -70,9 +59,21 @@ const ExpandedHotel = ({ data }: { data: any}) => {
   );
 }
 
-export const HotelsList: React.FC = () => {
+export const InfoList: React.FC = () => {
   const dispatch = useAppDispatch();
+  const hotels = useAppSelector(state => state.hotels);
+//   const auth = useAppSelector(state => state.auth);
+//   API
+//             .get_with_auth(auth!, 'hotel', {
+//             }).then(
+//                 // (value) => console.log(value)
+//             )
+//             .finally(() => {
+//             //   console.log('hotels', dispatch(hotelsR.fetch(auth!)))
+//             });
 
+        
+  
   return (
     <Table 
       title="Список отелей:"
@@ -83,8 +84,4 @@ export const HotelsList: React.FC = () => {
       expandableRowsComponent={ExpandedHotel}
     />
   );
-}
-
-function dispatch(arg0: any) {
-  throw new Error("Function not implemented.");
 }

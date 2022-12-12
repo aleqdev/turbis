@@ -36,6 +36,7 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 import Persons from './pages/Persons';
 import Tours from './pages/Tours';
+import InfoPage from './pages/InfoPage';
 
 setupIonicReact();
 
@@ -85,6 +86,9 @@ const App: React.FC = () => {
               </Route>
               <Route path="/page/Persons" exact={true}>
                 <Persons/>
+              </Route>
+              <Route path="/page/Info" exact={true}>
+                <InfoPage />
               </Route>
               <Route path="/page/Clients" exact={true}>
                 <Clients/>
