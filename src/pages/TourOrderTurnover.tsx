@@ -1,4 +1,6 @@
 import { IonButtons, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonMenuButton, IonModal, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+// import { IonButtons, IonHeader, IonItem, IonLabel, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+
 import './Page.css';
 import {
   IonContent,
@@ -58,6 +60,9 @@ const Page: React.FC = () => {
         <IonDatetime onIonChange={ev => changeFromDate(ev)} presentation="date"></IonDatetime>
       
         <TourOrderTurnoverTable/>
+        <IonItem lines='none'>
+          <span style={{color: 'gray'}}>Нажмите `Ctrl`+`Z` для обновления данных</span>
+        </IonItem>
       </IonContent>
     </IonPage>
   );

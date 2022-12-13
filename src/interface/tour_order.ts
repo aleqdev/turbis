@@ -10,6 +10,7 @@ export class TourOrder {
   price: number;
   people_count: number;
   group_id: number;
+  crt_date: Date;
   cost?: number;
   client?: Client;
   payment_type?: TourOrderPaymentType;
@@ -29,6 +30,7 @@ export class TourOrder {
     this.payment_type = args.payment_type;
     this.tour = args.tour;
     this.status = args.status;
+    this.crt_date = args.crt_date;
   }
 
   static formatStatus(order: TourOrder): string {

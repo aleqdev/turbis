@@ -24,6 +24,13 @@ function makeListColumns(openPatchTour: () => void, dispatch: ReturnType<typeof 
       wrap: true
     },
     {
+      name: "Дата",
+      selector: "crt_date",
+      sortable: true,
+      wrap: true,
+      cell: (e: TourOrder) => `${formatDate(e.crt_date)}`
+    },
+    {
       name: "Клиент",
       selector: "person",
       sortable: true,
