@@ -18,12 +18,13 @@ const MetaPage: React.FC = () => {
   }
 
   dispatch(TourOrderTurnoverR.fetch(auth));
-  console.log('good', dispatch(TourOrderTurnoverR.fetch(auth)))
 
   return <Page/>
 }
 
 const Page: React.FC = () => {
+  const turnover = useAppSelector(state => state.tourOrderTurnover);
+
   return (
     <IonPage>
       <IonHeader>
@@ -38,6 +39,15 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
+        {
+          (turnover.status === "ok") ? 
+            <IonTitle>
+              <h2>
+                Количество полученных денежных средств на счету компании: <span style={{color: 'red'}}>{turnover.data.total_money_received}</span> рублей
+              </h2>
+            </IonTitle>
+            : <IonTitle>Загрузка...</IonTitle>
+        }
         <TourOrderTurnoverTable/>
       </IonContent>
     </IonPage>

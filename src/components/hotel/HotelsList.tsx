@@ -1,25 +1,11 @@
 import { IonCol, IonGrid, IonRow } from "@ionic/react";
-import React, { useEffect } from "react";
+import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import City from "../../interface/city";
 import Hotel from "../../interface/hotel";
 import Person from "../../interface/person";
-import { AuthProps } from "../../interface/props/auth";
-import { citiesR, hotelsR, personsR, useAppDispatch } from "../../redux/store";
+import { hotelsR, useAppDispatch } from "../../redux/store";
 import { Table } from "../table_management/Table";
-
-export function PutHotelModal(
-  {auth, onDismiss}: AuthProps & {
-    onDismiss: (data?: object | null, role?: string) => void
-  }
-) {
-  console.log('good')
-  useEffect(() => {
-    dispatch(personsR.fetch(auth));
-    dispatch(citiesR.fetch(auth));
-  }, []);
-}
-
 
 const listColumns = [
   {
@@ -83,8 +69,4 @@ export const HotelsList: React.FC = () => {
       expandableRowsComponent={ExpandedHotel}
     />
   );
-}
-
-function dispatch(arg0: any) {
-  throw new Error("Function not implemented.");
 }
