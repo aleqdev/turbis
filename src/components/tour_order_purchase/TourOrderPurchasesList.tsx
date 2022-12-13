@@ -14,6 +14,13 @@ const listColumns = [
     wrap: true
   },
   {
+    name: "Дата",
+    selector: "crt_date",
+    sortable: true,
+    wrap: true,
+    cell: (e: TourOrderPurchase) => `${formatDate(e.crt_date)}`
+  },
+  {
     name: "Клиент",
     selector: "client",
     sortable: true,
