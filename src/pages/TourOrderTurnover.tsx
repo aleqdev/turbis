@@ -61,7 +61,7 @@ const Page: React.FC = () => {
       
         <TourOrderTurnoverTable/>
         <IonItem lines='none'>
-          <span style={{color: 'gray'}}>Нажмите `Ctrl`+`Z` для обновления данных</span>
+          <span style={{color: 'gray'}}>Нажмите `Ctrl`+`R` для обновления данных</span>
         </IonItem>
       </IonContent>
     </IonPage>
