@@ -34,7 +34,7 @@ export const TourOrderTurnoverTable: React.FC = () => {
   return (
     <><br /><br />
     {
-      (sum_money === 0) ? <IonTitle><h2>Количество денежных средств на счете компании = <span style={{color: 'red'}}>Загружается...</span> рублей</h2></IonTitle>
+      (sum_money === 0) ? <IonTitle><h2>Количество денежных средств на счете компании = <span style={{color: 'red'}}>Загружается...</span></h2></IonTitle>
       :
       <IonTitle><h2>Количество денежных средств на счете компании = <span style={{color: 'red'}}>{sum_money}</span> рублей</h2></IonTitle>
     }
