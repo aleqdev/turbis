@@ -1,6 +1,8 @@
 import { formatDateDiff } from "../utils/fmt";
 import Hotel from "./hotel"
 import TourFeedingType from "./tour_feeding_type"
+import TourOrder from "./tour_order";
+import TourOrderPurchase from "./tour_order_purchase";
 
 export class Tour {
     id: number;
@@ -12,8 +14,8 @@ export class Tour {
     description: string;
     hotel?: Hotel;
     feeding_type?: TourFeedingType;
-    ordered?: number;
-    selled?: number;
+    ordered?: TourOrder[];
+    selled?: TourOrderPurchase[];
 
     constructor(args: {[Property in keyof Tour]: Tour[Property]}) {
         this.id = args.id;
