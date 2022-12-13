@@ -1,4 +1,4 @@
-import { IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonHeader, IonItem, IonLabel, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
   IonContent,
@@ -49,6 +49,9 @@ const Page: React.FC = () => {
             : <IonTitle>Загрузка...</IonTitle>
         }
         <TourOrderTurnoverTable/>
+        <IonItem lines='none'>
+          <span style={{color: 'gray'}}>Нажмите `Ctrl`+`Z` для обновления данных</span>
+        </IonItem>
       </IonContent>
     </IonPage>
   );

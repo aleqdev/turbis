@@ -27,8 +27,8 @@ export function PutTourOrderPaymentModal(
     if (name) {
       onDismiss({
         name: name,
-        money_received: inputTourOrder?.price,
-        tour_order_id: inputTourOrder?.id
+        money_received: inputTourOrder!.price * inputTourOrder!.people_count,
+        tour_order_id: inputTourOrder!.id
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -41,7 +41,7 @@ export function PutTourOrderPaymentModal(
       return toursOrders.status === "ok" ? toursOrders.data : null
     },
     title: "Выберите заказ",
-    formatter: (e: TourOrder) => `Заказ №${e.group_id} ${e.price} руб. <${e!.payment_type!.name}> ${Person.format(e.client?.person!)}`,
+    formatter: (e: TourOrder) => `Заказ №${e.group_id} ${e.price * e.people_count} руб. <${e!.payment_type!.name}> ${Person.format(e.client?.person!)}`,
     sorter: (e: TourOrder, query: string) => {
       return query.split(' ').reduce((value, element) => {
         element = element.toLowerCase();
@@ -96,7 +96,7 @@ export function PutTourOrderPaymentModal(
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">Сумма оплаты</IonLabel>
-          <IonInput ref={inputName} value={inputTourOrder?.price} disabled={true} type="text" placeholder="= 0 р" required/>
+          <IonInput ref={inputName} value={!inputTourOrder ? "..." : inputTourOrder!.price * inputTourOrder!.people_count} disabled={true} type="text" placeholder="= 0 р" required/>
         </IonItem>
       </IonContent>
     </>
