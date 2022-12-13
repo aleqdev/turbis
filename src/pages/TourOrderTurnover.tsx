@@ -1,4 +1,4 @@
-import { IonButtons, IonHeader, IonItem, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonMenuButton, IonModal, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Page.css';
 import {
   IonContent,
@@ -16,14 +16,22 @@ const MetaPage: React.FC = () => {
   if (!auth) {
     return <NoAuth/>
   }
-
-  dispatch(TourOrderTurnoverR.fetch(auth));
-  console.log('good', dispatch(TourOrderTurnoverR.fetch(auth)))
+  const date_begin = new Date('2022-12-15T19:28:00+03:00');
+  const date_end = new Date('2022-12-28T19:28:00+03:00');
+  dispatch(TourOrderTurnoverR.fetch(auth, date_begin, date_end));
+  console.log('данные', dispatch(TourOrderTurnoverR.fetch(auth)))
 
   return <Page/>
 }
 
 const Page: React.FC = () => {
+  const turnover = useAppSelector(state => state.tourOrderTurnover);
+
+
+  function changeFromDate(ev:any) {
+    console.log(ev)
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -38,6 +46,17 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen>
+        {
+          (turnover.status === "ok") ? 
+            <IonTitle>
+              <h2>
+                Количество полученных денежных средств на счету компании: <span style={{color: 'red'}}>{turnover.data.total_money_received}</span> рублей
+              </h2>
+            </IonTitle>
+            : <IonTitle>Загрузка...</IonTitle>
+        }
+        <IonDatetime onIonChange={ev => changeFromDate(ev)} presentation="date"></IonDatetime>
+      
         <TourOrderTurnoverTable/>
       </IonContent>
     </IonPage>

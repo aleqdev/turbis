@@ -87,13 +87,13 @@ export const panic = (error: any): PanicAction<PANIC> => ({
   error
 });
 
-export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): ThunkAction<Promise<TourOrderTurnoverState>, unknown, unknown, AnyAction> => {
+export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): ThunkAction<Promise<PromiseSettledResult<void>[] | undefined>, unknown, unknown, AnyAction> => {
   if (auth === undefined) {
     throw new Error(`\`auth\` in dispatched fetch of \`tour_order_turnover\` is \`undefined\``);
   }
 
   return async (dispatch: any) => {
-    function onSuccess(payload: any) {
+    function setEntries(payload: any) {
       const tours: Tour[] = payload.data;
       const entries = tours.map(tour => new TourOrderTurnoverEntry({
         tour_id: tour.id,
@@ -101,20 +101,24 @@ export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): T
         selled: tour.selled ?? 0,
         tour: tour
       }));
-
       dispatch(set_entries(entries));
-      return tours;
+    }
+    function setTotalMoneyReceived(payload: any) {
+      const totalMoneyReceived: number = payload.data[0].sum ?? 0;
+      dispatch(set_total_money_received(totalMoneyReceived));
     }
     function onError(error: any) {
       dispatch(panic(error));
     }
     try {
-      const success: any = await API.get_with_auth(auth, "tour?select=*,ordered:tour_order_turnover_ordered,selled:tour_order_turnover_selled,hotel(*,city(*,region(*,country(*)))),feeding_type:tour_feeding_type(*)", {
+      const fetchEntries = API.get_with_auth(auth, "tour?select=*,ordered:tour_order_turnover_ordered,selled:tour_order_turnover_selled,hotel(*,city(*,region(*,country(*)))),feeding_type:tour_feeding_type(*)", {
         date_begin,
         date_end
-      });
-      onSuccess(success);
-      return success.data;
+      }).then(setEntries);
+
+      const fetchTotalMoneyReceived = API.get_with_auth(auth, "tour_order_payment_total_money_received").then(setTotalMoneyReceived);
+
+      return await Promise.allSettled([fetchEntries, fetchTotalMoneyReceived]);
     } catch (error) {
       onError(error);
     }
