@@ -94,7 +94,6 @@ export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): T
 
   date_begin ??= new Date(0);
   date_end ??= new Date(8640000000000000);
-
   const date_begin_str = date_begin.toISOString();
   const date_end_str = date_end.toISOString();
 
