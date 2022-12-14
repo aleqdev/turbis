@@ -94,14 +94,13 @@ export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): T
 
   date_begin ??= new Date(0);
   date_end ??= new Date(8640000000000000);
-
   const date_begin_str = date_begin.toISOString();
   const date_end_str = date_end.toISOString();
 
   return async (dispatch: any) => {
     function setEntries(payload: any) {
       const tours: Tour[] = payload.data;
-      console.log(tours);
+      // console.log(tours);
       const entries = tours.map(tour => new TourOrderTurnoverEntry({
         tour_id: tour.id,
         ordered: (tour.ordered ?? []).reduce((value, el) => { return value + el.people_count }, 0),
