@@ -1,4 +1,4 @@
-import { IonButtons, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonLabel, IonMenuButton, IonModal, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonCol, IonDatetime, IonDatetimeButton, IonGrid, IonHeader, IonItem, IonLabel, IonMenuButton, IonModal, IonPage, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/react';
 
 import './Page.css';
 import {
@@ -15,6 +15,17 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import { TourOrderTurnoverEntry } from '../interface/tour_order_turnover';
 import Tour from '../interface/tour';
+import {XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries, ContinuousColorLegend, ContinuousSizeLegend, FlexibleXYPlot, VerticalBarSeries} from 'react-vis';
+import {
+  // main component
+  Chart,
+  // graphs
+  Bars, Cloud, Dots, Labels, Lines, Pies, RadialLines, Ticks, Title,
+  // wrappers
+  Layer, Animate, Transform, Handlers,
+  // helpers
+  DropShadow, Gradient
+} from 'rumble-charts';
 
 const MetaPage: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
@@ -40,7 +51,7 @@ const Page: React.FC = () => {
     dispatch(TourOrderTurnoverR.fetch(auth!))
   }, []);
   useEffect(() => {
-    const fetchEntries = API.get_with_auth(auth!, `tour?select=*,ordered:tour_order(people_count),selled:tour_order_purchase(people_count),hotel(*,city(*,region(*,country(*)))),feeding_type:tour_feeding_type(*)&ordered.crt_date=gte.${date_begin_str}&ordered.crt_date=lte.${date_end_str}&selled.crt_date=gte.${date_begin_str}&selled.crt_date=lte.${date_end_str}`).then((value) => {setTours((value as any).data)});
+    const fetchEntries = API.get_with_auth(auth!, `tour?select=*,ordered:tour_order(*),selled:tour_order_purchase(people_count),hotel(*,city(*,region(*,country(*)))),feeding_type:tour_feeding_type(*)&ordered.crt_date=gte.${date_begin_str}&ordered.crt_date=lte.${date_end_str}&selled.crt_date=gte.${date_begin_str}&selled.crt_date=lte.${date_end_str}`).then((value) => {setTours((value as any).data)});
   }, [date_begin, date_end]);
 
   function changeFromDate(ev:any) {
@@ -77,6 +88,143 @@ const Page: React.FC = () => {
     },
   ];
 
+  
+  function getDiaram(data2:any) {
+    console.log(data2)
+    let dataDiagram:any = [
+      0
+      // {data: [1,2,3], name: 'Oleg'},
+      // {data: [3,4,5], name: 'Maksim'}
+    ]
+    
+    let ticks:any = [
+      {label: 'Начало', x: 0}
+      // {label: 'Mon Dec 12 2022 23:50:01 GMT+0300 (Москва, стандартное время)', x: 0}
+    ]
+    let ticks2:any = []
+    data2.ordered.forEach((element:any, ind:any) => {
+      console.log(element)
+      ticks.push({label: 'Кол-во человек: ' + element.people_count.toString()+ '  ' + element.crt_date.toLocaleString("ru", {year: 'numeric',month: 'long', day: 'numeric',}), x: ind + 1})
+      // ticks2.push({label: element.people_count, y: ind})
+      dataDiagram.push(element.people_count)
+    });
+    
+    return <Chart
+    series={[
+      {
+        data: dataDiagram
+      }
+    ]}
+    viewBox="0 0 300 150"
+  >
+    <Handlers
+      distance="x"
+      onMouseLeave={function noRefCheck(){}}
+      onMouseMove={function noRefCheck(){}}
+    >
+      <Layer
+        height="68%"
+        position="middle center"
+        width="100%"
+      >
+        < Dots label='a'/>
+        <Labels
+          dotStyle={{
+            dominantBaseline: 'text-after-edge',
+            fontFamily: 'sans-serif',
+            fontSize: '0.65em',
+            textAnchor: 'middle'
+          }}
+          label={function noRefCheck(){}}
+          labelAttributes={{
+            y: -2
+          }}
+
+    />
+        <Lines
+          colors={[
+            '#007696'
+          ]}
+          interpolation="cardinal"
+          lineAttributes={{
+            strokeLinecap: 'round',
+            strokeWidth: 5
+          }}
+          lineWidth={0}
+        />
+        
+        <Ticks
+      axis="y"
+      labelAttributes={{
+        x: 10
+      }}
+      labelStyle={{
+        dominantBaseline: 'middle',
+        fill: 'lightgray',
+        textAnchor: 'end',
+        // fill: '#000',
+        fontFamily: 'sans-serif',
+        fontSize: 10,
+      }}
+      lineLength="50%"
+      lineStyle={{
+        stroke: 'lightgray'
+      }}
+      ticks={ticks2}
+      lineVisible={false}
+    />
+        <Ticks
+          axis="x"
+          labelAttributes={{
+            y: '2em',
+          }}
+          labelStyle={{
+            dominantBaseline: 'text-after-edge',
+            fill: '#000',
+            fontFamily: 'sans-serif',
+            fontSize: 4,
+            fontWeight: 'normal',
+            textAnchor: 'middle'
+          }}
+          ticks={ticks}
+        />
+      </Layer>
+    </Handlers>
+  </Chart>
+  //   return <XYPlot
+  //   width={300}
+  //   height={300}>
+  //   <HorizontalGridLines />
+  //   {/* <LineSeries
+  //     data={dataDiagram} startTitle="Диаграмма 2" /> */}
+  // <FlexibleXYPlot>
+  //     <VerticalBarSeries data={dataDiagram} />
+  // </FlexibleXYPlot>
+  //   {/* <XAxis title="Дата"/>
+  //   <YAxis title="Кол-во заказов"/> */}
+  // </XYPlot>
+  }
+    
+  
+  const ExpandedDiagram = ({ data }: { data: any}) => {
+    return (
+      <IonGrid>
+        <IonGrid>
+          <IonRow>
+            <IonCol>{'ID:'}</IonCol>
+            <IonCol size='10'>{data.id}</IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>{'Диаграмма заказов:'}</IonCol>
+            <IonCol size='10'>
+              {getDiaram(data)}
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </IonGrid>
+    );
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -93,11 +241,11 @@ const Page: React.FC = () => {
       <IonContent fullscreen>
         { 
           (turnover.status === "ok") ? 
-            <IonTitle>
+            <IonText>
               <h2>
                 Количество полученных денежных средств на счету компании: <span style={{color: 'red'}}>{turnover.data.total_money_received}</span> рублей
               </h2>
-            </IonTitle>
+            </IonText>
             : <IonTitle>Загрузка...</IonTitle>
         }
         <br /><br /><IonTitle>Период отчета</IonTitle>
@@ -115,6 +263,7 @@ const Page: React.FC = () => {
           <IonDatetime onIonChange={ev => changeEndDate(ev)} presentation='date' id="datetime2"></IonDatetime>
         </IonModal>
       </IonItem>
+      
       <IonList>
       {
         (tours.status === "loading") ? <IonTitle>Загрузка...</IonTitle> :
@@ -125,6 +274,7 @@ const Page: React.FC = () => {
             print={true}
             export={true}
             exportHeaders={true}
+            fileName={'Отчет об оборотах туров'}
             filterPlaceholder="Поиск"
           >
           <DataTable
@@ -136,6 +286,8 @@ const Page: React.FC = () => {
             highlightOnHover
             noDataComponent="Пусто"
             paginationComponentOptions={{rowsPerPageText: "Высота таблицы"}}
+            expandableRows
+            expandableRowsComponent={ExpandedDiagram}
           />
          </DataTableExtensions>
       }
