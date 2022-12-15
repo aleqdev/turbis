@@ -1,5 +1,5 @@
 import { IonCol, IonGrid, IonItem, IonRow } from "@ionic/react";
-import React from "react";
+import React, { useMemo } from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import { TourOrderTurnoverEntry } from "../../interface/tour_order_turnover";
 import { formatDate } from "../../utils/fmt";
@@ -58,7 +58,7 @@ function getDiaram(e: TourOrderTurnoverEntry) {
       .filter(e => e.crt_date >= date.subtract(1, 'month').toDate() && e.crt_date < date.toDate())
       .reduce((value, el) => value + el.people_count, 0);
   });
-
+  
   return (
     <Plot 
       data={[
@@ -87,6 +87,8 @@ function getDiaram(e: TourOrderTurnoverEntry) {
 }
 
 const ExpandedElement = ({ data }: { data: any}) => {
+  const diagram = useMemo(() => getDiaram(data), [data])
+
   return (
     <IonGrid>
       <IonGrid>
@@ -96,7 +98,7 @@ const ExpandedElement = ({ data }: { data: any}) => {
         </IonRow>
         <IonRow class="ion-justify-content-center">
           <IonCol size='7'>
-            {getDiaram(data)}
+            {diagram}
           </IonCol>
         </IonRow>
       </IonGrid>

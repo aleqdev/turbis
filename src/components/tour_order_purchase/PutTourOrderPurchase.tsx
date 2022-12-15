@@ -14,6 +14,7 @@ import Client from '../../interface/client';
 import TourOrderPaymentType from '../../interface/tour_order_payment_type';
 import Tour from '../../interface/tour';
 import { isNaturalNumber } from '../../utils/checks';
+import { DatabaseAuth } from '../../interface/database_auth';
 
 export function PutTourOrderPurchaseModal(
   {auth, onDismiss}: AuthProps & {
@@ -29,6 +30,7 @@ export function PutTourOrderPurchaseModal(
   const [inputTourPrice, setInputTourPrice] = useState(0 as number | null);
   const [inputTour, setInputTour] = useState(null as Tour | null);
   const [inputReservationsConfirmed, setInputReservationsConfirmed] = useState(false);
+  const [inputTourOrder, setInputTourOrder] = useState(null as TourOrder | null);
 
   const [totalCost, setTotalCost] = useState(null as number | null);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
@@ -101,7 +103,7 @@ export function PutTourOrderPurchaseModal(
   }, []);
 
   function confirm() {
-    if (inputPaymentType && inputClient) {
+    if (inputPaymentType && inputClient && inputTourOrder) {
       onDismiss({
         client_id: inputClient.id,
         payment_type_id: inputPaymentType.id,
@@ -110,7 +112,7 @@ export function PutTourOrderPurchaseModal(
         people_count: inputPeopleCount,
         group_id: 1,
         reservations_confirmed: inputReservationsConfirmed,
-
+        tour_order: inputTourOrder
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -179,6 +181,7 @@ export function PutTourOrderPurchaseModal(
           setInputClient(order.client!);
           setInputPaymentType(order.payment_type!);
           setInputReservationsConfirmed(false);
+          setInputTourOrder(order);
         }
       },
     });
@@ -265,6 +268,10 @@ export function PutTourOrderPurchaseModal(
 export const PutTourOrderPurchaseModalController: React.FC = () => {
   const auth = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(tourOrdersR.fetch(auth as DatabaseAuth));
+  }, []);
   
   const [present, dismiss] = useIonModal(PutTourOrderPurchaseModal, {
     auth,
@@ -289,17 +296,17 @@ export const PutTourOrderPurchaseModalController: React.FC = () => {
               group_id: ev.detail.data.group_id,
               reservations_confirmed: ev.detail.data.reservations_confirmed
             })
+            .then(async (_) => {
+              await API
+                .patch_with_auth(auth!, `tour_order?id=eq.${ev.detail.data.tour_order.id}`, {
+                  status: ev.detail.data.tour_order.status === "only-selled" ? "completed" : "only-purchased"
+                })
+            })
             .then((_) => {
               presentAlert({
                 header: "Данные о продаже тура добавлены",
                 buttons: ["Ок"]
               });
-            })
-            .then((_) => {
-              return API
-                .patch_with_auth(auth!, `tour_order?id=eq.${ev.detail.data.tour_order_id}`, {
-                  status: ev.detail.data.tour_order.status === "only-selled" ? "completed" : "only-purchased"
-                })
             })
             .catch((error) => {
               presentAlert({

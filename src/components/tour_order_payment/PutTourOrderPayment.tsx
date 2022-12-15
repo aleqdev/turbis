@@ -28,7 +28,8 @@ export function PutTourOrderPaymentModal(
       onDismiss({
         name: name,
         money_received: inputTourOrder!.price * inputTourOrder!.people_count,
-        tour_order_id: inputTourOrder!.id
+        tour_order_id: inputTourOrder!.id,
+        tour_order: inputTourOrder!
       }, 'confirm');
     } else {
       setErrorMessage("Не все поля заполнены!")
@@ -125,8 +126,8 @@ export const PutTourOrderPaymentModalController: React.FC = () => {
               tour_order_id: ev.detail.data.tour_order_id,
               money_received: ev.detail.data.money_received
             })
-            .then((_) => {
-              return API
+            .then(async (_) => {
+              await API
                 .patch_with_auth(auth!, `tour_order?id=eq.${ev.detail.data.tour_order_id}`, {
                   status: ev.detail.data.tour_order.status === "only-purchased" ? "completed" : "only-selled"
                 })
@@ -138,6 +139,7 @@ export const PutTourOrderPaymentModalController: React.FC = () => {
               });
             })
             .catch((error) => {
+              console.log(error);
               presentAlert({
                 header: "Ошибка",
                 subHeader: error.response.statusText,
