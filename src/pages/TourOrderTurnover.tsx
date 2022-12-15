@@ -35,7 +35,7 @@ const Page: React.FC = () => {
       dateBeginUnbounded ? new Date(0) : dateBegin, 
       dateEndUnbounded ? new Date(8640000000000000) : dateEnd
     ));
-  }, [dateBegin, dateEnd]);
+  }, [dateBegin, dateEnd, dateBeginUnbounded, dateEndUnbounded]);
 
   return (
     <IonPage>
