@@ -54,6 +54,9 @@ export function process_error_hint(resp: AxiosResponse<any, any>): string {
       case "22001":
         return "Введённое поле больше максимума, отведённого для него."
 
+      case "23505":
+        return "Запись не может быть создана, так как она уже имеется."
+
       default:
         return JSON.stringify(body)
     }

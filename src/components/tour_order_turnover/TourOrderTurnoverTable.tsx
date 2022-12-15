@@ -58,7 +58,7 @@ function getDiaram(e: TourOrderTurnoverEntry) {
       .filter(e => e.crt_date >= date.subtract(1, 'month').toDate() && e.crt_date < date.toDate())
       .reduce((value, el) => value + el.people_count, 0);
   });
-  
+
   return (
     <Plot 
       data={[
@@ -80,7 +80,7 @@ function getDiaram(e: TourOrderTurnoverEntry) {
         },
       ]}
       layout={{
-        title: 'График продаж/заказов по месяцам',
+        title: 'График продаж/заказов по месяцам в течении года',
       }}
     />
   );
@@ -109,7 +109,7 @@ const ExpandedElement = ({ data }: { data: any}) => {
 export const TourOrderTurnoverTable: React.FC = () => {
   return (
     <Table 
-      title="Сведенья об оборотах туров:"
+      title="Сведенья о турах:"
       selector={state => {
         const turnover = state.tourOrderTurnover;
         return turnover.status === "ok" ? turnover.data.entries : []

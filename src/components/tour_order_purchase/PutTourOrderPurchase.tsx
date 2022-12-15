@@ -294,7 +294,8 @@ export const PutTourOrderPurchaseModalController: React.FC = () => {
               price: ev.detail.data.price,
               people_count: ev.detail.data.people_count,
               group_id: ev.detail.data.group_id,
-              reservations_confirmed: ev.detail.data.reservations_confirmed
+              reservations_confirmed: ev.detail.data.reservations_confirmed,
+              tour_order_id: ev.detail.data.tour_order.id,
             })
             .then(async (_) => {
               await API
