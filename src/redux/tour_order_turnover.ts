@@ -102,8 +102,8 @@ export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): T
       const tours: Tour[] = payload.data;
       const entries = tours.map(tour => new TourOrderTurnoverEntry({
         tour_id: tour.id,
-        ordered: (tour.ordered ?? []).reduce((value, el) => { return value + el.people_count }, 0),
-        selled: (tour.selled ?? []).reduce((value, el) => { return value + el.people_count }, 0),
+        ordered: tour.ordered ?? [],
+        selled: tour.selled ?? [],
         tour: tour
       }));
       dispatch(set_entries(entries));

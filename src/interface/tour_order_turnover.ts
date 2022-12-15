@@ -1,9 +1,11 @@
 import Tour from "./tour";
+import TourOrder from "./tour_order";
+import TourOrderPurchase from "./tour_order_purchase";
 
 export class TourOrderTurnoverEntry {
   tour_id: number;
-  ordered: number;
-  selled: number;
+  ordered: TourOrder[];
+  selled: TourOrderPurchase[];
   tour?: Tour;
 
   constructor(args: {[Property in keyof TourOrderTurnoverEntry]: TourOrderTurnoverEntry[Property]}) {

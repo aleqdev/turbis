@@ -9,7 +9,7 @@ import API from '../../utils/server';
 import { SelectWithSearchModal } from '../SelectWithSearch';
 import { formatDate, formatDateDiff } from '../../utils/fmt';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { process_error_hint } from '../../utils/process_erros_hints';
 import presentNoAuthAlert from '../../utils/present_no_auth_alert';
 import { toursR, tourFeedingTypesR, hotelsR } from '../../redux/store';
@@ -113,8 +113,8 @@ export function PatchTourModal(
     if (inputHotel && inputFeedingType && arrivalDate && departureDate && cost && description) {
       onDismiss({
         id: tour!.id,
-        arrivalDate: moment(arrivalDate, "DD-MM-YYYY"),
-        departureDate: moment(departureDate, "DD-MM-YYYY"),
+        arrivalDate: dayjs(arrivalDate, "DD-MM-YYYY"),
+        departureDate: dayjs(departureDate, "DD-MM-YYYY"),
         description,
         cost,
         feedingType: inputFeedingType,
@@ -127,8 +127,8 @@ export function PatchTourModal(
 
   function calcDiff() {
     if (inputDepartureDate?.current?.value && inputArrivalDate?.current?.value) {
-      const inputArrival = moment(inputArrivalDate.current.value as string, "DD-MM-YYYY").toDate();
-      const inputDeparture = moment(inputDepartureDate.current.value as string, "DD-MM-YYYY").toDate();
+      const inputArrival = dayjs(inputArrivalDate.current.value as string, "DD-MM-YYYY").toDate();
+      const inputDeparture = dayjs(inputDepartureDate.current.value as string, "DD-MM-YYYY").toDate();
       if (inputDeparture.getTime() - inputArrival.getTime() > 0) {
         setDiff(formatDateDiff(inputArrival, inputDeparture));
       }

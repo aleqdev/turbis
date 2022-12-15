@@ -254,7 +254,7 @@ export function PutTourOrderPurchaseModal(
             <IonInput value={totalCost === null ? "" : `= ${totalCost}₽`} disabled/>
         </IonItem>
         <IonItem lines='none'>
-          <IonCheckbox slot="start" onIonChange={(ev) => setInputReservationsConfirmed(ev.detail.value)}></IonCheckbox>
+          <IonCheckbox slot="start" onIonChange={(ev) => setInputReservationsConfirmed(ev.detail.checked)}></IonCheckbox>
           <IonLabel>Бронь номеров подтверждена в отеле</IonLabel>
         </IonItem>
       </IonContent>
