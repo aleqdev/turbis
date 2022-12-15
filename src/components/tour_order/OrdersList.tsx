@@ -8,6 +8,7 @@ import { formatDate } from "../../utils/fmt";
 import Person from "../../interface/person";
 import { DatabaseAuth } from "../../interface/database_auth";
 import { PatchTourModalFn } from "../tour/PatchTour";
+import { IonItem } from "@ionic/react";
 
 function makeListColumns(openPatchTour: () => void, dispatch: ReturnType<typeof useAppDispatch>, auth: DatabaseAuth) {
   return [
@@ -35,20 +36,45 @@ function makeListColumns(openPatchTour: () => void, dispatch: ReturnType<typeof 
       selector: "person",
       sortable: true,
       wrap: true,
-      cell: (e: TourOrder) => `${Person.format(e.client?.person!)} <${e.client?.type?.name}>`
+      cell: (e: TourOrder) => {
+        return (
+          <IonItem routerLink={`/page/Clients`} lines='none'>
+            <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+              {`${Person.format(e.client?.person!)} <${e.client?.type?.name}>`}
+            </small>
+          </IonItem>
+        )
+      }
     },
     {
       name: "Вид оплаты",
       selector: "payment_type.name",
       sortable: true,
-      wrap: true
+      wrap: true,
+      cell: (e: TourOrder) => {
+        return (
+          <IonItem routerLink={`/page/TourOrderPaymentTypes`} lines='none'>
+            <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+              {`${e.payment_type!.name}`}
+            </small>
+          </IonItem>
+        )
+      }
     },
     {
       name: "Тур",
       selector: "tour",
       sortable: true,
       wrap: true,
-      cell: (e: TourOrder) => `${e.tour?.hotel?.name} (с ${formatDate(e.tour?.arrival_date!)} по ${formatDate(e.tour?.departure_date!)})`
+      cell: (e: TourOrder) => {
+        return (
+          <IonItem routerLink={`/page/Tours`} lines='none'>
+            <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+              {`${e.tour?.hotel?.name} (с ${formatDate(e.tour?.arrival_date!)} по ${formatDate(e.tour?.departure_date!)})`}
+            </small>
+          </IonItem>
+        )
+      }
     },
     {
       name: "Цена",

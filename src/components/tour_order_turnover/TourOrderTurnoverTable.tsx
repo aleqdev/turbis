@@ -1,4 +1,4 @@
-import { IonCol, IonGrid, IonItem, IonRow } from "@ionic/react";
+import { IonCol, IonGrid, IonItem, IonLabel, IonRow } from "@ionic/react";
 import React, { useMemo } from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import { TourOrderTurnoverEntry } from "../../interface/tour_order_turnover";
@@ -6,6 +6,7 @@ import { formatDate } from "../../utils/fmt";
 import { Table } from "../table_management/Table";
 import dayjs from "dayjs";
 import Plot from 'react-plotly.js';
+import Person from "../../interface/person";
 
 const listColumns = [
   {
@@ -30,7 +31,7 @@ const listColumns = [
   },
 ];
 
-function getDiaram(e: TourOrderTurnoverEntry) {
+function getDiagram(e: TourOrderTurnoverEntry) {
   const dates = [
     dayjs(),
     dayjs().subtract(1, 'month'),
@@ -86,22 +87,58 @@ function getDiaram(e: TourOrderTurnoverEntry) {
   );
 }
 
-const ExpandedElement = ({ data }: { data: any}) => {
-  const diagram = useMemo(() => getDiaram(data), [data])
+const ExpandedElement = ({ data }: { data: TourOrderTurnoverEntry }) => {
+  if (data === undefined) {
+    return <></>
+  }
+  
+  const diagram = useMemo(() => getDiagram(data), [data])
 
   return (
     <IonGrid>
-      <IonGrid>
-        <IonRow>
-          <IonCol>{'ID:'}</IonCol>
-          <IonCol size='10'>{data.tour_id}</IonCol>
-        </IonRow>
-        <IonRow class="ion-justify-content-center">
-          <IonCol size='7'>
-            {diagram}
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+      <IonRow>
+        <IonCol>{'ID тура:'}</IonCol>
+        <IonCol size='10'>{data.tour_id}</IonCol>
+      </IonRow>
+      <IonRow class="ion-justify-content-center">
+        <IonCol size='7'>
+          {diagram}
+        </IonCol>
+      </IonRow>
+      <IonCol>{`Заказано: (${data.ordered.length})`}</IonCol>
+      {
+        data.ordered.map(o => {
+          return (
+            <IonCol>
+              <IonGrid>
+                <IonRow>
+                  <IonCol>{`ID: ${o.id}`}</IonCol>
+                  <IonCol>{`${Person.format(o.client?.person!)}`}</IonCol>
+                  <IonCol>{`${formatDate(o.crt_date)}`}</IonCol>
+                  <IonCol>{`${o.people_count} чел.`}</IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonCol>
+          )
+        })
+      }
+      <IonCol>{`Продано: (${data.selled.length})`}</IonCol>
+      {
+        data.selled.map(o => {
+          return (
+            <IonCol>
+              <IonGrid>
+                <IonRow>
+                  <IonCol>{`ID: ${o.id}`}</IonCol>
+                  <IonCol>{`${Person.format(o.client?.person!)}`}</IonCol>
+                  <IonCol>{`${formatDate(o.crt_date)}`}</IonCol>
+                  <IonCol>{`${o.people_count} чел.`}</IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonCol>
+          )
+        })
+      }
     </IonGrid>
   );
 }

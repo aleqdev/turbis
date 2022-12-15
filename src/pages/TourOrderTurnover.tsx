@@ -24,7 +24,7 @@ const MetaPage: React.FC = () => {
 const Page: React.FC = () => {
   const dispatch = useAppDispatch();
   const [auth, turnover] = useAppSelector(state => [state.auth, state.tourOrderTurnover]);
-  const [dateBegin, setDateBegin] = React.useState(dayjs().subtract(1, 'year').toDate());
+  const [dateBegin, setDateBegin] = React.useState(dayjs().toDate());
   const [dateEnd, setDateEnd] = React.useState(dayjs().toDate());
   const [dateBeginUnbounded, setDateBeginUnbounded] = React.useState(true);
   const [dateEndUnbounded, setDateEndUnbounded] = React.useState(true);

@@ -116,7 +116,7 @@ export const fetch = (auth: DatabaseAuth, date_begin?: Date, date_end?: Date): T
       dispatch(panic(error));
     }
     try {
-      const fetchEntries = API.get_with_auth(auth, `tour?select=*,ordered:tour_order(*),selled:tour_order_purchase(*),hotel(*,city(*,region(*,country(*)))),feeding_type:tour_feeding_type(*)&ordered.crt_date=gte.${date_begin_str}&ordered.crt_date=lte.${date_end_str}&selled.crt_date=gte.${date_begin_str}&selled.crt_date=lte.${date_end_str}`).then(setEntries);
+      const fetchEntries = API.get_with_auth(auth, `tour?select=*,ordered:tour_order(*,client(*,person(*))),selled:tour_order_purchase(*,client(*,person(*))),hotel(*,city(*,region(*,country(*)))),feeding_type:tour_feeding_type(*)&ordered.crt_date=gte.${date_begin_str}&ordered.crt_date=lte.${date_end_str}&selled.crt_date=gte.${date_begin_str}&selled.crt_date=lte.${date_end_str}`).then(setEntries);
       const fetchTotalMoneyReceived = API.get_with_auth(auth, "tour_order_payment_total_money_received").then(setTotalMoneyReceived);
 
       return await Promise.allSettled([fetchEntries, fetchTotalMoneyReceived]);

@@ -1,4 +1,4 @@
-import { IonCol, IonGrid, IonRow } from "@ionic/react";
+import { IonCol, IonGrid, IonItem, IonRow } from "@ionic/react";
 import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import City from "../../interface/city";
@@ -17,13 +17,29 @@ const listColumns = [
     name: "Местоположение",
     selector: "city",
     sortable: true,
-    cell: City.makeFormatter("city")
+    cell: (e: Hotel) => {
+      return (
+        <IonItem routerLink={`/page/Regions`} lines='none'>
+          <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+            {`${City.format(e, 'city')}`}
+          </small>
+        </IonItem>
+      )
+    }
   },
   {
     name: "Владелец",
     selector: "owner",
     sortable: true,
-    cell: Person.makeFormatter("owner")
+    cell: (e: Hotel) => {
+      return (
+        <IonItem routerLink={`/page/Persons`} lines='none'>
+          <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+            {`${Person.format(e, 'owner')}`}
+          </small>
+        </IonItem>
+      )
+    }
   },
 ];
 

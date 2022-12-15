@@ -17,10 +17,10 @@ function makeListColumns(openPatchTourOrder: () => void, dispatch: ReturnType<ty
       wrap: true,
       cell: (e: TourOrderPayment) => {
         return (
-          <IonItem routerLink={`/page/TourOrders`}>
-            <a style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+          <IonItem routerLink={`/page/TourOrders`} lines='none'>
+            <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
               {`${e.order!.tour!.hotel!.name}, ${e.order!.tour!.hotel!.city!.name} (${Person.format(e.order!.client!.person!)} <${e.order!.client!.type!.name})>`}
-            </a>
+            </small>
           </IonItem>
         )
       }

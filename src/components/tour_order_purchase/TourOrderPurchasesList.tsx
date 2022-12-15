@@ -5,6 +5,7 @@ import { Table } from "../table_management/Table";
 import TourOrderPurchase from "../../interface/tour_order_purchase";
 import Person from "../../interface/person";
 import { formatDate } from "../../utils/fmt";
+import { IonItem } from "@ionic/react";
 
 const listColumns = [
   {
@@ -25,20 +26,45 @@ const listColumns = [
     selector: "client",
     sortable: true,
     wrap: true,
-    cell: (e: TourOrderPurchase) => `${Person.format(e!.client!.person!)} <${e!.client!.type!.name}>`
+    cell: (e: TourOrderPurchase) => {
+      return (
+        <IonItem routerLink={`/page/Clients`} lines='none'>
+          <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+            {`${Person.format(e!.client!.person!)} <${e!.client!.type!.name}>`}
+          </small>
+        </IonItem>
+      )
+    }
   },
   {
     name: "Вид оплаты",
     selector: "payment_type.name",
     sortable: true,
-    wrap: true
+    wrap: true,
+    cell: (e: TourOrderPurchase) => {
+      return (
+        <IonItem routerLink={`/page/TourOrderPaymentTypes`} lines='none'>
+          <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+            {`${e.payment_type?.name}`}
+          </small>
+        </IonItem>
+      )
+    }
   },
   {
     name: "Тур",
     selector: "tour",
     sortable: true,
     wrap: true,
-    cell: (e: TourOrderPurchase) => `${e!.tour!.hotel!.name}`
+    cell: (e: TourOrderPurchase) => {
+      return (
+        <IonItem routerLink={`/page/Hotels`} lines='none'>
+          <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+            {`${e!.tour!.hotel!.name}`}
+          </small>
+        </IonItem>
+      )
+    }
   },
   {
     name: "Цена",

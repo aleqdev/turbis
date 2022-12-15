@@ -1,3 +1,4 @@
+import { IonItem } from "@ionic/react";
 import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import Employee from "../../interface/employee";
@@ -41,7 +42,16 @@ const listColumns = [
     name: "Роль",
     selector: "role.name",
     sortable: true,
-    wrap: true
+    wrap: true,
+    cell: (e: Employee) => {
+      return (
+        <IonItem routerLink={`/page/EmployeeRoles`} lines='none'>
+          <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+            {`${e.role!.name}`}
+          </small>
+        </IonItem>
+      )
+    }
   }
 ];
 

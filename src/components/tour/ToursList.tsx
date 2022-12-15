@@ -1,4 +1,4 @@
-import { IonCol, IonGrid, IonRow } from "@ionic/react";
+import { IonCol, IonGrid, IonItem, IonRow } from "@ionic/react";
 import React from "react";
 import 'react-data-table-component-extensions/dist/index.css';
 import Tour from "../../interface/tour";
@@ -17,7 +17,16 @@ const listColumns = [
     name: "Отель",
     selector: "hotel.name",
     sortable: true,
-    wrap: true
+    wrap: true,
+    cell: (e: Tour) => {
+      return (
+        <IonItem routerLink={`/page/Hotels`} lines='none'>
+          <small style={{textDecoration: "underline", color: "#F60", cursor: "pointer"}}>
+            {`${e.hotel?.name}`}
+          </small>
+        </IonItem>
+      )
+    }
   },
   {
     name: "Дата заезда",
@@ -89,7 +98,7 @@ const ExpandedTour = ({ data }: { data: any}) => {
         </IonRow>
         <IonRow>
           <IonCol>{'Стоимость:'}</IonCol>
-          <IonCol size='10'>{`${data.cost} руб.`}</IonCol>
+          <IonCol size='10'>{`${data.price} руб.`}</IonCol>
         </IonRow>
         <IonRow>
           <IonCol>{'Описание:'}</IonCol>
